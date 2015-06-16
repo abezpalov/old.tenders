@@ -9,15 +9,18 @@ class Runner:
 	name = 'Обновление с сайта государственных закупок России'
 	alias = 'zakupki-gov-ru'
 
+	urls = {
+		'base':    'ftp.zakupki.gov.ru',
+		'lists':   'fcs_nsi',
+		'regions': 'fcs_regions'
+	}
+
 	def __init__(self):
 
 		# Загрузчик
 		self.updater = Updater.objects.take(
 			alias = self.alias,
 			name  = self.name)
-
-		self.url = 'ftp.zakupki.gov.ru'
-
 
 	def run(self):
 
@@ -39,16 +42,21 @@ class Runner:
 		for region in regions:
 
 			if region != '_logs':
-				region = Region.objects.take(alias = region, name = region, full_name = region)
+				region = Region.objects.take(
+					alias = region,
+					name = region,
+					full_name = region)
 
 				if region.state:
-					content = self.getFTPCatalog('fcs_regions/{}'.format(region.alias))
-					print(region.name)
-					print(content)
-					print('\n')
 
 					# Ждем, чтобы не получить отбой сервера
 					time.sleep(10)
+
+					# Получаем содержимое каталога
+					content = self.getFTPCatalog('{}/{}'.format(self.urls['regions'], region.alias))
+					print(region.name)
+					print(content)
+					print('\n')
 
 		# TODO
 
@@ -62,7 +70,7 @@ class Runner:
 
 		# Подключаемся
 		ftp = FTP(
-			host   = self.url,
+			host   = self.urls['base'],
 			user   = self.updater.login,
 			passwd = self.updater.password)
 

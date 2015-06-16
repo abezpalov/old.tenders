@@ -61,13 +61,6 @@ class Country(models.Model):
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
 	objects   = CountryManager()
-	
-	def __init__(self):
-
-		self.RUS = Country.objects.take(
-			alias     = 'RUS',
-			name      = 'Россия',
-			full_name = 'Российская федерация')
 
 	def __str__(self):
 		return self.name

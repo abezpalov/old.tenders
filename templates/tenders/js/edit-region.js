@@ -15,10 +15,10 @@ $("body").delegate("[data-do='open-edit-region']", "click", function(){
 
 				// Заполняем значение полей
 				$('#edit-region-id').val(data.region['id']);
-				$('#edit-region-name').val(data.region'name']);
+				$('#edit-region-name').val(data.region['name']);
 				$('#edit-region-full-name').val(data.region['full_name']);
 				$('#edit-region-alias').val(data.region['alias']);
-				$('#edit-region-country').val(data.region['counry']);
+				$('#edit-region-country').val(data.region['country']['id']);
 				$('#edit-region-state').prop('checked', data.region['state']);
 
 				// Открываем окно

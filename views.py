@@ -229,7 +229,11 @@ def ajaxGetRegion(request):
 			region['country']['alias'] = r.counry.alias
 			region['country']['state'] = r.counry.state
 		else:
+			region['country'] = {}
 			region['country']['id'] = 0
+			region['country']['name']  = ''
+			region['country']['alias'] = ''
+			region['country']['state'] = ''
 
 		result = {
 			'status':  'success',
@@ -251,7 +255,7 @@ def ajaxSaveRegion(request):
 	import json
 	import unidecode
 	from django.utils import timezone
-	from tenders.models import Region
+	from tenders.models import Region, Country
 
 	# Проверяем тип запроса
 	if (not request.is_ajax()) or (request.method != 'POST'):
