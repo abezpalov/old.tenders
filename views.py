@@ -146,7 +146,7 @@ def ajaxSwitchUpdaterState(request):
 		return HttpResponse(status=400)
 
 	# Проверяем права доступа
-	if not request.user.has_perm('catalog.change_updater'):
+	if not request.user.has_perm('tenders.change_updater'):
 		result = {
 			'status': 'alert',
 			'message': 'Ошибка 403: отказано в доступе.'}
@@ -166,6 +166,184 @@ def ajaxSwitchUpdaterState(request):
 			result = {'status': 'success', 'message': 'Статус загрузчика {} изменен на {}.'.format(updater.name, updater.state)}
 		except Updater.DoesNotExist:
 			result = {'status': 'alert', 'message': 'Загрузчик с идентификатором {} отсутствует в базе.'.format(request.POST.get('updater_id'))}
+
+	# Возвращаем ответ
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+# Region
+
+
+def regions(request):
+	"Представление: список загрузчиков."
+
+	# Импортируем
+	from tenders.models import Region, Country
+
+	# Проверяем права доступа
+	if request.user.has_perm('tenders.add_region')\
+	or request.user.has_perm('tenders.change_region')\
+	or request.user.has_perm('tenders.delete_region'):
+
+		# Получаем списки объектов
+		regions   = Region.objects.all()
+		countries = Country.objects.all()
+
+	return render(request, 'tenders/regions.html', locals())
+
+
+def ajaxGetRegion(request):
+	"AJAX-представление: Get Region."
+
+	# Импортируем
+	import json
+	from tenders.models import Region
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_region')\
+	and not request.user.has_perm('tenders.delete_region'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Получаем объект
+	try:
+		r = Region.objects.get(id = request.POST.get('region_id'))
+
+		region = {}
+		region['id']        = r.id
+		region['name']      = r.name
+		region['full_name'] = r.full_name
+		region['alias']     = r.alias
+		region['state']     = r.state
+
+		if r.country:
+			region['country'] = {}
+			region['country']['id']    = r.country.id
+			region['country']['name']  = r.counry.name
+			region['country']['alias'] = r.counry.alias
+			region['country']['state'] = r.counry.state
+		else:
+			region['country']['id'] = 0
+
+		result = {
+			'status':  'success',
+			'message': 'Данные региона получены.',
+			'region':  region}
+
+	except Region.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: регион отсутствует в базе.'}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSaveRegion(request):
+	"AJAX-представление: Save Region."
+
+	# Импортируем
+	import json
+	import unidecode
+	from django.utils import timezone
+	from tenders.models import Region
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status = 400)
+
+	# Проверяем права доступа
+	try:
+		region = Region.objects.get(id = request.POST.get('region_id'))
+		if not request.user.has_perm('tenders.change_region'):
+			return HttpResponse(status = 403)
+	except Region.DoesNotExist:
+		region = Region()
+		if not request.user.has_perm('tenders.add_region'):
+			return HttpResponse(status = 403)
+		region.created = timezone.now()
+
+	# name
+	if not request.POST.get('region_name').strip():
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: отсутствует наименование.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+	region.name   = request.POST.get('region_name').strip()[:100]
+
+	# full_name
+	if request.POST.get('region_full_name').strip():
+		region.full_name = request.POST.get('region_full_name').strip()[:100]
+	else:
+		region.full_name = request.POST.get('region_name').strip()[:100]
+
+	# alias
+	if request.POST.get('region_alias').strip():
+		region.alias = unidecode.unidecode(request.POST.get('region_alias')).strip()[:100]
+	else:
+		region.alias = unidecode.unidecode(request.POST.get('region_name')).strip()[:100]
+
+	# country
+	try:
+		region.country = Country.objects.get(id = request.POST.get('region_country_id'))
+	except Country.DoesNotExist:
+		region.country = None
+
+	# state
+	if request.POST.get('region_state') == 'true':
+		region.state = True
+	else:
+		region.state = False
+
+	# modified
+	region.modified = timezone.now()
+
+	# Сохраняем
+	region.save()
+
+	# Возвращаем ответ
+	result = {
+		'status': 'success',
+		'message': 'Регион {} сохранён.'.format(region.name)}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSwitchRegionState(request):
+	"AJAX-представление: Switch Region State."
+
+	# Импортируем
+	import json
+	from datetime import datetime
+	from tenders.models import Region
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_region'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Проверяем корректность вводных данных
+	try:
+		region = Region.objects.get(id = request.POST.get('region_id'))
+		if request.POST.get('region_state') == 'true':
+			region.state = True
+		else:
+			region.state = False
+		region.save()
+		result = {'status': 'success', 'message': 'Статус региона {} изменен на {}.'.format(region.name, region.state)}
+	except region.DoesNotExist:
+		result = {'status': 'alert', 'message': 'Загрузчик с идентификатором {} отсутствует в базе.'.format(request.POST.get('region_id'))}
 
 	# Возвращаем ответ
 	return HttpResponse(json.dumps(result), 'application/javascript')

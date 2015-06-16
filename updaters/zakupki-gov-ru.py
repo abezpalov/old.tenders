@@ -1,7 +1,6 @@
 import time
 from datetime import date
 from django.utils import timezone
-from catalog.models import Currency
 from tenders.models import *
 
 
@@ -17,12 +16,6 @@ class Runner:
 			alias = self.alias,
 			name  = self.name)
 
-		# Основная валюта
-		self.currency = {}
-		self.currency['rub'] = Currency.objects.get(alias = 'RUB')
-		self.currency['usd'] = Currency.objects.get(alias = 'USD')
-		self.currency['eur'] = Currency.objects.get(alias = 'EUR')
-
 		self.url = 'ftp.zakupki.gov.ru'
 
 
@@ -32,6 +25,10 @@ class Runner:
 		if not self.updater.login or not self.updater.password:
 			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
 			return False
+
+		print("login: {}".format(self.updater.login))
+		print("password: {}".format(self.updater.password))
+
 
 		# Получаем список регионов с FTP-сервера
 		regions = self.getFTPCatalog('fcs_regions')
@@ -68,6 +65,7 @@ class Runner:
 			host   = self.url,
 			user   = self.updater.login,
 			passwd = self.updater.password)
+
 
 		# Авторизуемся
 		ftp.login()

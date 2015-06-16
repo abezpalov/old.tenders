@@ -67,7 +67,7 @@ class Country(models.Model):
 		self.RUS = Country.objects.take(
 			alias     = 'RUS',
 			name      = 'Россия',
-			full_name = 'Российская Федерация')
+			full_name = 'Российская федерация')
 
 	def __str__(self):
 		return self.name
@@ -95,9 +95,11 @@ class Region(models.Model):
 	name      = models.CharField(max_length = 100)
 	full_name = models.CharField(max_length = 100)
 	alias     = models.CharField(max_length = 100, unique = True)
+	country   = models.ForeignKey(Country, null = True, default = None)
 	state     = models.BooleanField(default = False)
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
+	updated   = models.DateTimeField(null = True, default = None)
 	objects   = RegionManager()
 	
 	def __str__(self):

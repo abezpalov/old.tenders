@@ -1,0 +1,38 @@
+{% if perms.tenders.add_region or perms.tenders.change_region %}
+<div id="modal-edit-region" class="reveal-modal large" data-reveal>
+
+	<input id="edit-region-id" type="hidden" value="0">
+
+	<label>Наименование
+		<input id="edit-region-name" type="text">
+	</label>
+
+	<label>Наименование (полное)
+		<input id="edit-region-full-name" type="text">
+	</label>
+
+	<label>Псевдоним (служебное поле)
+		<input id="edit-region-alias" type="text">
+	</label>
+
+	<label>Страна
+		<select id="edit-region-country">
+			<option value="0" selected> - Не определена - </option>
+			{% for country in countries %}
+			<option value="{{ country.id }}">{{ country.name }}</option>
+			{% endfor %}
+		</select>
+	</label>
+
+	<label>Статус
+		<div class="switch small">
+			<input id="edit-region-state" type="checkbox">
+			<label for="edit-region-state"></label>
+		</div>
+	</label>
+
+	<button data-do="edit-region-save" class="primary"><i class="fa fa-ok"></i>&nbsp;Сохранить</button>
+	<button data-do="edit-region-cancel" class="secondary">Отменить</button>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+{% endif %}
