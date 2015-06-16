@@ -68,15 +68,9 @@ class Runner:
 		# Импортируем
 		from ftplib import FTP
 
-		# Подключаемся
-		ftp = FTP(
-			host   = self.urls['base'],
-			user   = self.updater.login,
-			passwd = self.updater.password)
-
-
 		# Авторизуемся
-		ftp.login()
+		ftp = FTP(host = self.urls['base'])
+		ftp.login(user = self.updater.login, passwd = self.updater.password)
 
 		# Переходим в нужный каталог
 		if catalog:
