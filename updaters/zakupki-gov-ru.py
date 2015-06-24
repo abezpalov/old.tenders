@@ -10,6 +10,7 @@ class Runner:
 		'base':     'ftp.zakupki.gov.ru',
 		'essences': 'fcs_nsi',
 		'regions':  'fcs_regions',
+		'country':  'nsiOKSM',
 		'currency': 'nsiCurrency',
 		'okei':     'nsiOKEI'}
 
@@ -32,6 +33,7 @@ class Runner:
 
 		# Обновляем справочники
 #		self.getEssencesList()                                                  # Тест
+		self.updateEssence('country')
 		self.updateEssence('currency')
 		self.updateEssence('okei')
 
@@ -133,8 +135,9 @@ class Runner:
 				print("Извлек файл {} типа {} из архива {}.".format(xml_name, type(xml_data), zip_name))
 
 				# Парсим файл
-				if   'currency' == essence: self.parseCurrency(xml_data)
-				elif 'okei' == essence: self.parseOKEI(xml_data)
+				if   'country'  == essence: self.parseCountry(xml_data)
+				elif 'currency' == essence: self.parseCurrency(xml_data)
+				elif 'okei'     == essence: self.parseOKEI(xml_data)
 				# TODO
 				# TODO
 				# TODO
@@ -143,6 +146,50 @@ class Runner:
 				else: print('Ошибка: отсутствует парсер для сущности {}.'.format(essence))
 
 				print("Файл {} обработан.".format(xml_name))
+
+		return True
+
+
+	def parseCountry(self, xml_data):
+		'Парсит страны'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for country_list in root:
+
+			# Получаем элемент
+			for country in country_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in country:
+					if   value.tag.endswith('countryCode'):
+						e['code'] = value.text
+					elif value.tag.endswith('countryFullName'):
+						e['full_name'] = value.text
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				country = Country.objects.update(
+					code         = e['code'],
+					full_name    = e['full_name'],
+					state        = e['state'])
+
+				print("Обновлена страна: {}.".format(country.full_name))
 
 		return True
 

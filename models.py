@@ -53,11 +53,31 @@ class CountryManager(models.Manager):
 			country.save()
 		return country
 
+	def update(self, code, full_name, name = None, state = True):
+		try:
+			country           = self.get(code = code)
+			country.full_name = full_name
+			country.state     = state
+			country.modified  = timezone.now()
+			if name:
+				country.name  = name
+			country.save()
+		except Country.DoesNotExist:
+			country           = Country()
+			country.code      = code
+			country.name      = name
+			country.full_name = full_name
+			country.state     = state
+			country.created   = timezone.now()
+			country.modified  = timezone.now()
+			country.save()
+		return country
+
 
 class Country(models.Model):
-	name      = models.CharField(max_length = 100)
-	full_name = models.CharField(max_length = 100)
-	alias     = models.CharField(max_length = 100, unique = True)
+	code      = models.CharField(max_length = 10, unique = True)
+	name      = models.CharField(max_length = 100, null = True, default = None)
+	full_name = models.CharField(max_length = 100, null = True, default = None)
 	state     = models.BooleanField(default = True)
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
