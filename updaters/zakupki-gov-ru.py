@@ -12,7 +12,8 @@ class Runner:
 		'regions':  'fcs_regions',
 		'country':  'nsiOKSM',
 		'currency': 'nsiCurrency',
-		'okei':     'nsiOKEI'}
+		'okei':     'nsiOKEI',
+		'kosgu':    'nsiKOSGU'}
 
 
 	def __init__(self):
@@ -33,13 +34,14 @@ class Runner:
 
 		# Обновляем справочники
 #		self.getEssencesList()                                                  # Тест
+
 		self.updateEssence('country')
+		self.updateRegions()
 		self.updateEssence('currency')
 		self.updateEssence('okei')
+		self.updateEssence('kosgu')
 
 
-		# Обновляем список регионов
-		self.updateRegions()
 
 		# Обновляем планы регионов
 		# TODO
@@ -51,7 +53,7 @@ class Runner:
 
 
 	def getFTPCatalog(self, catalog = None):
-		'Возврящает содержимое папки'
+		'Возвращает содержимое папки'
 
 		# Импортируем
 		from ftplib import FTP
@@ -138,6 +140,7 @@ class Runner:
 				if   'country'  == essence: self.parseCountry(xml_data)
 				elif 'currency' == essence: self.parseCurrency(xml_data)
 				elif 'okei'     == essence: self.parseOKEI(xml_data)
+				elif 'kosgu'    == essence: self.parseKOSGU(xml_data)
 				# TODO
 				# TODO
 				# TODO
@@ -334,9 +337,74 @@ class Runner:
 					international_name   = e['international_name'],
 					local_symbol         = e['local_symbol'],
 					international_symbol = e['international_symbol'],
-					state                = True)
+					state                = e['state'])
 
 				print("Обновлена единица измерения: {}.".format(okei.full_name))
+
+		return True
+
+
+	def parseKOSGU(self, xml_data):
+		'Парсит классификатор операций сектора государственного управления.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# parent_code
+					elif value.tag.endswith('parentCode'):
+						if not value.text or value.text == '000':
+							e['parent_code'] = None
+						else:
+							e['parent_code'] = value.text
+	
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				try:
+					e['parent_code'] = e['parent_code']
+				except KeyError:
+					e['parent_code'] = None
+
+				print(e)
+
+				kosgu = KOSGU.objects.update(
+					code        = e['code'],
+					parent_code = e['parent_code'],
+					name        = e['name'],
+					state       = e['state'])
+
+				print("Обновлён элемент КОСГУ: {} {}.".format(kosgu.code, kosgu.name))
 
 		return True
 

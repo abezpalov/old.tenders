@@ -348,6 +348,74 @@ class OKEI(models.Model):
 		ordering = ['code']
 
 
+class KOSGUManager(models.Manager):
+
+	def take(self, code, parent_code = None, name = None, parent = None, state = True):
+		try:
+			kosgu = self.get(code = code)
+		except KOSGU.DoesNotExist:
+			kosgu             = KOSGU()
+			kosgu.code        = code
+			kosgu.parent_code = parent_code
+			kosgu.name        = name
+			if parent_code:
+				kosgu.parent  = self.take(parent_code)
+			else:
+				kosgu.parent  = None
+			kosgu.state       = state
+			kosgu.created     = timezone.now()
+			kosgu.modified    = timezone.now()
+			kosgu.save()
+		return kosgu
+
+	def update(self, code, parent_code = None, name = None, parent = None, state = True):
+		try:
+			kosgu             = self.get(code = code)
+			kosgu.parent_code = parent_code
+			kosgu.name        = name
+			if parent_code:
+				kosgu.parent  = self.take(parent_code)
+			else:
+				kosgu.parent  = None
+			kosgu.state       = state
+			kosgu.modified    = timezone.now()
+			kosgu.save()
+		except KOSGU.DoesNotExist:
+			kosgu             = KOSGU()
+			kosgu.code        = code
+			kosgu.parent_code = parent_code
+			kosgu.name        = name
+			if parent_code:
+				kosgu.parent  = self.take(parent_code)
+			else:
+				kosgu.parent  = None
+			kosgu.state       = state
+			kosgu.created     = timezone.now()
+			kosgu.modified    = timezone.now()
+			kosgu.save()
+		return kosgu
+
+
+class KOSGU(models.Model):
+	'Классификация операций сектора государственного управления.'
+
+	code        = models.CharField(max_length = 10, unique = True)
+	parent_code = models.CharField(max_length = 10, null = True, default = None)
+	name        = models.CharField(max_length = 100, null = True, default = None)
+	parent      = models.ForeignKey('self', null = True, default = None)
+	state       = models.BooleanField(default = True)
+	created     = models.DateTimeField()
+	modified    = models.DateTimeField()
+
+	objects     = KOSGUManager()
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		ordering = ['code']
+
+
 
 
 
