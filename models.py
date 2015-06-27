@@ -46,8 +46,8 @@ class CountryManager(models.Manager):
 		except Country.DoesNotExist:
 			country = Country(
 				alias     = alias[:100],
-				name      = name[:100],
-				full_name = full_name[:100],
+				name      = name,
+				full_name = full_name,
 				created   = timezone.now(),
 				modified  = timezone.now())
 			country.save()
@@ -76,8 +76,8 @@ class CountryManager(models.Manager):
 
 class Country(models.Model):
 	code      = models.CharField(max_length = 10, unique = True)
-	name      = models.CharField(max_length = 100, null = True, default = None)
-	full_name = models.CharField(max_length = 100, null = True, default = None)
+	name      = models.TextField(null = True, default = None)
+	full_name = models.TextField(null = True, default = None)
 	state     = models.BooleanField(default = True)
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
@@ -107,8 +107,8 @@ class RegionManager(models.Manager):
 
 
 class Region(models.Model):
-	name      = models.CharField(max_length = 100)
-	full_name = models.CharField(max_length = 100)
+	name      = models.TextField(null = True, default = None)
+	full_name = models.TextField(null = True, default = None)
 	alias     = models.CharField(max_length = 100, unique = True)
 	country   = models.ForeignKey(Country, null = True, default = None)
 	state     = models.BooleanField(default = False)
@@ -164,7 +164,7 @@ class CurrencyManager(models.Manager):
 class Currency(models.Model):
 	code         = models.CharField(max_length = 10, unique = True)
 	digital_code = models.CharField(max_length = 10, unique = True)
-	name         = models.CharField(max_length = 100, null = True, default = None)
+	name         = models.TextField(null = True, default = None)
 	state        = models.BooleanField(default = True)
 	created      = models.DateTimeField()
 	modified     = models.DateTimeField()
@@ -213,7 +213,7 @@ class OKEISectionManager(models.Manager):
 
 class OKEISection(models.Model):
 	code     = models.CharField(max_length = 10, unique = True)
-	name     = models.CharField(max_length = 100, null = True, default = None)
+	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField()
 	modified = models.DateTimeField()
@@ -262,7 +262,7 @@ class OKEIGroupManager(models.Manager):
 
 class OKEIGroup(models.Model):
 	code     = models.CharField(max_length = 10, unique = True)
-	name     = models.CharField(max_length = 100, null = True, default = None)
+	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField()
 	modified = models.DateTimeField()
@@ -328,13 +328,13 @@ class OKEIManager(models.Manager):
 
 class OKEI(models.Model):
 	code                 = models.CharField(max_length = 10, unique = True)
-	full_name            = models.CharField(max_length = 100, null = True, default = None)
+	full_name            = models.TextField(null = True, default = None)
 	section              = models.ForeignKey(OKEISection, null = True, default = None)
 	group                = models.ForeignKey(OKEIGroup, null = True, default = None)
-	local_name           = models.CharField(max_length = 100, null = True, default = None)
-	international_name   = models.CharField(max_length = 100, null = True, default = None)
-	local_symbol         = models.CharField(max_length = 100, null = True, default = None)
-	international_symbol = models.CharField(max_length = 100, null = True, default = None)
+	local_name           = models.TextField(null = True, default = None)
+	international_name   = models.TextField(null = True, default = None)
+	local_symbol         = models.TextField(null = True, default = None)
+	international_symbol = models.TextField(null = True, default = None)
 	state                = models.BooleanField(default = True)
 	created              = models.DateTimeField()
 	modified             = models.DateTimeField()
@@ -397,11 +397,10 @@ class KOSGUManager(models.Manager):
 
 
 class KOSGU(models.Model):
-	'Классификация операций сектора государственного управления.'
 
 	code        = models.CharField(max_length = 10, unique = True)
 	parent_code = models.CharField(max_length = 10, null = True, default = None)
-	name        = models.CharField(max_length = 100, null = True, default = None)
+	name        = models.TextField(null = True, default = None)
 	parent      = models.ForeignKey('self', null = True, default = None)
 	state       = models.BooleanField(default = True)
 	created     = models.DateTimeField()
@@ -416,22 +415,213 @@ class KOSGU(models.Model):
 		ordering = ['code']
 
 
+class OKOPFManager(models.Manager):
+
+	def take(self, code, parent_code = None, full_name = None, singular_name = None, parent = None, state = True):
+		try:
+			okopf = self.get(code = code)
+		except OKOPF.DoesNotExist:
+			okopf               = OKOPF()
+			okopf.code          = code
+			okopf.parent_code   = parent_code
+			okopf.full_name     = full_name
+			okopf.singular_name = singular_name
+			if parent_code:
+				okopf.parent    = self.take(parent_code)
+			else:
+				okopf.parent    = None
+			okopf.state         = state
+			okopf.created       = timezone.now()
+			okopf.modified      = timezone.now()
+			okopf.save()
+		return okopf
+
+	def update(self, code, parent_code = None, full_name = None, singular_name = None, parent = None, state = True):
+		try:
+			okopf               = self.get(code = code)
+			okopf.parent_code   = parent_code
+			okopf.full_name     = full_name
+			okopf.singular_name = singular_name
+			if parent_code:
+				okopf.parent    = self.take(parent_code)
+			else:
+				okopf.parent    = None
+			okopf.state         = state
+			okopf.modified      = timezone.now()
+			okopf.save()
+		except OKOPF.DoesNotExist:
+			okopf               = OKOPF()
+			okopf.code          = code
+			okopf.parent_code   = parent_code
+			okopf.full_name     = full_name
+			okopf.singular_name = singular_name
+			if parent_code:
+				okopf.parent    = self.take(parent_code)
+			else:
+				okopf.parent    = None
+			okopf.state         = state
+			okopf.created       = timezone.now()
+			okopf.modified      = timezone.now()
+			okopf.save()
+		return okopf
 
 
+class OKOPF(models.Model):
+
+	code          = models.CharField(max_length = 10, unique = True)
+	full_name     = models.TextField(null = True, default = None)
+	singular_name = models.TextField(null = True, default = None)
+	parent_code   = models.CharField(max_length = 10, null = True, default = None)
+	parent        = models.ForeignKey('self', null = True, default = None)
+	state         = models.BooleanField(default = True)
+	created       = models.DateTimeField()
+	modified      = models.DateTimeField()
+
+	objects       = OKOPFManager()
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		ordering = ['code']
 
 
+class OKPDManager(models.Manager):
+
+	def take(self, code, parent_code = None, alias = None, name = None, state = True):
+		try:
+			okpd = self.get(code = code)
+		except OKPD.DoesNotExist:
+			okpd             = OKPD()
+			okpd.code        = code
+			okpd.parent_code = parent_code
+			okpd.alias       = alias
+			okpd.name        = name
+			if parent_code:
+				okpd.parent  = self.take(parent_code)
+			else:
+				okpd.parent  = None
+			okpd.state       = state
+			okpd.created     = timezone.now()
+			okpd.modified    = timezone.now()
+			okpd.save()
+		return okpd
+
+	def update(self, code, parent_code = None, alias = None, name = None, state = True):
+		try:
+			okpd             = self.get(code = code)
+			okpd.parent_code = parent_code
+			okpd.alias       = alias
+			okpd.name        = name
+			if parent_code:
+				okpd.parent  = self.take(parent_code)
+			else:
+				okpd.parent  = None
+			okpd.state       = state
+			okpd.modified    = timezone.now()
+			okpd.save()
+		except OKPD.DoesNotExist:
+			okpd             = OKPD()
+			okpd.code        = code
+			okpd.parent_code = parent_code
+			okpd.alias       = alias
+			okpd.name        = name
+			if parent_code:
+				okpd.parent    = self.take(parent_code)
+			else:
+				okpd.parent    = None
+			okpd.state         = state
+			okpd.created       = timezone.now()
+			okpd.modified      = timezone.now()
+			okpd.save()
+		return okpd
 
 
+class OKPD(models.Model):
+
+	code          = models.CharField(max_length = 100, unique = True)
+	alias         = models.CharField(max_length = 100, null = True, default = None)
+	name          = models.TextField(null = True, default = None)
+	parent_code   = models.CharField(max_length = 100, null = True, default = None)
+	parent        = models.ForeignKey('self', null = True, default = None)
+	state         = models.BooleanField(default = True)
+	created       = models.DateTimeField()
+	modified      = models.DateTimeField()
+
+	objects       = OKPDManager()
+
+	def __str__(self):
+		return "{} {}".format(self.alias, self.name)
+
+	class Meta:
+		ordering = ['alias']
 
 
+class OKTMOManager(models.Manager):
+
+	def take(self, code, parent_code = None, full_name = None, state = True):
+		try:
+			oktmo = self.get(code = code)
+		except OKTMO.DoesNotExist:
+			oktmo             = OKTMO()
+			oktmo.code        = code
+			oktmo.parent_code = parent_code
+			oktmo.full_name   = full_name
+			if parent_code:
+				oktmo.parent  = self.take(parent_code)
+			else:
+				oktmo.parent  = None
+			oktmo.state       = state
+			oktmo.created     = timezone.now()
+			oktmo.modified    = timezone.now()
+			oktmo.save()
+		return oktmo
+
+	def update(self, code, parent_code = None, full_name = None, state = True):
+		try:
+			oktmo             = self.get(code = code)
+			oktmo.parent_code = parent_code
+			oktmo.full_name   = full_name
+			if parent_code:
+				oktmo.parent  = self.take(parent_code)
+			else:
+				oktmo.parent  = None
+			oktmo.state       = state
+			oktmo.modified    = timezone.now()
+			oktmo.save()
+		except OKTMO.DoesNotExist:
+			oktmo             = OKTMO()
+			oktmo.code        = code
+			oktmo.parent_code = parent_code
+			oktmo.full_name   = full_name
+			if parent_code:
+				oktmo.parent  = self.take(parent_code)
+			else:
+				oktmo.parent  = None
+			oktmo.state       = state
+			oktmo.created     = timezone.now()
+			oktmo.modified    = timezone.now()
+			oktmo.save()
+		return oktmo
 
 
+class OKTMO(models.Model):
 
+	code        = models.CharField(max_length = 20, unique = True)
+	full_name   = models.TextField(null = True, default = None)
+	parent_code = models.CharField(max_length = 20, null = True, default = None)
+	parent      = models.ForeignKey('self', null = True, default = None)
+	state       = models.BooleanField(default = True)
+	created     = models.DateTimeField()
+	modified    = models.DateTimeField()
 
+	objects       = OKTMOManager()
 
+	def __str__(self):
+		return self.full_name
 
-
-
+	class Meta:
+		ordering = ['code']
 
 
 

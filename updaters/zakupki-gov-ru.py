@@ -13,7 +13,10 @@ class Runner:
 		'country':  'nsiOKSM',
 		'currency': 'nsiCurrency',
 		'okei':     'nsiOKEI',
-		'kosgu':    'nsiKOSGU'}
+		'kosgu':    'nsiKOSGU',
+		'okopf':    'nsiOKOPF',
+		'okpd':     'nsiOKPD',
+		'oktmo':    'nsiOKTMO'}
 
 
 	def __init__(self):
@@ -40,6 +43,9 @@ class Runner:
 		self.updateEssence('currency')
 		self.updateEssence('okei')
 		self.updateEssence('kosgu')
+		self.updateEssence('okopf')
+		self.updateEssence('okpd')
+		self.updateEssence('oktmo')
 
 
 
@@ -141,6 +147,9 @@ class Runner:
 				elif 'currency' == essence: self.parseCurrency(xml_data)
 				elif 'okei'     == essence: self.parseOKEI(xml_data)
 				elif 'kosgu'    == essence: self.parseKOSGU(xml_data)
+				elif 'okopf'    == essence: self.parseOKOPF(xml_data)
+				elif 'okpd'     == essence: self.parseOKPD(xml_data)
+				elif 'oktmo'    == essence: self.parseOKTMO(xml_data)
 				# TODO
 				# TODO
 				# TODO
@@ -396,8 +405,6 @@ class Runner:
 				except KeyError:
 					e['parent_code'] = None
 
-				print(e)
-
 				kosgu = KOSGU.objects.update(
 					code        = e['code'],
 					parent_code = e['parent_code'],
@@ -407,6 +414,213 @@ class Runner:
 				print("Обновлён элемент КОСГУ: {} {}.".format(kosgu.code, kosgu.name))
 
 		return True
+
+
+	def parseOKOPF(self, xml_data):
+		'Парсит ОКОПФ.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# parent_code
+					elif value.tag.endswith('parentCode'):
+						if not value.text:
+							e['parent_code'] = None
+						else:
+							e['parent_code'] = value.text
+	
+					# full_name
+					elif value.tag.endswith('fullName'):
+						e['full_name'] = value.text
+
+					# singular_name
+					elif value.tag.endswith('singularName'):
+						e['singular_name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				try:
+					e['parent_code'] = e['parent_code']
+				except KeyError:
+					e['parent_code'] = None
+
+				print(e)
+
+				okopf = OKOPF.objects.update(
+					code          = e['code'],
+					parent_code   = e['parent_code'],
+					full_name     = e['full_name'],
+					singular_name = e['singular_name'],
+					state         = e['state'])
+
+				print("Обновлён элемент ОКОПФ: {} {}.".format(okopf.code, okopf.full_name))
+
+		return True
+
+
+	def parseOKPD(self, xml_data):
+		'Парсит ОКПД.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('id'):
+						e['code'] = value.text
+
+					# parent_code
+					elif value.tag.endswith('parentId'):
+						if not value.text:
+							e['parent_code'] = None
+						else:
+							e['parent_code'] = value.text
+
+					# alias
+					elif value.tag.endswith('code'):
+						e['alias'] = value.text	
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				try:
+					e['parent_code'] = e['parent_code']
+				except KeyError:
+					e['parent_code'] = None
+
+				print(e)
+
+				okpd = OKPD.objects.update(
+					code        = e['code'],
+					parent_code = e['parent_code'],
+					alias       = e['alias'],
+					name        = e['name'],
+					state       = e['state'])
+
+				print("Обновлён элемент ОКДП: {} {}.".format(okpd.alias, okpd.name))
+
+		return True
+
+
+	def parseOKTMO(self, xml_data):
+		'Парсит ОКТМО.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# parent_code
+					elif value.tag.endswith('parentCode'):
+						if not value.text:
+							e['parent_code'] = None
+						else:
+							e['parent_code'] = value.text
+
+					# full_name
+					elif value.tag.endswith('fullName'):
+						e['full_name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				try:
+					e['parent_code'] = e['parent_code']
+				except KeyError:
+					e['parent_code'] = None
+
+				print(e)
+
+				oktmo = OKTMO.objects.update(
+					code        = e['code'],
+					parent_code = e['parent_code'],
+					full_name   = e['full_name'],
+					state       = e['state'])
+
+				print("Обновлён элемент ОКТМО: {}.".format(oktmo.full_name))
+
+		return True
+
+
 
 	# TODO Parser
 	# TODO Parser
