@@ -102,8 +102,11 @@ class Runner:
 			ftp.cwd(catalog)
 
 		# Скачиваем файл
-		ftp.retrbinary("RETR {}".format(file_name), zip_file.write)
-		zip_data  = ZipFile(zip_file)
+		try:
+			ftp.retrbinary("RETR {}".format(file_name), zip_file.write)
+			zip_data  = ZipFile(zip_file)
+		except:
+			return False
 
 		# Возвращаем результат
 		return zip_data
@@ -133,6 +136,10 @@ class Runner:
 			# Скачиваем архив
 			zip_data = self.getZipFromFTP(zip_name, catalog)
 			print("Скачал файл {}, тип объекта {}.".format(zip_name, type(zip_data)))
+
+			if not zip_data:
+				print("Ошибка: невозможно скачать файл. Перехожу с следующему.")
+				continue
 
 			# Получаем список файлов в архиве
 			xml_names = zip_data.namelist()
@@ -472,7 +479,6 @@ class Runner:
 				except KeyError:
 					e['parent_code'] = None
 
-				print(e)
 
 				okopf = OKOPF.objects.update(
 					code          = e['code'],
@@ -542,8 +548,6 @@ class Runner:
 				except KeyError:
 					e['parent_code'] = None
 
-				print(e)
-
 				okpd = OKPD.objects.update(
 					code        = e['code'],
 					parent_code = e['parent_code'],
@@ -608,8 +612,6 @@ class Runner:
 				except KeyError:
 					e['parent_code'] = None
 
-				print(e)
-
 				oktmo = OKTMO.objects.update(
 					code        = e['code'],
 					parent_code = e['parent_code'],
@@ -619,6 +621,8 @@ class Runner:
 				print("Обновлён элемент ОКТМО: {}.".format(oktmo.full_name))
 
 		return True
+
+
 
 
 
