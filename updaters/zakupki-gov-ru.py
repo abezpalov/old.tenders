@@ -21,11 +21,12 @@ class Runner:
 		'oktmo':    'nsiOKTMO',
 		'okved':    'nsiOKVED',
 
-		'placing_way':           'nsiPlacingWay',
+		'placing_way':                 'nsiPlacingWay',
+		'plan_position_change_reason': 'nsiPlanPositionChangeReason',
 
-		'purchase_document_type': 'nsiPurchaseDocumentTypes',
-		'purchase_preference':    'nsiPurchasePreferences',
-		'purchase_reject_reason': 'nsiPurchaseRejectReason'}
+		'purchase_document_type':      'nsiPurchaseDocumentTypes',
+		'purchase_preference':         'nsiPurchasePreferences',
+		'purchase_reject_reason':      'nsiPurchaseRejectReason'}
 
 
 	def __init__(self):
@@ -60,7 +61,8 @@ class Runner:
 
 
 
-		self.updateEssence('placing_way')
+#		self.updateEssence('placing_way')
+		self.updateEssence('plan_position_change_reason')
 
 #		self.updateEssence('purchase_document_type')
 #		self.updateEssence('purchase_preference')
@@ -173,16 +175,17 @@ class Runner:
 				print("Извлек файл {} типа {} из архива {}.".format(xml_name, type(xml_data), zip_name))
 
 				# Парсим файл
-				if   'country'     == essence: self.parseCountry(xml_data)
-				elif 'currency'    == essence: self.parseCurrency(xml_data)
-				elif 'okei'        == essence: self.parseOKEI(xml_data)
-				elif 'kosgu'       == essence: self.parseKOSGU(xml_data)
-				elif 'okopf'       == essence: self.parseOKOPF(xml_data)
-				elif 'okpd'        == essence: self.parseOKPD(xml_data)
-				elif 'oktmo'       == essence: self.parseOKTMO(xml_data)
-				elif 'okved'       == essence: self.parseOKVED(xml_data)
+				if   'country'                     == essence: self.parseCountry(xml_data)
+				elif 'currency'                    == essence: self.parseCurrency(xml_data)
+				elif 'okei'                        == essence: self.parseOKEI(xml_data)
+				elif 'kosgu'                       == essence: self.parseKOSGU(xml_data)
+				elif 'okopf'                       == essence: self.parseOKOPF(xml_data)
+				elif 'okpd'                        == essence: self.parseOKPD(xml_data)
+				elif 'oktmo'                       == essence: self.parseOKTMO(xml_data)
+				elif 'okved'                       == essence: self.parseOKVED(xml_data)
 
-				elif 'placing_way' == essence: self.parsePlacingWay(xml_data)
+				elif 'placing_way'                 == essence: self.parsePlacingWay(xml_data)
+				elif 'plan_position_change_reason' == essence: self.parsePlanPositionChangeReason(xml_data)
 
 
 
@@ -803,6 +806,61 @@ class Runner:
 					state            = e['state'])
 
 				print("Обновлён элемент пути размещения: {}.".format(placing_way))
+
+		return True
+
+
+	def parsePositionChangeReasonList(self, xml_data):
+		'Парсит пути причины изменения позиций планов закупок.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# oos_id
+					if value.tag.endswith('id'):
+						e['oos_id'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# description
+					elif value.tag.endswith('description'):
+						e['description'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				plan_position_change_reason = PlanPositionChangeReason.objects.update(
+					oos_id      = e['oos_id'],
+					name        = e['name'],
+					description = e['description'],
+					state       = e['state'])
+
+				print("Обновлён элемент Причина изменения позиции плана: {}.".format(plan_position_change_reason))
 
 		return True
 

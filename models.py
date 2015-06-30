@@ -888,19 +888,13 @@ class PlacingWayManager(models.Manager):
 			o.modified           = timezone.now()
 			o.save()
 		except PlacingWay.DoesNotExist:
-			o                    = PlacingWay()
-			o.code               = code
-			o.placing_way_id     = placing_way_id
-			o.name               = name
-			o.placing_way_type   = placing_way_type
-			if subsystem_type:
-				o.subsystem_type = SubsystemType.objects.take(code = subsystem_type)
-			else:
-				o.subsystem_type = None
-			o.state              = state
-			o.created            = timezone.now()
-			o.modified           = timezone.now()
-			o.save()
+			o = self.take(
+				code             = code,
+				placing_way_id   = placing_way_id,
+				name             = name,
+				placing_way_type = placing_way_type,
+				subsystem_type   = subsystem_type,
+				state            = state)
 		return o
 
 
@@ -924,6 +918,55 @@ class PlacingWay(models.Model):
 		ordering = ['code']
 
 
+class PlanPositionChangeReasonManager(models.Manager):
+
+	def take(self, oos_id, name = None, description = None, state = True):
+		try:
+			o = self.get(oos_id = oos_id)
+		except PlanPositionChangeReason.DoesNotExist:
+			o             = PlanPositionChangeReason()
+			o.oos_id      = oos_id
+			o.name        = name
+			o.description = description
+			o.state       = state
+			o.created     = timezone.now()
+			o.modified    = timezone.now()
+			o.save()
+		return o
+
+	def update(self, oos_id, name = None, description = None, state = True):
+		try:
+			o             = self.get(oos_id = oos_id)
+			o.name        = name
+			o.description = description
+			o.state       = state
+			o.modified    = timezone.now()
+			o.save()
+		except PlanPositionChangeReason.DoesNotExist:
+			o = self.take(
+				oos_id      = oos_id,
+				name        = name,
+				description = description,
+				state       = state)
+		return o
+
+
+class PlanPositionChangeReason(models.Model):
+
+	oos_id      = models.CharField(max_length = 20, null = True, default = None)
+	name        = models.TextField(null = True, default = None)
+	description = models.TextField(null = True, default = None)
+	state       = models.BooleanField(default = True)
+	created     = models.DateTimeField()
+	modified    = models.DateTimeField()
+
+	objects     = PlanPositionChangeReason()
+
+	def __str__(self):
+		return "{} {}".format(self.name)
+
+	class Meta:
+		ordering = ['oos_id']
 
 
 
