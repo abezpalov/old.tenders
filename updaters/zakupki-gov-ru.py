@@ -21,6 +21,11 @@ class Runner:
 		'oktmo':    'nsiOKTMO',
 		'okved':    'nsiOKVED',
 
+		'budget':                      'nsiBudget',
+		'organisation_type':           'nsiOrganizationType',
+		'organisation':                'nsiOrganization',
+
+
 		'placing_way':                 'nsiPlacingWay',
 		'plan_position_change_reason': 'nsiPlanPositionChangeReason',
 
@@ -58,11 +63,16 @@ class Runner:
 #		self.updateEssence('oktmo')
 #		self.updateEssence('okved')
 
+#		self.updateEssence('budget')
+
+		self.updateEssence('organisation')
+#		self.updateEssence('organisation_right')
+#		self.updateEssence('organisation_type')
 
 
 
 #		self.updateEssence('placing_way')
-		self.updateEssence('plan_position_change_reason')
+#		self.updateEssence('plan_position_change_reason')
 
 #		self.updateEssence('purchase_document_type')
 #		self.updateEssence('purchase_preference')
@@ -95,6 +105,7 @@ class Runner:
 
 		# Переходим в нужный каталог
 		if catalog:
+			print(catalog)
 			ftp.cwd(catalog)
 
 		# Получаем содержимое каталога
@@ -160,7 +171,7 @@ class Runner:
 
 			# Скачиваем архив
 			zip_data = self.getZipFromFTP(zip_name, catalog)
-			print("Скачал файл {}, тип объекта {}.".format(zip_name, type(zip_data)))
+			print("Скачал файл {}.".format(zip_name))
 
 			if not zip_data:
 				print("Ошибка: невозможно скачать файл. Перехожу с следующему.")
@@ -172,7 +183,7 @@ class Runner:
 
 				# Извлекаем файл из архива
 				xml_data = zip_data.open(xml_name)
-				print("Извлек файл {} типа {} из архива {}.".format(xml_name, type(xml_data), zip_name))
+				print("Извлек файл {}.".format(xml_name))
 
 				# Парсим файл
 				if   'country'                     == essence: self.parseCountry(xml_data)
@@ -183,6 +194,16 @@ class Runner:
 				elif 'okpd'                        == essence: self.parseOKPD(xml_data)
 				elif 'oktmo'                       == essence: self.parseOKTMO(xml_data)
 				elif 'okved'                       == essence: self.parseOKVED(xml_data)
+
+				elif 'budget'                      == essence: self.parseBudget(xml_data)
+
+				elif 'organisation_right'          == essence: self.parseOrganisationRight(xml_data)
+				elif 'organisation_type'           == essence: self.parseOrganisationType(xml_data)
+
+				elif 'organisation'                == essence: self.parseOrganisation(xml_data)
+
+
+
 
 				elif 'placing_way'                 == essence: self.parsePlacingWay(xml_data)
 				elif 'plan_position_change_reason' == essence: self.parsePlanPositionChangeReason(xml_data)
@@ -745,6 +766,246 @@ class Runner:
 		return True
 
 
+	def parseBudget(self, xml_data):
+		'Парсит бюджет.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+
+				# Обновляем информацию в базе
+				budget = Budget.objects.update(
+					code  = e['code'],
+					name  = e['name'],
+					state = e['state'])
+
+				print("Обновлён элемент Бюджет: {}.".format(budget))
+
+		return True
+
+
+	def parseOrganisationType(self, xml_data):
+		'Парсит типы организаций.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# description
+					elif value.tag.endswith('description'):
+						e['description'] = value.text
+
+
+				# Обновляем информацию в базе
+				organisation_type = OrganisationType.objects.update(
+					code        = e['code'],
+					name        = e['name'],
+					description = e['description'])
+
+				print("Обновлён элемент Тип организации: {}.".format(organisation_type))
+
+		return True
+
+	# TODO parseOrganisation
+
+	def parseOrganisation(self, xml_data):
+		'Парсит организации.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					if value.tag.endswith('regNumber'):
+						e['reg_number'] = value.text
+
+					elif value.tag.endswith('shortName'):
+						e['short_name'] = value.text
+
+					elif value.tag.endswith('fullName'):
+						e['full_name'] = value.text
+
+					elif value.tag.endswith('headAgency'):
+						for sub in element:
+							if value.tag.endswith('regNum'):
+								e['head_agency'] = sub.text
+
+					elif value.tag.endswith('orderingAgency'):
+						for sub in element:
+							if value.tag.endswith('regNum'):
+								e['ordering_agency'] = sub.text
+
+					elif value.tag.endswith('OKOGU'):
+						e['okogu'] = value.text
+
+					elif value.tag.endswith('INN'):
+						e['inn'] = value.text
+
+					elif value.tag.endswith('KPP'):
+						e['kpp'] = value.text
+
+					elif value.tag.endswith('OKPO'):
+						e['okpo'] = value.text
+
+					elif value.tag.endswith('organizationType'):
+						for sub in element:
+							if value.tag.endswith('code'):
+								e['organisation_type'] = sub.text
+
+					elif value.tag.endswith('OKTMO'):
+						for sub in element:
+							if value.tag.endswith('code'):
+								e['oktmo'] = sub.text
+
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+					elif value.tag.endswith('register'):
+						if value.text == 'true':
+							e['register'] = True
+						else:
+							e['register'] = False
+
+				# Обрабатываем зависимости
+				try:
+					if e['head_agency']:
+						e['head_agency'] = Organisation.objects.take(e['head_agency'])
+				except KeyError:
+					e['head_agency'] = None
+				except Organisation.DoesNotExist:
+					e['head_agency'] = None
+
+
+				try:
+					if e['ordering_agency']:
+						e['ordering_agency'] = Organisation.objects.take(e['ordering_agency'])
+				except KeyError:
+					e['ordering_agency'] = None
+				except Organisation.DoesNotExist:
+					e['ordering_agency'] = None
+
+				try:
+					if e['organisation_type']:
+						e['organisation_type'] = OrganisationType.objects.take(e['organisation_type'])
+				except KeyError:
+					e['organisation_type'] = None
+				except Organisation.DoesNotExist:
+					e['organisation_type'] = None
+
+				try:
+					if e['oktmo']:
+						e['oktmo'] = OKTMO.objects.take(e['oktmo'])
+				except KeyError:
+					e['oktmo'] = None
+				except Organisation.DoesNotExist:
+					e['oktmo'] = None
+
+				try:
+					if e['okogu']:
+						e['okogu'] = OKOGU.objects.take(e['okogu'])
+				except KeyError:
+					e['okogu'] = None
+				except Organisation.DoesNotExist:
+					e['okogu'] = None
+
+				# Обновляем информацию в базе
+				organisation = Organisation.objects.update(
+					reg_number        = e['reg_number'],
+					short_name        = e['short_name'],
+					full_name         = e['full_name'],
+					head_agency       = e['head_agency'],
+					ordering_agency   = e['ordering_agency'],
+					okogu             = e['okogu'],
+					inn               = e['inn'],
+					kpp               = e['kpp'],
+					okpo              = e['okpo'],
+					organisation_type = e['organisation_type'],
+					oktmo             = e['oktmo'],
+					state             = e['state'],
+					register          = e['register'])
+
+				print("Обновлён элемент Организация: {}.".format(organisation))
+
+		return True
+
+
 	def parsePlacingWay(self, xml_data):
 		'Парсит пути размещения.'
 
@@ -805,12 +1066,12 @@ class Runner:
 					subsystem_type   = e['subsystem_type'],
 					state            = e['state'])
 
-				print("Обновлён элемент пути размещения: {}.".format(placing_way))
+				print("Обновлён элемент Путь размещения: {}.".format(placing_way))
 
 		return True
 
 
-	def parsePositionChangeReasonList(self, xml_data):
+	def parsePlanPositionChangeReason(self, xml_data):
 		'Парсит пути причины изменения позиций планов закупок.'
 
 		# Импортируем

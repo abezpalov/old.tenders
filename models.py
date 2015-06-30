@@ -7,16 +7,16 @@ class UpdaterManager(models.Manager):
 
 	def take(self, alias, name):
 		try:
-			updater = self.get(alias = alias)
+			o = self.get(alias = alias)
 		except Updater.DoesNotExist:
-			updater = Updater(
+			o = Updater(
 				alias    = alias[:100],
 				name     = name[:100],
 				created  = timezone.now(),
 				modified = timezone.now(),
 				updated  = timezone.now())
-			updater.save()
-		return updater
+			o.save()
+		return o
 
 
 class Updater(models.Model):
@@ -41,38 +41,35 @@ class Updater(models.Model):
 
 class CountryManager(models.Manager):
 
-	def take(self, alias, name, full_name):
+	def take(self, code, full_name, name = None, state = True):
 		try:
-			country = self.get(alias = alias)
+			o = self.get(code = code)
 		except Country.DoesNotExist:
-			country = Country(
-				alias     = alias[:100],
+			o = Country(
+				code      = code[:100],
 				name      = name,
 				full_name = full_name,
 				created   = timezone.now(),
 				modified  = timezone.now())
-			country.save()
-		return country
+			o.save()
+		return o
 
 	def update(self, code, full_name, name = None, state = True):
 		try:
-			country           = self.get(code = code)
-			country.full_name = full_name
-			country.state     = state
-			country.modified  = timezone.now()
+			o           = self.get(code = code)
 			if name:
-				country.name  = name
-			country.save()
+				o.name  = name
+			o.full_name = full_name
+			o.state     = state
+			o.modified  = timezone.now()
+			o.save()
 		except Country.DoesNotExist:
-			country           = Country()
-			country.code      = code
-			country.name      = name
-			country.full_name = full_name
-			country.state     = state
-			country.created   = timezone.now()
-			country.modified  = timezone.now()
-			country.save()
-		return country
+			o = self.take(
+				code      = code,
+				full_name = full_name,
+				name      = name,
+				state     = state)
+		return o
 
 
 class Country(models.Model):
@@ -96,16 +93,16 @@ class RegionManager(models.Manager):
 
 	def take(self, alias, name, full_name):
 		try:
-			region = self.get(alias = alias)
+			o = self.get(alias = alias)
 		except Region.DoesNotExist:
-			region = Region(
+			o = Region(
 				alias     = alias[:100],
 				name      = name[:100],
 				full_name = full_name[:100],
 				created   = timezone.now(),
 				modified  = timezone.now())
-			region.save()
-		return region
+			o.save()
+		return o
 
 
 class Region(models.Model):
@@ -628,9 +625,6 @@ class OKTMO(models.Model):
 		ordering = ['code']
 
 
-# TODO DEV
-
-
 class OKVEDSectionManager(models.Manager):
 
 	def take(self, name, state = True):
@@ -853,6 +847,233 @@ class SubsystemType(models.Model):
 		ordering = ['code']
 
 
+class OrganisationTypeManager(models.Manager):
+
+	def take(self, code, name = None, description = None):
+		try:
+			o = self.get(code = code)
+		except OrganisationType.DoesNotExist:
+			o             = OrganisationType()
+			o.code        = code
+			o.name        = name
+			o.description = description
+			o.created     = timezone.now()
+			o.modified    = timezone.now()
+			o.save()
+		return o
+
+	def update(self, code, name = None, description = None):
+		try:
+			o             = self.get(code = code)
+			o.name        = name
+			o.description = description
+			o.modified    = timezone.now()
+			o.save()
+		except OrganisationType.DoesNotExist:
+			o = self.take(
+				code        = code,
+				name        = name,
+				description = description)
+		return o
+
+
+class OrganisationType(models.Model):
+
+	code        = models.CharField(max_length = 20, unique = True)
+	name        = models.TextField(null = True, default = None)
+	description = models.TextField(null = True, default = None)
+	created     = models.DateTimeField()
+	modified    = models.DateTimeField()
+
+	objects     = OrganisationTypeManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class BudgetManager(models.Manager):
+
+	def take(self, code, name = None, state = True):
+		try:
+			o = self.get(code = code)
+		except Budget.DoesNotExist:
+			o          = Budget()
+			o.code     = code
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
+
+	def update(self, code, name = None, state = True):
+		try:
+			o          = self.get(code = code)
+			o.name     = name
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
+		except Budget.DoesNotExist:
+			o = self.take(
+				code  = code,
+				name  = name,
+				state = state)
+		return o
+
+
+class Budget(models.Model):
+
+	code     = models.CharField(max_length = 20, unique = True)
+	name     = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = BudgetManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class OKOGUManager(models.Manager):
+
+	def take(self, code, name = None, state = True):
+		try:
+			o = self.get(code = code)
+		except OKOGU.DoesNotExist:
+			o          = Budget()
+			o.code     = code
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
+
+
+class OKOGU(models.Model):
+
+	code     = models.CharField(max_length = 20, unique = True)
+	name     = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = OKOGUManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class OrganisationManager(models.Manager):
+
+	def take(self, reg_number, short_name = None, full_name = None, head_agency = None, ordering_agency = None, okogu = None, inn = None, kpp = None, okpo = None, organisation_type = None, oktmo = None, state = True, register = True):
+		try:
+			o = self.get(reg_number = reg_number)
+		except Organisation.DoesNotExist:
+			o                       = Organisation()
+			o.reg_number            = reg_number
+			o.short_name            = short_name
+			o.full_name             = full_name
+			o.head_agency           = head_agency
+			o.ordering_agency       = ordering_agency
+			o.okogu                 = okogu
+			o.inn                   = inn
+			o.kpp                   = kpp
+			o.okpo                  = okpo
+			o.organisation_type     = organisation_type
+			o.oktmo                 = oktmo
+			o.state                 = state
+			o.register              = register
+			o.created               = timezone.now()
+			o.modified              = timezone.now()
+			o.save()
+		return o
+
+	def update(self, reg_number, short_name = None, full_name = None, head_agency = None, ordering_agency = None, okogu = None, inn = None, kpp = None, okpo = None, organisation_type = None, oktmo = None, state = True, register = True):
+		try:
+			o                       = self.get(reg_number = reg_number)
+			o.short_name            = short_name
+			o.full_name             = full_name
+			o.head_agency           = head_agency
+			o.ordering_agency       = ordering_agency
+			o.okogu                 = okogu
+			o.inn                   = inn
+			o.kpp                   = kpp
+			o.okpo                  = okpo
+			o.organisation_type     = organisation_type
+			o.oktmo                 = oktmo
+			o.state                 = state
+			o.register              = register
+			o.modified              = timezone.now()
+			o.save()
+		except Organisation.DoesNotExist:
+			o = self.take(
+				reg_number        = reg_number,
+				short_name        = short_name,
+				full_name         = full_name,
+				head_agency       = head_agency,
+				ordering_agency   = ordering_agency,
+				okogu             = okogu,
+				inn               = inn,
+				kpp               = kpp,
+				okpo              = okpo,
+				organisation_type = organisation_type,
+				oktmo             = oktmo,
+				state             = state,
+				register          = register)
+		return o
+
+
+class Organisation(models.Model):
+
+	reg_number        = models.CharField(max_length = 20, unique = True)
+	short_name        = models.TextField(null = True, default = None)
+	full_name         = models.TextField(null = True, default = None)
+	# factual_address
+	# postal_address
+	# email
+	# phone
+	# fax
+	# contact_person
+	# accounts
+	# budgets
+	head_agency       = models.ForeignKey('self', related_name = 'organisation_head_agency', null = True, default = None)
+	ordering_agency   = models.ForeignKey('self', related_name = 'organisation_ordering_agency', null = True, default = None)
+	okogu             = models.ForeignKey(OKOGU, null = True, default = None)
+	inn               = models.CharField(max_length = 20, null = True, default = None)
+	kpp               = models.CharField(max_length = 20, null = True, default = None)
+	okpo              = models.CharField(max_length = 20, null = True, default = None)
+	# okved
+	organisation_type = models.ForeignKey(OrganisationType, null = True, default = None)
+	oktmo             = models.ForeignKey(OKTMO, null = True, default = None)
+	state             = models.BooleanField(default = True)
+	register          = models.BooleanField(default = True)
+	created           = models.DateTimeField()
+	modified          = models.DateTimeField()
+
+	objects     = OrganisationManager()
+
+	def __str__(self):
+		return "{} {}".format(self.reg_number, self.short_name)
+
+	class Meta:
+		ordering = ['reg_number']
+
+
+
+# TODO OrganisationRight
+
+
 class PlacingWayManager(models.Manager):
 
 	def take(self, code, placing_way_id = None, name = None, placing_way_type = None, subsystem_type = None, state = True):
@@ -960,10 +1181,10 @@ class PlanPositionChangeReason(models.Model):
 	created     = models.DateTimeField()
 	modified    = models.DateTimeField()
 
-	objects     = PlanPositionChangeReason()
+	objects     = PlanPositionChangeReasonManager()
 
 	def __str__(self):
-		return "{} {}".format(self.name)
+		return "{} {}".format(self.oos_id, self.name)
 
 	class Meta:
 		ordering = ['oos_id']
