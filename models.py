@@ -20,6 +20,7 @@ class UpdaterManager(models.Manager):
 
 
 class Updater(models.Model):
+
 	name     = models.CharField(max_length = 100)
 	alias    = models.CharField(max_length = 100, unique = True)
 	login    = models.CharField(max_length = 100)
@@ -75,6 +76,7 @@ class CountryManager(models.Manager):
 
 
 class Country(models.Model):
+
 	code      = models.CharField(max_length = 10, unique = True)
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
@@ -107,6 +109,7 @@ class RegionManager(models.Manager):
 
 
 class Region(models.Model):
+
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 	alias     = models.CharField(max_length = 100, unique = True)
@@ -162,6 +165,7 @@ class CurrencyManager(models.Manager):
 
 
 class Currency(models.Model):
+
 	code         = models.CharField(max_length = 10, unique = True)
 	digital_code = models.CharField(max_length = 10, unique = True)
 	name         = models.TextField(null = True, default = None)
@@ -622,6 +626,316 @@ class OKTMO(models.Model):
 
 	class Meta:
 		ordering = ['code']
+
+
+# TODO DEV
+
+
+class OKVEDSectionManager(models.Manager):
+
+	def take(self, name, state = True):
+		try:
+			okved_section = self.get(name = name)
+		except OKVEDSection.DoesNotExist:
+			okved_section          = OKVEDSection()
+			okved_section.name     = name
+			okved_section.state    = state
+			okved_section.created  = timezone.now()
+			okved_section.modified = timezone.now()
+			okved_section.save()
+		return okved_section
+
+	def update(self, name, state = True):
+		try:
+			okved_section          = self.get(name = name)
+			okved_section.state    = state
+			okved_section.modified = timezone.now()
+			okved_section.save()
+		except OKVEDSection.DoesNotExist:
+			okved_section          = OKVEDSection()
+			okved_section.name     = name
+			okved_section.state    = state
+			okved_section.created  = timezone.now()
+			okved_section.modified = timezone.now()
+			okved_section.save()
+		return okved_section
+
+
+class OKVEDSection(models.Model):
+
+	name     = models.CharField(max_length = 20, unique = True)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = OKVEDSectionManager()
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		ordering = ['name']
+
+
+class OKVEDSubSectionManager(models.Manager):
+
+	def take(self, name, state = True):
+		try:
+			okved_subsection = self.get(name = name)
+		except OKVEDSubSection.DoesNotExist:
+			okved_subsection          = OKVEDSubSection()
+			okved_subsection.name     = name
+			okved_subsection.state    = state
+			okved_subsection.created  = timezone.now()
+			okved_subsection.modified = timezone.now()
+			okved_subsection.save()
+		return okved_subsection
+
+	def update(self, name, state = True):
+		try:
+			okved_subsection          = self.get(name = name)
+			okved_subsection.state    = state
+			okved_subsection.modified = timezone.now()
+			okved_subsection.save()
+		except OKVEDSubSection.DoesNotExist:
+			okved_subsection          = OKVEDSubSection()
+			okved_subsection.name     = name
+			okved_subsection.state    = state
+			okved_subsection.created  = timezone.now()
+			okved_subsection.modified = timezone.now()
+			okved_subsection.save()
+		return okved_subsection
+
+
+class OKVEDSubSection(models.Model):
+
+	name     = models.CharField(max_length = 20, unique = True)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = OKVEDSubSectionManager()
+
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		ordering = ['name']
+
+
+class OKVEDManager(models.Manager):
+
+	def take(self, oos_id, parent_oos_id = None, code = None, section = None, subsection = None, name = None, state = True):
+		try:
+			okved = self.get(oos_id = oos_id)
+		except OKVED.DoesNotExist:
+			okved                = OKVED()
+			okved.oos_id         = oos_id
+			okved.parent_oos_id  = parent_oos_id
+			if parent_oos_id:
+				okved.parent     = self.take(oos_id = parent_oos_id)
+			else:
+				okved.parent     = None
+			okved.code           = code
+			if section:
+				okved.section    = OKVEDSection.objects.take(name = section)
+			else:
+				okved.section    = None
+			if subsection:
+				okved.subsection = OKVEDSubSection.objects.take(name = subsection)
+			else:
+				okved.subsection = None
+			okved.name           = name
+			okved.state          = state
+			okved.created        = timezone.now()
+			okved.modified       = timezone.now()
+			okved.save()
+		return okved
+
+	def update(self, oos_id, parent_oos_id = None, code = None, section = None, subsection = None, name = None, state = True):
+		try:
+			okved             = self.get(oos_id = oos_id)
+			okved.parent_oos_id  = parent_oos_id
+			if parent_oos_id:
+				okved.parent     = self.take(oos_id = parent_oos_id)
+			else:
+				okved.parent     = None
+			okved.code           = code
+			if section:
+				okved.section    = OKVEDSection.objects.take(name = section)
+			else:
+				okved.section    = None
+			if subsection:
+				okved.subsection = OKVEDSubSection.objects.take(name = subsection)
+			else:
+				okved.subsection = None
+			okved.name           = name
+			okved.state          = state
+			okved.modified       = timezone.now()
+			okved.save()
+		except OKVED.DoesNotExist:
+			okved                = OKVED()
+			okved.oos_id         = oos_id
+			okved.parent_oos_id  = parent_oos_id
+			if parent_oos_id:
+				okved.parent     = self.take(oos_id = parent_oos_id)
+			else:
+				okved.parent     = None
+			okved.code           = code
+			if section:
+				okved.section    = OKVEDSection.objects.take(name = section)
+			else:
+				okved.section    = None
+			if subsection:
+				okved.subsection = OKVEDSubSection.objects.take(name = subsection)
+			else:
+				okved.subsection = None
+			okved.name           = name
+			okved.state          = state
+			okved.created        = timezone.now()
+			okved.modified       = timezone.now()
+			okved.save()
+		return okved
+
+
+class OKVED(models.Model):
+
+	oos_id        = models.CharField(max_length = 20, unique = True)
+	parent_oos_id = models.CharField(max_length = 20, null = True, default = None)
+	parent        = models.ForeignKey('self', null = True, default = None)
+	code          = models.CharField(max_length = 100, null = True, default = None)
+	section       = models.ForeignKey(OKVEDSection, null = True, default = None)
+	subsection    = models.ForeignKey(OKVEDSubSection, null = True, default = None)
+	name          = models.TextField(null = True, default = None)
+	state         = models.BooleanField(default = True)
+	created       = models.DateTimeField()
+	modified      = models.DateTimeField()
+
+	objects       = OKVEDManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class SubsystemTypeManager(models.Manager):
+
+	def take(self, code, name = None, state = True):
+		try:
+			o = self.get(code = code)
+		except SubsystemType.DoesNotExist:
+			o          = SubsystemType()
+			o.code     = code
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
+
+
+class SubsystemType(models.Model):
+
+	code     = models.CharField(max_length = 20, unique = True)
+	name     = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = SubsystemTypeManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class PlacingWayManager(models.Manager):
+
+	def take(self, code, placing_way_id = None, name = None, placing_way_type = None, subsystem_type = None, state = True):
+		try:
+			o = self.get(code = code)
+		except PlacingWay.DoesNotExist:
+			o                    = PlacingWay()
+			o.code               = code
+			o.placing_way_id     = placing_way_id
+			o.name               = name
+			o.placing_way_type   = placing_way_type
+			if subsystem_type:
+				o.subsystem_type = SubsystemType.objects.take(code = subsystem_type)
+			else:
+				o.subsystem_type = None
+			o.state              = state
+			o.created            = timezone.now()
+			o.modified           = timezone.now()
+			o.save()
+		return o
+
+	def update(self, code, placing_way_id = None, name = None, placing_way_type = None, subsystem_type = None, state = True):
+		try:
+			o                    = self.get(code = code)
+			o.placing_way_id     = placing_way_id
+			o.name               = name
+			o.placing_way_type   = placing_way_type
+			if subsystem_type:
+				o.subsystem_type = SubsystemType.objects.take(code = subsystem_type)
+			else:
+				o.subsystem_type = None
+			o.state              = state
+			o.modified           = timezone.now()
+			o.save()
+		except PlacingWay.DoesNotExist:
+			o                    = PlacingWay()
+			o.code               = code
+			o.placing_way_id     = placing_way_id
+			o.name               = name
+			o.placing_way_type   = placing_way_type
+			if subsystem_type:
+				o.subsystem_type = SubsystemType.objects.take(code = subsystem_type)
+			else:
+				o.subsystem_type = None
+			o.state              = state
+			o.created            = timezone.now()
+			o.modified           = timezone.now()
+			o.save()
+		return o
+
+
+class PlacingWay(models.Model):
+
+	placing_way_id   = models.CharField(max_length = 20, null = True, default = None)
+	code             = models.CharField(max_length = 20, null = True, default = None)
+	name             = models.TextField(null = True, default = None)
+	palcing_way_type = models.CharField(max_length = 20, null = True, default = None)
+	subsistem_type   = models.ForeignKey(SubsystemType, null = True, default = None)
+	state            = models.BooleanField(default = True)
+	created          = models.DateTimeField()
+	modified         = models.DateTimeField()
+
+	objects          = PlacingWayManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

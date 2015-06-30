@@ -8,15 +8,24 @@ class Runner:
 	alias = 'zakupki-gov-ru'
 	urls = {
 		'base':     'ftp.zakupki.gov.ru',
+
 		'essences': 'fcs_nsi',
 		'regions':  'fcs_regions',
+
 		'country':  'nsiOKSM',
 		'currency': 'nsiCurrency',
 		'okei':     'nsiOKEI',
 		'kosgu':    'nsiKOSGU',
 		'okopf':    'nsiOKOPF',
 		'okpd':     'nsiOKPD',
-		'oktmo':    'nsiOKTMO'}
+		'oktmo':    'nsiOKTMO',
+		'okved':    'nsiOKVED',
+
+		'placing_way':           'nsiPlacingWay',
+
+		'purchase_document_type': 'nsiPurchaseDocumentTypes',
+		'purchase_preference':    'nsiPurchasePreferences',
+		'purchase_reject_reason': 'nsiPurchaseRejectReason'}
 
 
 	def __init__(self):
@@ -38,14 +47,28 @@ class Runner:
 		# Обновляем справочники
 #		self.getEssencesList()                                                  # Тест
 
-		self.updateEssence('country')
-		self.updateRegions()
-		self.updateEssence('currency')
-		self.updateEssence('okei')
-		self.updateEssence('kosgu')
-		self.updateEssence('okopf')
-		self.updateEssence('okpd')
-		self.updateEssence('oktmo')
+#		self.updateEssence('country')
+#		self.updateRegions()
+#		self.updateEssence('currency')
+#		self.updateEssence('okei')
+#		self.updateEssence('kosgu')
+#		self.updateEssence('okopf')
+#		self.updateEssence('okpd')
+#		self.updateEssence('oktmo')
+#		self.updateEssence('okved')
+
+
+
+
+		self.updateEssence('placing_way')
+
+#		self.updateEssence('purchase_document_type')
+#		self.updateEssence('purchase_preference')
+#		self.updateEssence('purchase_reject_reason')
+
+
+
+
 
 
 
@@ -150,18 +173,25 @@ class Runner:
 				print("Извлек файл {} типа {} из архива {}.".format(xml_name, type(xml_data), zip_name))
 
 				# Парсим файл
-				if   'country'  == essence: self.parseCountry(xml_data)
-				elif 'currency' == essence: self.parseCurrency(xml_data)
-				elif 'okei'     == essence: self.parseOKEI(xml_data)
-				elif 'kosgu'    == essence: self.parseKOSGU(xml_data)
-				elif 'okopf'    == essence: self.parseOKOPF(xml_data)
-				elif 'okpd'     == essence: self.parseOKPD(xml_data)
-				elif 'oktmo'    == essence: self.parseOKTMO(xml_data)
+				if   'country'     == essence: self.parseCountry(xml_data)
+				elif 'currency'    == essence: self.parseCurrency(xml_data)
+				elif 'okei'        == essence: self.parseOKEI(xml_data)
+				elif 'kosgu'       == essence: self.parseKOSGU(xml_data)
+				elif 'okopf'       == essence: self.parseOKOPF(xml_data)
+				elif 'okpd'        == essence: self.parseOKPD(xml_data)
+				elif 'oktmo'       == essence: self.parseOKTMO(xml_data)
+				elif 'okved'       == essence: self.parseOKVED(xml_data)
+
+				elif 'placing_way' == essence: self.parsePlacingWay(xml_data)
+
+
+
 				# TODO
 				# TODO
 				# TODO
 				# TODO
 				# TODO
+
 				else: print('Ошибка: отсутствует парсер для сущности {}.'.format(essence))
 
 				print("Файл {} обработан.".format(xml_name))
@@ -182,16 +212,16 @@ class Runner:
 		root = tree.getroot()
 
 		# Получаем список
-		for country_list in root:
+		for element_list in root:
 
 			# Получаем элемент
-			for country in country_list:
+			for element in element_list:
 
 				# Инициируем пустой справочник элемента
 				e = {}
 
 				# Обрабатываем значения полей
-				for value in country:
+				for value in element:
 					if   value.tag.endswith('countryCode'):
 						e['code'] = value.text
 					elif value.tag.endswith('countryFullName'):
@@ -208,7 +238,7 @@ class Runner:
 					full_name    = e['full_name'],
 					state        = e['state'])
 
-				print("Обновлена страна: {}.".format(country.full_name))
+				print("Обновлена страна: {}.".format(country))
 
 		return True
 
@@ -226,16 +256,16 @@ class Runner:
 		root = tree.getroot()
 
 		# Получаем список
-		for currency_list in root:
+		for element_list in root:
 
 			# Получаем элемент
-			for currency in currency_list:
+			for element in element_list:
 
 				# Инициируем пустой справочник элемента
 				e = {}
 
 				# Обрабатываем значения полей
-				for value in currency:
+				for value in element:
 					if   value.tag.endswith('code'):
 						e['code'] = value.text
 					elif value.tag.endswith('digitalCode'):
@@ -255,7 +285,7 @@ class Runner:
 					name         = e['name'],
 					state        = e['state'])
 
-				print("Обновлена валюта: {}.".format(currency.code))
+				print("Обновлена валюта.".format(currency))
 
 		return True
 
@@ -273,16 +303,16 @@ class Runner:
 		root = tree.getroot()
 
 		# Получаем список
-		for okei_list in root:
+		for element_list in root:
 
 			# Получаем элемент
-			for okei in okei_list:
+			for element in element_list:
 
 				# Инициируем пустой справочник элемента
 				e = {}
 
 				# Обрабатываем значения полей
-				for value in okei:
+				for value in element:
 
 					# code
 					if value.tag.endswith('code'):
@@ -355,7 +385,7 @@ class Runner:
 					international_symbol = e['international_symbol'],
 					state                = e['state'])
 
-				print("Обновлена единица измерения: {}.".format(okei.full_name))
+				print("Обновлена единица измерения: {}.".format(okei))
 
 		return True
 
@@ -418,7 +448,7 @@ class Runner:
 					name        = e['name'],
 					state       = e['state'])
 
-				print("Обновлён элемент КОСГУ: {} {}.".format(kosgu.code, kosgu.name))
+				print("Обновлён элемент КОСГУ: {}.".format(kosgu))
 
 		return True
 
@@ -487,7 +517,7 @@ class Runner:
 					singular_name = e['singular_name'],
 					state         = e['state'])
 
-				print("Обновлён элемент ОКОПФ: {} {}.".format(okopf.code, okopf.full_name))
+				print("Обновлён элемент ОКОПФ: {}.".format(okopf))
 
 		return True
 
@@ -555,7 +585,7 @@ class Runner:
 					name        = e['name'],
 					state       = e['state'])
 
-				print("Обновлён элемент ОКДП: {} {}.".format(okpd.alias, okpd.name))
+				print("Обновлён элемент ОКДП: {}.".format(okpd))
 
 		return True
 
@@ -618,9 +648,172 @@ class Runner:
 					full_name   = e['full_name'],
 					state       = e['state'])
 
-				print("Обновлён элемент ОКТМО: {}.".format(oktmo.full_name))
+				print("Обновлён элемент ОКТМО: {}.".format(oktmo))
 
 		return True
+
+
+	def parseOKVED(self, xml_data):
+		'Парсит ОКВЭД.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# oos_id
+					if value.tag.endswith('id'):
+						e['oos_id'] = value.text
+
+					# parent_oos_id
+					elif value.tag.endswith('parentId'):
+						if not value.text:
+							e['parent_oos_id'] = None
+						else:
+							e['parent_oos_id'] = value.text
+
+					# code
+					elif value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# section
+					elif value.tag.endswith('section'):
+						e['section'] = value.text
+
+					# subsection
+					elif value.tag.endswith('subsection'):
+						e['subsection'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Корректируем
+				try:
+					e['parent_oos_id'] = e['parent_oos_id']
+				except KeyError:
+					e['parent_oos_id'] = None
+
+				try:
+					e['section'] = e['section']
+				except KeyError:
+					e['section'] = None
+
+				try:
+					e['subsection'] = e['subsection']
+				except KeyError:
+					e['subsection'] = None
+
+				# Обновляем информацию в базе
+				okved = OKVED.objects.update(
+					oos_id        = e['oos_id'],
+					parent_oos_id = e['parent_oos_id'],
+					code          = e['code'],
+					section       = e['section'],
+					subsection    = e['subsection'],
+					name          = e['name'],
+					state         = e['state'])
+
+				print("Обновлён элемент ОКВЭД: {}.".format(okved))
+
+		return True
+
+
+	def parsePlacingWay(self, xml_data):
+		'Парсит пути размещения.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# placing_way_id
+					if value.tag.endswith('placingWayId'):
+						e['placing_way_id'] = value.text
+
+					# code
+					elif value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# type
+					elif value.tag.endswith('type'):
+						e['placing_way_type'] = value.text
+
+					# subsystem_type
+					elif value.tag.endswith('subsystemType'):
+						e['subsystem_type'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обновляем информацию в базе
+				placing_way = PlacingWay.objects.update(
+					placing_way_id   = e['placing_way_id'],
+					code             = e['code'],
+					name             = e['name'],
+					placing_way_type = e['placing_way_type'],
+					subsystem_type   = e['subsystem_type'],
+					state            = e['state'])
+
+				print("Обновлён элемент пути размещения: {}.".format(placing_way))
+
+		return True
+
+
+
+
+
+
+
+
+
 
 
 
