@@ -7,31 +7,29 @@ class Runner:
 	name = 'Обновление с сайта государственных закупок России'
 	alias = 'zakupki-gov-ru'
 	urls = {
-		'base':     'ftp.zakupki.gov.ru',
-
-		'essences': 'fcs_nsi',
-		'regions':  'fcs_regions',
-
-		'country':  'nsiOKSM',
-		'currency': 'nsiCurrency',
-		'okei':     'nsiOKEI',
-		'kosgu':    'nsiKOSGU',
-		'okopf':    'nsiOKOPF',
-		'okpd':     'nsiOKPD',
-		'oktmo':    'nsiOKTMO',
-		'okved':    'nsiOKVED',
-
+		'base':                        'ftp.zakupki.gov.ru',
+		'essences':                    'fcs_nsi',
+		'regions':                     'fcs_regions',
+		'country':                     'nsiOKSM',
+		'currency':                    'nsiCurrency',
+		'okei':                        'nsiOKEI',
+		'kosgu':                       'nsiKOSGU',
+		'okopf':                       'nsiOKOPF',
+		'okpd':                        'nsiOKPD',
+		'oktmo':                       'nsiOKTMO',
+		'okved':                       'nsiOKVED',
 		'budget':                      'nsiBudget',
+		'budget_type':                 'nsiOffBudgetType',
 		'organisation_type':           'nsiOrganizationType',
 		'organisation':                'nsiOrganization',
-
-
 		'placing_way':                 'nsiPlacingWay',
 		'plan_position_change_reason': 'nsiPlanPositionChangeReason',
-
 		'purchase_document_type':      'nsiPurchaseDocumentTypes',
 		'purchase_preference':         'nsiPurchasePreferences',
-		'purchase_reject_reason':      'nsiPurchaseRejectReason'}
+		'purchase_reject_reason':      'nsiPurchaseRejectReason',
+		'plangraph':                   'plangraphs',
+		'prev_month':                  'prevMonth',
+		'curr_month':                  'currMonth'}
 
 
 	def __init__(self):
@@ -41,6 +39,26 @@ class Runner:
 			alias = self.alias,
 			name  = self.name)
 
+		self.parsers = {
+
+			'country':                     self.parseCountry,
+			'currency':                    self.parseCurrency,
+			'okei':                        self.parseOKEI,
+			'kosgu':                       self.parseKOSGU,
+			'okopf':                       self.parseOKOPF,
+			'okpd':                        self.parseOKPD,
+			'oktmo':                       self.parseOKTMO,
+			'okved':                       self.parseOKVED,
+			'budget':                      self.parseBudget,
+			'budget_type':                 self.parseBudgetType,
+			'organisation_type':           self.parseOrganisationType,
+			'organisation':                self.parseOrganisation,
+			'placing_way':                 self.parsePlacingWay,
+			'plan_position_change_reason': self.parsePlanPositionChangeReason,
+
+			'plangraph':                   self.parsePlanGraph
+		}
+
 
 	def run(self):
 
@@ -49,43 +67,61 @@ class Runner:
 			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
 			return False
 
-
 		# Обновляем справочники
-#		self.getEssencesList()                                                  # Тест
+		self.getEssencesList()
 
-#		self.updateEssence('country')
-#		self.updateRegions()
-#		self.updateEssence('currency')
-#		self.updateEssence('okei')
-#		self.updateEssence('kosgu')
-#		self.updateEssence('okopf')
-#		self.updateEssence('okpd')
-#		self.updateEssence('oktmo')
-#		self.updateEssence('okved')
+		self.updateEssence('country')
+		self.updateEssence('currency')
+		self.updateEssence('okei')
+		self.updateEssence('kosgu')
+		self.updateEssence('okopf')
+		self.updateEssence('okpd')
+		self.updateEssence('oktmo')
+		self.updateEssence('okved')
 
-#		self.updateEssence('budget')
+		self.updateEssence('budget')
+		self.updateEssence('budget_type')
 
+		self.updateEssence('organisation_type')
 		self.updateEssence('organisation')
-#		self.updateEssence('organisation_right')
-#		self.updateEssence('organisation_type')
 
+		self.updateEssence('placing_way')
+		self.updateEssence('plan_position_change_reason')
 
-
-#		self.updateEssence('placing_way')
-#		self.updateEssence('plan_position_change_reason')
-
-#		self.updateEssence('purchase_document_type')
-#		self.updateEssence('purchase_preference')
-#		self.updateEssence('purchase_reject_reason')
-
-
-
-
-
-
+		self.updateEssence('purchase_document_type')
+		self.updateEssence('purchase_preference')
+		self.updateEssence('purchase_reject_reason')
 
 		# Обновляем планы регионов
-		# TODO
+		self.updateRegions()
+
+		# Получаем спиисок "нужных" регионов
+		regions = Region.objects.filter(state = True)
+
+		for region in regions:
+
+			# TODO Обработка планов-графиков
+			catalogs = [
+#				"{}/{}/{}".format(
+#					self.urls['regions'],
+#					region.alias,
+#					self.urls['plangraph']),
+#				"{}/{}/{}/{}".format(
+#					self.urls['regions'],
+#					region.alias,
+#					self.urls['plangraph'],
+#					self.urls['prev_month']),
+				"{}/{}/{}/{}".format(
+					self.urls['regions'],
+					region.alias,
+					self.urls['plangraph'],
+					self.urls['prev_month'])]
+
+			for catalog in catalogs:
+				self.updateEssence(essence = 'plangraph', catalog = catalog)
+
+			print(catalog)
+
 
 		# Обновляем тендеры регионов
 		# TODO
@@ -105,7 +141,6 @@ class Runner:
 
 		# Переходим в нужный каталог
 		if catalog:
-			print(catalog)
 			ftp.cwd(catalog)
 
 		# Получаем содержимое каталога
@@ -156,14 +191,16 @@ class Runner:
 		return essences
 
 
-	def updateEssence(self, essence):
+	def updateEssence(self, essence, catalog = None):
 		'Получает файлы сущностей для анализа и обработки'
 
 		# Импортируем
 		from io import TextIOWrapper
 
 		# Получаем список файлов
-		catalog = "/{}/{}".format(self.urls['essences'], self.urls[essence])
+		if catalog is None:
+			catalog = "/{}/{}".format(self.urls['essences'], self.urls[essence])
+
 		zip_names = self.getFTPCatalog(catalog)
 
 		# Загружаем архивы
@@ -186,38 +223,13 @@ class Runner:
 				print("Извлек файл {}.".format(xml_name))
 
 				# Парсим файл
-				if   'country'                     == essence: self.parseCountry(xml_data)
-				elif 'currency'                    == essence: self.parseCurrency(xml_data)
-				elif 'okei'                        == essence: self.parseOKEI(xml_data)
-				elif 'kosgu'                       == essence: self.parseKOSGU(xml_data)
-				elif 'okopf'                       == essence: self.parseOKOPF(xml_data)
-				elif 'okpd'                        == essence: self.parseOKPD(xml_data)
-				elif 'oktmo'                       == essence: self.parseOKTMO(xml_data)
-				elif 'okved'                       == essence: self.parseOKVED(xml_data)
+				try:
+					parse = self.parsers[essence]
+				except KeyError:
+					print('Ошибка: отсутствует парсер для сущности {}.'.format(essence))
+					continue
 
-				elif 'budget'                      == essence: self.parseBudget(xml_data)
-
-				elif 'organisation_right'          == essence: self.parseOrganisationRight(xml_data)
-				elif 'organisation_type'           == essence: self.parseOrganisationType(xml_data)
-
-				elif 'organisation'                == essence: self.parseOrganisation(xml_data)
-
-
-
-
-				elif 'placing_way'                 == essence: self.parsePlacingWay(xml_data)
-				elif 'plan_position_change_reason' == essence: self.parsePlanPositionChangeReason(xml_data)
-
-
-
-				# TODO
-				# TODO
-				# TODO
-				# TODO
-				# TODO
-
-				else: print('Ошибка: отсутствует парсер для сущности {}.'.format(essence))
-
+				parse(xml_data)
 				print("Файл {} обработан.".format(xml_name))
 
 		return True
@@ -817,6 +829,70 @@ class Runner:
 		return True
 
 
+	def parseBudgetType(self, xml_data):
+		'Парсит типы бюджета.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('code'):
+						e['code'] = value.text
+
+					# name
+					elif value.tag.endswith('name'):
+						e['name'] = value.text
+
+					# subsystem_type
+					elif value.tag.endswith('subsystemType'):
+						e['subsystem_type'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обрабатываем зависимости
+				try:
+					if e['subsystem_type']:
+						e['subsystem_type'] = SubsystemType.objects.take(e['subsystem_type'])
+				except KeyError:
+					e['subsystem_type'] = None
+				except SubsystemType.DoesNotExist:
+					e['subsystem_type'] = None
+
+				# Обновляем информацию в базе
+				budget_type = BudgetType.objects.update(
+					code           = e['code'],
+					name           = e['name'],
+					subsystem_type = e['subsystem_type'],
+					state          = e['state'])
+
+				print("Обновлён элемент Тип бюджета: {}.".format(budget_type))
+
+		return True
+
+
 	def parseOrganisationType(self, xml_data):
 		'Парсит типы организаций.'
 
@@ -1124,6 +1200,289 @@ class Runner:
 				print("Обновлён элемент Причина изменения позиции плана: {}.".format(plan_position_change_reason))
 
 		return True
+
+
+	def parsePlanGraph(self, xml_data):
+		'Парсит планы-графики.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# План
+			if element_list.tag.endswith('tenderPlan'):
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				for element in element_list:
+
+					# Основная информация о плане
+					if element.tag.endswith('commonInfo'):
+
+						for value in element:
+
+							if   value.tag.endswith('id'):            e['plan_oos_id']       = value.text
+							elif value.tag.endswith('planNumber'):    e['plan_number']       = value.text
+							elif value.tag.endswith('year'):          e['plan_year']         = value.text
+							elif value.tag.endswith('versionNumber'): e['plan_version']      = value.text
+							elif value.tag.endswith('createDate'):    e['plan_created']      = value.text
+							elif value.tag.endswith('confirmDate'):   e['plan_confirmed']    = value.text
+							elif value.tag.endswith('publishDate'):   e['plan_published']    = value.text
+							elif value.tag.endswith('description'):   e['plan_description']  = value.text
+
+							# Владелец
+							elif value.tag.endswith('owner'):
+								for sub in value:
+									if sub.tag.endswith('regNum'):
+										e['owner'] = sub.text
+
+					# Информация о заказчике
+					elif element.tag.endswith('customerInfo'):
+						for value in element:
+
+							# Заказчик
+							if value.tag.endswith('customer'):
+								for sub in value:
+									if sub.tag.endswith('regNum'):
+										e['customer'] = sub.text
+
+							# ОКТМО
+							elif value.tag.endswith('OKTMO'):
+								for sub in value:
+									if sub.tag.endswith('code'):
+										e['oktmo_code'] = sub.text
+
+					# Контактное лицо
+					elif element.tag.endswith('responsibleContactInfo'):
+						for value in element:
+							if value.tag.endswith('firstName'):    e['contact_person_first_name']  = value.text
+							elif value.tag.endswith('lastName'):   e['contact_person_last_name']   = value.text
+							elif value.tag.endswith('middleName'): e['contact_person_middle_name'] = value.text
+							elif value.tag.endswith('email'):      e['contact_person_email']       = value.text
+							elif value.tag.endswith('phone'):      e['contact_person_phone']       = value.text
+							elif value.tag.endswith('fax'):        e['contact_person_fax']         = value.text
+
+					# Сопровождаемые данные?
+					elif element.tag.endswith('providedPurchases'):
+
+						for value in element:
+
+							# Список позиций
+							if value.tag.endswith('positions'):
+
+								e['positions'] = []
+
+								# Позиция
+								for position in value:
+
+									p = {}
+
+									for position_element in position:
+
+										if position_element.tag.endswith('commonInfo'):
+
+											for position_sub in position_element:
+
+												if position_sub.tag.endswith('positionNumber'):
+
+													p['position_number'] = position_sub.text
+
+												# Amounts KBKs
+												elif position_sub.tag.endswith('amountKBKs'):
+													p['kbks'] = []
+													for kbk_element in position_sub:
+														k = {}
+														for kbk_value in kbk_element:
+															if kbk_value.tag.endswith('code'):
+																k['code'] = kbk_value.text
+														p['kbks'].append(k)
+
+												# ОКВЭД
+												elif position_sub.tag.endswith('OKVEDs'):
+													p['okveds'] = []
+													for okved_element in position_sub:
+														o = {}
+														for okved_value in okved_element:
+															if okved_value.tag.endswith('code'):
+																o['code'] = okved_value.text
+														p['okveds'].append(o)
+
+												elif position_sub.tag.endswith('contractSubjectName'):
+													p['position_subject_name'] = position_sub.text
+
+												elif position_sub.tag.endswith('contractMaxPrice'):
+													p['position_max_price'] = position_sub.text
+
+												elif position_sub.tag.endswith('payments'):
+													p['payments'] = position_sub.text
+
+												elif position_sub.tag.endswith('contractCurrency'):
+													for currency_value in position_sub:
+														if currency_value.tag.endswith('code'):
+															p['currency_code'] = currency_value.text
+
+												elif position_sub.tag.endswith('placingWay'):
+													for placing_way_value in position_sub:
+														if placing_way_value.tag.endswith('code'):
+															p['placing_way_code'] = placing_way_value.text
+
+												elif position_sub.tag.endswith('positionModification'):
+													for position_modification_value in position_sub:
+
+														if position_modification_value.tag.endswith('changeReason'):
+															for change_reason_value in position_modification_value:
+																if change_reason_value.tag.endswith('id'):
+																	p['change_reason_id'] = change_reason_value.text
+
+										# Продукты
+										elif position_element.tag.endswith('products'):
+
+											p['products'] = []
+
+											for product_element in position_element:
+
+												pr = {}
+
+												for product_value in product_element:
+
+													if product_value.tag.endswith('OKPD'):
+														for okpd_value in product_value:
+															if okpd_value.tag.endswith('code'):
+																pr['okpd_code'] = okpd_value.text
+
+													elif product_value.tag.endswith('name'):
+														pr['name'] = product_value.text
+
+													elif product_value.tag.endswith('minRequirement'):
+														pr['min_requirement'] = product_value.text
+
+													elif product_value.tag.endswith('OKEI'):
+														for okei_value in product_value:
+															if okei_value.tag.endswith('code'):
+																pr['okei_code'] = okei_value.text
+
+													elif product_value.tag.endswith('sumMax'):
+														pr['sum_max'] = product_value.text
+
+													elif product_value.tag.endswith('price'):
+														pr['price'] = product_value.text
+
+													elif product_value.tag.endswith('quantityUndefined'):
+														pr['quantity_undefined'] = product_value.text
+
+													elif product_value.tag.endswith('quantity'):
+														pr['quantity'] = product_value.text
+
+												p['products'].append(pr)
+
+									e['positions'].append(p)
+
+				# Записываем в базу
+				print('\n')
+				print(e)
+				print('\n')
+
+				try:
+					e['owner'] = Organisation.objects.take(e['owner'])
+				except KeyError:
+					e['owner'] = None
+				except Organisation.DoesNotExist:
+					e['owner'] = None
+
+				try:
+					e['customer'] = Organisation.objects.take(e['customer'])
+				except KeyError:
+					e['customer'] = None
+				except Organisation.DoesNotExist:
+					e['customer'] = None
+
+				try:
+					e['oktmo'] = OKTMO.objects.take(e['oktmo'])
+				except KeyError:
+					e['oktmo'] = None
+				except OKTMO.DoesNotExist:
+					e['oktmo'] = None
+
+				try:
+					e['contact_person_email'] = e['contact_person_email']
+				except KeyError:
+					e['contact_person_email'] = None
+
+				try:
+					e['contact_person_phone'] = e['contact_person_phone']
+				except KeyError:
+					e['contact_person_phone'] = None
+
+				try:
+					e['contact_person_fax'] = e['contact_person_fax']
+				except KeyError:
+					e['contact_person_fax'] = None
+
+				try:
+					e['contact_person'] = ContactPerson.objects.take(
+						first_name  = e['contact_person_first_name'],
+						middle_name = e['contact_person_middle_name'],
+						last_name   = e['contact_person_last_name'],
+						email       = e['contact_person_email'],
+						phone       = e['contact_person_phone'],
+						fax         = e['contact_person_fax'])
+				except KeyError:
+					e['contact_person'] = None
+				except OKTMO.DoesNotExist:
+					e['contact_person'] = None
+
+				# Обновляем информацию в базе
+				plan_graph = PlanGraph.objects.update(
+					reg_number        = e['reg_number'],
+					short_name        = e['short_name'],
+					full_name         = e['full_name'],
+					head_agency       = e['head_agency'],
+					ordering_agency   = e['ordering_agency'],
+					okogu             = e['okogu'],
+					inn               = e['inn'],
+					kpp               = e['kpp'],
+					okpo              = e['okpo'],
+					organisation_type = e['organisation_type'],
+					oktmo             = e['oktmo'],
+					state             = e['state'],
+					register          = e['register'])
+
+
+
+
+			# Tender Plan Cancel
+			elif element_list.tag.endswith('tenderPlanCancel'):
+				print('Tender Plan Cancel')
+
+			# Tender Plan Unstructured
+			elif element_list.tag.endswith('tenderPlanUnstructured'):
+				print('Tender Plan Cancel')
+
+
+
+
+
+
+		return True
+
+
+
+
+
+
+
+
+
+
 
 
 

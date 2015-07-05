@@ -33,7 +33,7 @@ class Updater(models.Model):
 	objects  = UpdaterManager()
 
 	def __str__(self):
-		return self.name
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['name']
@@ -84,7 +84,7 @@ class Country(models.Model):
 	objects   = CountryManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.full_name)
 
 	class Meta:
 		ordering = ['name']
@@ -119,7 +119,7 @@ class Region(models.Model):
 	objects   = RegionManager()
 	
 	def __str__(self):
-		return self.name
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['name']
@@ -173,7 +173,7 @@ class Currency(models.Model):
 	objects      = CurrencyManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -222,7 +222,7 @@ class OKEISection(models.Model):
 	objects  = OKEISectionManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -270,7 +270,7 @@ class OKEIGroup(models.Model):
 	objects  = OKEIGroupManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -343,7 +343,7 @@ class OKEI(models.Model):
 	objects              = OKEIManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.full_name)
 
 	class Meta:
 		ordering = ['code']
@@ -410,7 +410,7 @@ class KOSGU(models.Model):
 	objects     = KOSGUManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -481,7 +481,7 @@ class OKOPF(models.Model):
 	objects       = OKOPFManager()
 
 	def __str__(self):
-		return self.name
+		return "{} {}".format(self.code, self.full_name)
 
 	class Meta:
 		ordering = ['code']
@@ -619,7 +619,7 @@ class OKTMO(models.Model):
 	objects       = OKTMOManager()
 
 	def __str__(self):
-		return self.full_name
+		return "{} {}".format(self.code, self.full_name)
 
 	class Meta:
 		ordering = ['code']
@@ -665,7 +665,7 @@ class OKVEDSection(models.Model):
 	objects  = OKVEDSectionManager()
 
 	def __str__(self):
-		return self.name
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['name']
@@ -711,7 +711,7 @@ class OKVEDSubSection(models.Model):
 	objects  = OKVEDSubSectionManager()
 
 	def __str__(self):
-		return self.name
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['name']
@@ -933,6 +933,57 @@ class Budget(models.Model):
 	modified = models.DateTimeField()
 
 	objects  = BudgetManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+class BudgetTypeManager(models.Manager):
+
+	def take(self, code, name = None, subsystem_type = None, state = True):
+		try:
+			o = self.get(code = code)
+		except BudgetType.DoesNotExist:
+			o                = BudgetType()
+			o.code           = code
+			o.name           = name
+			o.subsystem_type = subsystem_type
+			o.state          = state
+			o.created        = timezone.now()
+			o.modified       = timezone.now()
+			o.save()
+		return o
+
+	def update(self, code, name = None, subsystem_type = None, state = True):
+		try:
+			o                = self.get(code = code)
+			o.name           = name
+			o.subsystem_type = subsystem_type
+			o.state          = state
+			o.modified       = timezone.now()
+			o.save()
+		except BudgetType.DoesNotExist:
+			o = self.take(
+				code           = code,
+				name           = name,
+				subsystem_type = subsystem_type,
+				state          = state)
+		return o
+
+
+class BudgetType(models.Model):
+
+	code           = models.CharField(max_length = 20, unique = True)
+	name           = models.TextField(null = True, default = None)
+	subsystem_type = models.ForeignKey(SubsystemType, null = True, default = None)
+	state          = models.BooleanField(default = True)
+	created        = models.DateTimeField()
+	modified       = models.DateTimeField()
+
+	objects  = BudgetTypeManager()
 
 	def __str__(self):
 		return "{} {}".format(self.code, self.name)
@@ -1190,15 +1241,187 @@ class PlanPositionChangeReason(models.Model):
 		ordering = ['oos_id']
 
 
+class ContactPersonManager(models.Manager):
+
+	def take(self, first_name, middle_name, last_name, email, phone = None, fax = None, position = None, description = None, state = True):
+		try:
+			o = self.get(
+				first_name  = first_name,
+				middle_name = midle_name,
+				last_name   = last_name,
+				email       = email)
+		except ContactPerson.DoesNotExist:
+			o             = ContactPerson()
+			o.first_name  = first_name
+			o.middle_name = middle_name
+			o.last_name   = last_name
+			o.email       = email
+			o.phone       = phone
+			o.fax         = fax
+			o.position    = position
+			o.description = description
+			o.state       = state
+			o.created     = timezone.now()
+			o.modified    = timezone.now()
+			o.save()
+		return o
+
+	def update(self, first_name, middle_name, last_name, email, phone = None, fax = None, position = None, description = None, state = True):
+		try:
+			o = self.get(
+				first_name  = first_name,
+				middle_name = midle_name,
+				last_name   = last_name,
+				email       = email)
+			o.phone       = phone
+			o.fax         = fax
+			o.position    = position
+			o.description = description
+			o.state       = state
+			o.modified    = timezone.now()
+			o.save()
+		except ContactPerson.DoesNotExist:
+			o = self.take(
+				first_name  = first_name,
+				middle_name = middle_name,
+				last_name   = last_name,
+				email       = email,
+				phone       = phone,
+				fax         = fax,
+				position    = position,
+				description = description,
+				state       = state)
+		return o
+
+
+class ContactPerson(models.Model):
+
+	first_name  = models.CharField(max_length = 100, null = True, default = None)
+	middle_name = models.CharField(max_length = 100, null = True, default = None)
+	last_name   = models.CharField(max_length = 100, null = True, default = None)
+	email       = models.CharField(max_length = 100, null = True, default = None)
+	phone       = models.CharField(max_length = 20,  null = True, default = None)
+	fax         = models.CharField(max_length = 20,  null = True, default = None)
+	position    = models.CharField(max_length = 100, null = True, default = None)
+	description = models.TextField(null = True, default = None)
+	state       = models.BooleanField(default = True)
+	created     = models.DateTimeField()
+	modified    = models.DateTimeField()
+
+	objects     = ContactPersonManager()
+
+	def __str__(self):
+		return "{} {} {]".format(self.first_name, self.middle_name, self.last_name)
+
+	class Meta:
+		ordering = ['first_name', 'middle_name', 'last_name']
+
+
+class PlanGraphManager(models.Manager):
+
+	def take(self, oos_id, number = None, year = None, version = None,
+			description = None, owner = None, customer = None, oktmo = None,
+			contact_person = None, state = True, created = None,
+			confirmed = None, published = None):
+		try:
+			o = self.get(oos_id = oos_id)
+		except PlanGraph.DoesNotExist:
+			o                = PlanGraph()
+			o.oos_id         = oos_id
+			o.number         = number
+			o.year           = year
+			o.version        = version
+			o.description    = description
+			o.owner          = owner
+			o.customer       = customer
+			o.oktmo          = oktmo
+			o.contact_person = state
+			o.state          = state
+			o.confirmed      = modified
+			o.confirmed      = confirmed
+			o.published      = published
+			o.state          = state
+			o.modified       = timezone.now()
+			if created:
+				o.created    = created
+			else:
+				o.created    = timezone.now()
+			o.save()
+		return o
+
+	def update(self, oos_id, number = None, year = None, version = None,
+			description = None, owner = None, customer = None, oktmo = None,
+			contact_person = None, state = True, created = None,
+			confirmed = None, published = None):
+		try:
+			o = self.get(oos_id = oos_id)
+			o.number         = number
+			o.year           = year
+			o.version        = version
+			o.description    = description
+			o.owner          = owner
+			o.customer       = customer
+			o.oktmo          = oktmo
+			o.contact_person = state
+			o.state          = state
+			o.confirmed      = modified
+			o.confirmed      = confirmed
+			o.published      = published
+			o.state          = state
+			o.modified       = timezone.now()
+			if created:
+				o.created    = created
+			o.save()
+		except PlanGraph.DoesNotExist:
+			o = self.take(
+				oos_id         = oos_id,
+				number         = number,
+				year           = year,
+				version        = version,
+				description    = description,
+				owner          = owner,
+				customer       = customer,
+				oktmo          = oktmo,
+				contact_person = state,
+				state          = state,
+				modified       = modified,
+				confirmed      = confirmed,
+				published      = published,
+				created        = created)
+		return o
+
+
+class PlanGraph(models.Model):
+
+	oos_id         = models.CharField(max_length = 20, null = True, default = None)
+	number         = models.CharField(max_length = 20, null = True, default = None)
+	year           = models.IntegerField(null=True, default=None)
+	version        = models.IntegerField(null=True, default=None)
+	description    = models.TextField(null = True, default = None)
+	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
+	customer       = models.ForeignKey(Organisation, related_name = 'plan_graph_customer', null = True, default = None)
+	oktmo          = models.ForeignKey(OKTMO, null = True, default = None)
+	contact_person = models.ForeignKey(ContactPerson, null = True, default = None)
+	state          = models.BooleanField(default = True)
+	created        = models.DateTimeField()
+	modified       = models.DateTimeField()
+	confirmed      = models.DateTimeField(null=True, default=None)
+	published      = models.DateTimeField(null=True, default=None)
+
+	objects        = PlanGraphManager()
+
+	def __str__(self):
+		return "{} {} {} {} ".format(self.year, self.number, self.version, self.description)
+
+	class Meta:
+		ordering = ['year', 'number', 'version']
+
+
+# TODO Plan Graph Position
 
 
 
-
-
-
-
-
-
+# TODO Plan Graph Product
 
 
 
