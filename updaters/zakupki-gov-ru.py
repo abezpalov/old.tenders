@@ -20,6 +20,7 @@ class Runner:
 		'okved':                       'nsiOKVED',
 		'budget':                      'nsiBudget',
 		'budget_type':                 'nsiOffBudgetType',
+		'kbk_budget':                  'nsiKBKBudget',
 		'organisation_type':           'nsiOrganizationType',
 		'organisation':                'nsiOrganization',
 		'placing_way':                 'nsiPlacingWay',
@@ -51,6 +52,7 @@ class Runner:
 			'okved':                       self.parseOKVED,
 			'budget':                      self.parseBudget,
 			'budget_type':                 self.parseBudgetType,
+			'kbk_budget':                  self.parseKBKBudget,
 			'organisation_type':           self.parseOrganisationType,
 			'organisation':                self.parseOrganisation,
 			'placing_way':                 self.parsePlacingWay,
@@ -81,6 +83,7 @@ class Runner:
 
 		self.updateEssence('budget')
 		self.updateEssence('budget_type')
+		self.updateEssence('kbk_budget')
 
 		self.updateEssence('organisation_type')
 		self.updateEssence('organisation')
@@ -100,7 +103,6 @@ class Runner:
 
 		for region in regions:
 
-			# TODO Обработка планов-графиков
 			catalogs = [
 #				"{}/{}/{}".format(
 #					self.urls['regions'],
@@ -118,13 +120,11 @@ class Runner:
 					self.urls['prev_month'])]
 
 			for catalog in catalogs:
+
+				# Обрабатываем планы-графики
 				self.updateEssence(essence = 'plangraph', catalog = catalog)
 
-			print(catalog)
-
-
-		# Обновляем тендеры регионов
-		# TODO
+				# TODO Обновляем тендеры регионов
 
 		return True
 
@@ -199,16 +199,27 @@ class Runner:
 
 		# Получаем список файлов
 		if catalog is None:
-			catalog = "/{}/{}".format(self.urls['essences'], self.urls[essence])
+			catalog = "{}/{}".format(self.urls['essences'], self.urls[essence])
 
 		zip_names = self.getFTPCatalog(catalog)
 
 		# Загружаем архивы
 		for zip_name in zip_names:
 
+			# Проверяем источник
+			source = Source.objects.take(
+				url = "{}/{}/{}".format(
+					self.urls['base'],
+					catalog,
+					zip_name))
+
+			if source.state:
+				print("Файл {} уже обработан.".format(source.url))
+				continue
+
 			# Скачиваем архив
+			print("Скачиваю файл: {}".format(source.url))
 			zip_data = self.getZipFromFTP(zip_name, catalog)
-			print("Скачал файл {}.".format(zip_name))
 
 			if not zip_data:
 				print("Ошибка: невозможно скачать файл. Перехожу с следующему.")
@@ -216,21 +227,26 @@ class Runner:
 
 			# Получаем список файлов в архиве
 			xml_names = zip_data.namelist()
+			i = 0
 			for xml_name in xml_names:
 
 				# Извлекаем файл из архива
 				xml_data = zip_data.open(xml_name)
-				print("Извлек файл {}.".format(xml_name))
 
 				# Парсим файл
 				try:
 					parse = self.parsers[essence]
+					if parse(xml_data): i += 1
 				except KeyError:
-					print('Ошибка: отсутствует парсер для сущности {}.'.format(essence))
+					print("Ошибка: отсутствует парсер для сущности {}.".format(essence))
 					continue
 
-				parse(xml_data)
-				print("Файл {} обработан.".format(xml_name))
+			if i == len(xml_names):
+				print("Все файлы архива обработаны.")
+				source.state = True
+				source.save()
+			else:
+				print("Внимание! Не все файлы архива обработаны.")
 
 		return True
 
@@ -321,7 +337,7 @@ class Runner:
 					name         = e['name'],
 					state        = e['state'])
 
-				print("Обновлена валюта.".format(currency))
+				print("Обновлена валюта: {}.".format(currency))
 
 		return True
 
@@ -893,6 +909,83 @@ class Runner:
 		return True
 
 
+	def parseKBKBudget(self, xml_data):
+		'Парсит код поступления бюджета.'
+
+		# Импортируем
+		from lxml import etree
+
+		# Парсим
+		tree = etree.parse(xml_data)
+
+		# Получаем корневой элемент
+		root = tree.getroot()
+
+		# Получаем список
+		for element_list in root:
+
+			# Получаем элемент
+			for element in element_list:
+
+				# Инициируем пустой справочник элемента
+				e = {}
+
+				# Обрабатываем значения полей
+				for value in element:
+
+					# code
+					if value.tag.endswith('kbk'):
+						e['code'] = value.text
+
+					# budget
+					elif value.tag.endswith('budget'):
+						e['budget'] = value.text
+
+					# state
+					elif value.tag.endswith('actual'):
+						if value.text == 'true':
+							e['state'] = True
+						else:
+							e['state'] = False
+
+				# Обрабатываем зависимости
+				try:
+					e['budget'] = Budget.objects.take(code = e['budget'])
+				except KeyError:
+					e['budget'] = None
+				except SubsystemType.DoesNotExist:
+					e['budget'] = None
+
+				# Обновляем информацию в базе
+				kbk_budget = KBKBudget.objects.update(
+					code   = e['code'],
+					budget = e['budget'],
+					state  = e['state'])
+
+				print("Обновлён элемент Код поступления бюджета: {}.".format(kbk_budget))
+
+		return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	def parseOrganisationType(self, xml_data):
 		'Парсит типы организаций.'
 
@@ -940,7 +1033,6 @@ class Runner:
 
 		return True
 
-	# TODO parseOrganisation
 
 	def parseOrganisation(self, xml_data):
 		'Парсит организации.'
@@ -1230,14 +1322,14 @@ class Runner:
 
 						for value in element:
 
-							if   value.tag.endswith('id'):            e['plan_oos_id']       = value.text
-							elif value.tag.endswith('planNumber'):    e['plan_number']       = value.text
-							elif value.tag.endswith('year'):          e['plan_year']         = value.text
-							elif value.tag.endswith('versionNumber'): e['plan_version']      = value.text
-							elif value.tag.endswith('createDate'):    e['plan_created']      = value.text
-							elif value.tag.endswith('confirmDate'):   e['plan_confirmed']    = value.text
-							elif value.tag.endswith('publishDate'):   e['plan_published']    = value.text
-							elif value.tag.endswith('description'):   e['plan_description']  = value.text
+							if   value.tag.endswith('id'):            e['oos_id']       = value.text
+							elif value.tag.endswith('planNumber'):    e['number']       = value.text
+							elif value.tag.endswith('year'):          e['year']         = value.text
+							elif value.tag.endswith('versionNumber'): e['version']      = value.text
+							elif value.tag.endswith('createDate'):    e['created']      = value.text
+							elif value.tag.endswith('confirmDate'):   e['confirmed']    = value.text
+							elif value.tag.endswith('publishDate'):   e['published']    = value.text
+							elif value.tag.endswith('description'):   e['description']  = value.text
 
 							# Владелец
 							elif value.tag.endswith('owner'):
@@ -1294,7 +1386,7 @@ class Runner:
 
 												if position_sub.tag.endswith('positionNumber'):
 
-													p['position_number'] = position_sub.text
+													p['number'] = position_sub.text
 
 												# Amounts KBKs
 												elif position_sub.tag.endswith('amountKBKs'):
@@ -1387,10 +1479,6 @@ class Runner:
 									e['positions'].append(p)
 
 				# Записываем в базу
-				print('\n')
-				print(e)
-				print('\n')
-
 				try:
 					e['owner'] = Organisation.objects.take(e['owner'])
 				except KeyError:
@@ -1440,23 +1528,28 @@ class Runner:
 				except OKTMO.DoesNotExist:
 					e['contact_person'] = None
 
-				# Обновляем информацию в базе
 				plan_graph = PlanGraph.objects.update(
-					reg_number        = e['reg_number'],
-					short_name        = e['short_name'],
-					full_name         = e['full_name'],
-					head_agency       = e['head_agency'],
-					ordering_agency   = e['ordering_agency'],
-					okogu             = e['okogu'],
-					inn               = e['inn'],
-					kpp               = e['kpp'],
-					okpo              = e['okpo'],
-					organisation_type = e['organisation_type'],
-					oktmo             = e['oktmo'],
-					state             = e['state'],
-					register          = e['register'])
+					oos_id         = e['oos_id'],
+					number         = e['number'],
+					year           = e['year'],
+					version        = e['version'],
+					description    = e['description'],
+					owner          = e['owner'],
+					customer       = e['customer'],
+					oktmo          = e['oktmo'],
+					contact_person = e['contact_person'],
+					state          = True,
+					created        = e['created'],
+					confirmed      = e['confirmed'],
+					published      = e['published'])
 
-
+				try:
+					positions = e['positions']
+					for n, p in enumerate(e['positions']):
+						print("Position {}".format(n))
+				except KeyError:
+					print('Ошибка: не обнаружены позиции.')
+					# TODO Обработать с дополнительного файла
 
 
 			# Tender Plan Cancel
@@ -1468,53 +1561,7 @@ class Runner:
 				print('Tender Plan Cancel')
 
 
-
-
-
-
-		return True
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
-	# TODO Parser
+		return False
 
 
 	def updateRegions(self):

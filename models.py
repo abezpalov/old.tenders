@@ -38,6 +38,39 @@ class Updater(models.Model):
 	class Meta:
 		ordering = ['name']
 
+class SourceManager(models.Manager):
+
+	def take(self, url, state = False):
+		try:
+			o = self.get(url = url)
+		except Source.DoesNotExist:
+			o          = Source()
+			o.url      = url[:2048]
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
+
+class Source(models.Model):
+
+	url      = models.CharField(max_length = 2048)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = SourceManager()
+
+	def __str__(self):
+		return "{}".format(self.name)
+
+
+
+
+
+
+
+
 
 class CountryManager(models.Manager):
 
@@ -992,6 +1025,53 @@ class BudgetType(models.Model):
 		ordering = ['code']
 
 
+class KBKBudgetManager(models.Manager):
+
+	def take(self, code, budget = None, state = True):
+		try:
+			o = self.get(code = code)
+		except KBKBudget.DoesNotExist:
+			o          = KBKBudget()
+			o.code     = code
+			o.budget   = budget
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
+
+	def update(self, code, budget = None, state = True):
+		try:
+			o          = self.get(code = code)
+			o.budget   = budget
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
+		except KBKBudget.DoesNotExist:
+			o = self.take(
+				code   = code,
+				budget = budget,
+				state  = state)
+		return o
+
+
+class KBKBudget(models.Model):
+
+	code     = models.CharField(max_length = 50, unique = True)
+	budget   = models.ForeignKey(Budget, null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	objects  = KBKBudgetManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.budget)
+
+	class Meta:
+		ordering = ['code']
+
+
 class OKOGUManager(models.Manager):
 
 	def take(self, code, name = None, state = True):
@@ -1247,7 +1327,7 @@ class ContactPersonManager(models.Manager):
 		try:
 			o = self.get(
 				first_name  = first_name,
-				middle_name = midle_name,
+				middle_name = middle_name,
 				last_name   = last_name,
 				email       = email)
 		except ContactPerson.DoesNotExist:
@@ -1300,8 +1380,8 @@ class ContactPerson(models.Model):
 	middle_name = models.CharField(max_length = 100, null = True, default = None)
 	last_name   = models.CharField(max_length = 100, null = True, default = None)
 	email       = models.CharField(max_length = 100, null = True, default = None)
-	phone       = models.CharField(max_length = 20,  null = True, default = None)
-	fax         = models.CharField(max_length = 20,  null = True, default = None)
+	phone       = models.CharField(max_length = 100,  null = True, default = None)
+	fax         = models.CharField(max_length = 100,  null = True, default = None)
 	position    = models.CharField(max_length = 100, null = True, default = None)
 	description = models.TextField(null = True, default = None)
 	state       = models.BooleanField(default = True)
@@ -1335,9 +1415,8 @@ class PlanGraphManager(models.Manager):
 			o.owner          = owner
 			o.customer       = customer
 			o.oktmo          = oktmo
-			o.contact_person = state
+			o.contact_person = contact_person
 			o.state          = state
-			o.confirmed      = modified
 			o.confirmed      = confirmed
 			o.published      = published
 			o.state          = state
@@ -1362,9 +1441,8 @@ class PlanGraphManager(models.Manager):
 			o.owner          = owner
 			o.customer       = customer
 			o.oktmo          = oktmo
-			o.contact_person = state
+			o.contact_person = contact_person
 			o.state          = state
-			o.confirmed      = modified
 			o.confirmed      = confirmed
 			o.published      = published
 			o.state          = state
@@ -1382,9 +1460,8 @@ class PlanGraphManager(models.Manager):
 				owner          = owner,
 				customer       = customer,
 				oktmo          = oktmo,
-				contact_person = state,
+				contact_person = contact_person,
 				state          = state,
-				modified       = modified,
 				confirmed      = confirmed,
 				published      = published,
 				created        = created)
@@ -1395,8 +1472,8 @@ class PlanGraph(models.Model):
 
 	oos_id         = models.CharField(max_length = 20, null = True, default = None)
 	number         = models.CharField(max_length = 20, null = True, default = None)
-	year           = models.IntegerField(null=True, default=None)
-	version        = models.IntegerField(null=True, default=None)
+	year           = models.IntegerField(null = True, default = None)
+	version        = models.IntegerField(null = True, default = None)
 	description    = models.TextField(null = True, default = None)
 	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
 	customer       = models.ForeignKey(Organisation, related_name = 'plan_graph_customer', null = True, default = None)
@@ -1405,8 +1482,8 @@ class PlanGraph(models.Model):
 	state          = models.BooleanField(default = True)
 	created        = models.DateTimeField()
 	modified       = models.DateTimeField()
-	confirmed      = models.DateTimeField(null=True, default=None)
-	published      = models.DateTimeField(null=True, default=None)
+	confirmed      = models.DateTimeField(null = True, default = None)
+	published      = models.DateTimeField(null = True, default = None)
 
 	objects        = PlanGraphManager()
 
@@ -1417,7 +1494,36 @@ class PlanGraph(models.Model):
 		ordering = ['year', 'number', 'version']
 
 
-# TODO Plan Graph Position
+# TODO
+class PlanGraphPosition(models.Model):
+
+	number         = models.CharField(max_length = 50, null = True, default = None)
+	plan_graph     = models.ForeignKey(PlanGraph, null = True, default = None)
+	kbks           = models.ManyToManyField(KBKBudget, db_table = 'tenders_plan_graph_position_to_kbk', related_name = 'plan_graph_position_kbk')
+
+
+
+
+#	version        = models.IntegerField(null=True, default=None)
+#	description    = models.TextField(null = True, default = None)
+#	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
+#	customer       = models.ForeignKey(Organisation, related_name = 'plan_graph_customer', null = True, default = None)
+#	oktmo          = models.ForeignKey(OKTMO, null = True, default = None)
+#	contact_person = models.ForeignKey(ContactPerson, null = True, default = None)
+#	state          = models.BooleanField(default = True)
+#	created        = models.DateTimeField()
+#	modified       = models.DateTimeField()
+#	confirmed      = models.DateTimeField(null=True, default=None)
+#	published      = models.DateTimeField(null=True, default=None)
+
+#	objects        = PlanGraphManager()
+
+#	def __str__(self):
+#		return "{} {} {} {} ".format(self.year, self.number, self.version, self.description)
+
+#	class Meta:
+#		ordering = ['year', 'number', 'version']
+
 
 
 
