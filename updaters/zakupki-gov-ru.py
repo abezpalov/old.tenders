@@ -117,7 +117,7 @@ class Runner:
 					self.urls['regions'],
 					region.alias,
 					self.urls['plangraph'],
-					self.urls['prev_month'])]
+					self.urls['curr_month'])]
 
 			for catalog in catalogs:
 
@@ -234,12 +234,8 @@ class Runner:
 				xml_data = zip_data.open(xml_name)
 
 				# Парсим файл
-				try:
-					parse = self.parsers[essence]
-					if parse(xml_data): i += 1
-				except KeyError:
-					print("Ошибка: отсутствует парсер для сущности {}.".format(essence))
-					continue
+				parse = self.parsers[essence]
+				if parse(xml_data): i += 1
 
 			if i == len(xml_names):
 				print("Все файлы архива обработаны.")
@@ -600,18 +596,18 @@ class Runner:
 
 					# code
 					if value.tag.endswith('id'):
-						e['code'] = value.text
+						e['oos_id'] = value.text
 
 					# parent_code
 					elif value.tag.endswith('parentId'):
 						if not value.text:
-							e['parent_code'] = None
+							e['parent_oos_id'] = None
 						else:
-							e['parent_code'] = value.text
+							e['parent_oos_id'] = value.text
 
 					# alias
 					elif value.tag.endswith('code'):
-						e['alias'] = value.text	
+						e['code'] = value.text	
 
 					# name
 					elif value.tag.endswith('name'):
@@ -626,18 +622,18 @@ class Runner:
 
 				# Обновляем информацию в базе
 				try:
-					e['parent_code'] = e['parent_code']
+					e['parent_oos_id'] = e['parent_oos_id']
 				except KeyError:
-					e['parent_code'] = None
+					e['parent_oos_id'] = None
 
 				okpd = OKPD.objects.update(
-					code        = e['code'],
-					parent_code = e['parent_code'],
-					alias       = e['alias'],
-					name        = e['name'],
-					state       = e['state'])
+					oos_id        = e['oos_id'],
+					parent_oos_id = e['parent_oos_id'],
+					code          = e['code'],
+					name          = e['name'],
+					state         = e['state'])
 
-				print("Обновлён элемент ОКДП: {}.".format(okpd))
+				print("Обновлён элемент ОКПД: {}.".format(okpd))
 
 		return True
 
@@ -1303,265 +1299,236 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		# Планы-графики
+		pgs = tree.xpath('.//tenderPlan')
 
-			# План
-			if element_list.tag.endswith('tenderPlan'):
+		for pg in pgs:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			# План-график
+			plan_graph = {}
 
-				for element in element_list:
+			plan_graph['oos_id']                     = pg.xpath('./commonInfo/id')[0].text
+			plan_graph['number']                     = pg.xpath('./commonInfo/planNumber')[0].text
+			plan_graph['year']                       = pg.xpath('./commonInfo/year')[0].text
+			plan_graph['version']                    = pg.xpath('./commonInfo/versionNumber')[0].text
+			plan_graph['owner_reg_number']           = pg.xpath('./commonInfo/owner/regNum')[0].text
+			plan_graph['create_date']                = pg.xpath('./commonInfo/createDate')[0].text
+			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text
+			plan_graph['confirm_date']               = pg.xpath('./commonInfo/confirmDate')[0].text
+			plan_graph['publish_date']               = pg.xpath('./commonInfo/publishDate')[0].text
+			plan_graph['customer_reg_number']        = pg.xpath('./customerInfo/customer/regNum')[0].text
+			plan_graph['oktmo_code']                 = pg.xpath('./customerInfo/OKTMO/code')[0].text
+			plan_graph['contact_person_last_name']   = pg.xpath('./responsibleContactInfo/lastName')[0].text
+			plan_graph['contact_person_first_name']  = pg.xpath('./responsibleContactInfo/firstName')[0].text
+			plan_graph['contact_person_middle_name'] = pg.xpath('./responsibleContactInfo/middleName')[0].text
+			try:
+				plan_graph['contact_person_phone']   = pg.xpath('./responsibleContactInfo/phone')[0].text
+			except IndexError:
+				plan_graph['contact_person_phone']   = None
+			try:
+				plan_graph['contact_person_fax']     = pg.xpath('./responsibleContactInfo/fax')[0].text
+			except IndexError:
+				plan_graph['contact_person_fax']     = None
+			try:
+				plan_graph['contact_person_email']   = pg.xpath('./responsibleContactInfo/email')[0].text
+			except:
+				plan_graph['contact_person_email']   = None
 
-					# Основная информация о плане
-					if element.tag.endswith('commonInfo'):
+			plan_graph['owner'] = Organisation.objects.take(
+				reg_number = plan_graph['owner_reg_number'])
 
-						for value in element:
+			plan_graph['customer'] = Organisation.objects.take(
+				reg_number = plan_graph['customer_reg_number'])
 
-							if   value.tag.endswith('id'):            e['oos_id']       = value.text
-							elif value.tag.endswith('planNumber'):    e['number']       = value.text
-							elif value.tag.endswith('year'):          e['year']         = value.text
-							elif value.tag.endswith('versionNumber'): e['version']      = value.text
-							elif value.tag.endswith('createDate'):    e['created']      = value.text
-							elif value.tag.endswith('confirmDate'):   e['confirmed']    = value.text
-							elif value.tag.endswith('publishDate'):   e['published']    = value.text
-							elif value.tag.endswith('description'):   e['description']  = value.text
+			plan_graph['oktmo'] = OKTMO.objects.take(
+				code = plan_graph['oktmo_code'])
 
-							# Владелец
-							elif value.tag.endswith('owner'):
-								for sub in value:
-									if sub.tag.endswith('regNum'):
-										e['owner'] = sub.text
+			plan_graph['contact_person'] = ContactPerson.objects.take(
+				last_name   = plan_graph['contact_person_last_name'],
+				first_name  = plan_graph['contact_person_first_name'],
+				middle_name = plan_graph['contact_person_middle_name'],
+				email       = plan_graph['contact_person_email'],
+				phone       = plan_graph['contact_person_phone'],
+				fax         = plan_graph['contact_person_fax'])
 
-					# Информация о заказчике
-					elif element.tag.endswith('customerInfo'):
-						for value in element:
+			plan_graph = PlanGraph.objects.update(
+				oos_id         = plan_graph['oos_id'],
+				number         = plan_graph['number'],
+				year           = plan_graph['year'],
+				version        = plan_graph['version'],
+				owner          = plan_graph['owner'],
+				create_date    = plan_graph['create_date'],
+				description    = plan_graph['description'],
+				confirm_date   = plan_graph['confirm_date'],
+				publish_date   = plan_graph['publish_date'],
+				customer       = plan_graph['customer'],
+				oktmo          = plan_graph['oktmo'],
+				contact_person = plan_graph['contact_person'])
 
-							# Заказчик
-							if value.tag.endswith('customer'):
-								for sub in value:
-									if sub.tag.endswith('regNum'):
-										e['customer'] = sub.text
+			print("План-график: {}.".format(plan_graph))
 
-							# ОКТМО
-							elif value.tag.endswith('OKTMO'):
-								for sub in value:
-									if sub.tag.endswith('code'):
-										e['oktmo_code'] = sub.text
+			# Позиции планов-графиков
+			ps = pg.xpath('./providedPurchases/positions/position')
 
-					# Контактное лицо
-					elif element.tag.endswith('responsibleContactInfo'):
-						for value in element:
-							if value.tag.endswith('firstName'):    e['contact_person_first_name']  = value.text
-							elif value.tag.endswith('lastName'):   e['contact_person_last_name']   = value.text
-							elif value.tag.endswith('middleName'): e['contact_person_middle_name'] = value.text
-							elif value.tag.endswith('email'):      e['contact_person_email']       = value.text
-							elif value.tag.endswith('phone'):      e['contact_person_phone']       = value.text
-							elif value.tag.endswith('fax'):        e['contact_person_fax']         = value.text
+			for p in ps:
 
-					# Сопровождаемые данные?
-					elif element.tag.endswith('providedPurchases'):
+				# Позиция плана-графика
+				position = {}
 
-						for value in element:
-
-							# Список позиций
-							if value.tag.endswith('positions'):
-
-								e['positions'] = []
-
-								# Позиция
-								for position in value:
-
-									p = {}
-
-									for position_element in position:
-
-										if position_element.tag.endswith('commonInfo'):
-
-											for position_sub in position_element:
-
-												if position_sub.tag.endswith('positionNumber'):
-
-													p['number'] = position_sub.text
-
-												# Amounts KBKs
-												elif position_sub.tag.endswith('amountKBKs'):
-													p['kbks'] = []
-													for kbk_element in position_sub:
-														k = {}
-														for kbk_value in kbk_element:
-															if kbk_value.tag.endswith('code'):
-																k['code'] = kbk_value.text
-														p['kbks'].append(k)
-
-												# ОКВЭД
-												elif position_sub.tag.endswith('OKVEDs'):
-													p['okveds'] = []
-													for okved_element in position_sub:
-														o = {}
-														for okved_value in okved_element:
-															if okved_value.tag.endswith('code'):
-																o['code'] = okved_value.text
-														p['okveds'].append(o)
-
-												elif position_sub.tag.endswith('contractSubjectName'):
-													p['position_subject_name'] = position_sub.text
-
-												elif position_sub.tag.endswith('contractMaxPrice'):
-													p['position_max_price'] = position_sub.text
-
-												elif position_sub.tag.endswith('payments'):
-													p['payments'] = position_sub.text
-
-												elif position_sub.tag.endswith('contractCurrency'):
-													for currency_value in position_sub:
-														if currency_value.tag.endswith('code'):
-															p['currency_code'] = currency_value.text
-
-												elif position_sub.tag.endswith('placingWay'):
-													for placing_way_value in position_sub:
-														if placing_way_value.tag.endswith('code'):
-															p['placing_way_code'] = placing_way_value.text
-
-												elif position_sub.tag.endswith('positionModification'):
-													for position_modification_value in position_sub:
-
-														if position_modification_value.tag.endswith('changeReason'):
-															for change_reason_value in position_modification_value:
-																if change_reason_value.tag.endswith('id'):
-																	p['change_reason_id'] = change_reason_value.text
-
-										# Продукты
-										elif position_element.tag.endswith('products'):
-
-											p['products'] = []
-
-											for product_element in position_element:
-
-												pr = {}
-
-												for product_value in product_element:
-
-													if product_value.tag.endswith('OKPD'):
-														for okpd_value in product_value:
-															if okpd_value.tag.endswith('code'):
-																pr['okpd_code'] = okpd_value.text
-
-													elif product_value.tag.endswith('name'):
-														pr['name'] = product_value.text
-
-													elif product_value.tag.endswith('minRequirement'):
-														pr['min_requirement'] = product_value.text
-
-													elif product_value.tag.endswith('OKEI'):
-														for okei_value in product_value:
-															if okei_value.tag.endswith('code'):
-																pr['okei_code'] = okei_value.text
-
-													elif product_value.tag.endswith('sumMax'):
-														pr['sum_max'] = product_value.text
-
-													elif product_value.tag.endswith('price'):
-														pr['price'] = product_value.text
-
-													elif product_value.tag.endswith('quantityUndefined'):
-														pr['quantity_undefined'] = product_value.text
-
-													elif product_value.tag.endswith('quantity'):
-														pr['quantity'] = product_value.text
-
-												p['products'].append(pr)
-
-									e['positions'].append(p)
-
-				# Записываем в базу
+				position['number']               = p.xpath('./commonInfo/positionNumber')[0].text
 				try:
-					e['owner'] = Organisation.objects.take(e['owner'])
-				except KeyError:
-					e['owner'] = None
-				except Organisation.DoesNotExist:
-					e['owner'] = None
+					position['ext_number']       = p.xpath('./commonInfo/extNumber')[0].text
+				except IndexError:
+					position['ext_number']       = None
+
+				# TODO KBKs Бюджетирование по годам?
+
+				position['okveds']               = p.xpath('./commonInfo/OKVEDs/OKVED/code')
+				position['okpds']                = p.xpath('./products/product/OKPD/code')
+				position['subject_name']         = p.xpath('./commonInfo/contractSubjectName')[0].text
+				position['max_price']            = p.xpath('./commonInfo/contractMaxPrice')[0].text
+				position['payments']             = p.xpath('./commonInfo/payments')[0].text
+				position['currency_code']        = p.xpath('./commonInfo/contractCurrency/code')[0].text
+				position['placing_way_code']     = p.xpath('./commonInfo/placingWay/code')[0].text
+				try:
+					position['change_reason_id'] = p.xpath('./commonInfo/positionModification/changeReason/id')[0].text
+				except IndexError:
+					position['change_reason_id'] = None
+				position['publish_date']         = p.xpath('./commonInfo/positionPublishDate')[0].text
+				position['no_public_discussion'] = p.xpath('./commonInfo/noPublicDiscussion')[0].text
+				try:
+					position['placing_year']     = p.xpath('./purchaseConditions/purchaseGraph/year')[0].text
+				except IndexError:
+					position['placing_year']     = None
+				try:
+					position['placing_month']    = p.xpath('./purchaseConditions/purchaseGraph/month')[0].text
+				except IndexError:
+					position['placing_month']    = None
+				try:
+					position['execution_year']   = p.xpath('./purchaseConditions/contractExecutionTerm/year')[0].text
+				except IndexError:
+					position['execution_year']   = None
+				try:
+					position['execution_month']  = p.xpath('./purchaseConditions/contractExecutionTerm/month')[0].text
+				except IndexError:
+					position['execution_month']  = None
+
+				for n, okved in enumerate(position['okveds']):
+					try:
+						position['okveds'][n] = OKVED.objects.get(
+							code = okved.text)
+					except OKVED.DoesNotExist:
+						position['okveds'][n] = None
+
+				for n, okpd in enumerate(position['okpds']):
+					try:
+						position['okpds'][n] = OKPD.objects.get(
+							code = okpd.text)
+					except OKPD.DoesNotExist:
+						position['okpds'][n] = None
 
 				try:
-					e['customer'] = Organisation.objects.take(e['customer'])
-				except KeyError:
-					e['customer'] = None
-				except Organisation.DoesNotExist:
-					e['customer'] = None
+					position['currency'] = Currency.objects.get(
+						code = position['currency_code'])
+				except Currency.DoesNotExist:
+					position['currency'] = None
+
+				position['placing_way'] = PlacingWay.objects.take(
+					code = position['placing_way_code'])
 
 				try:
-					e['oktmo'] = OKTMO.objects.take(e['oktmo'])
-				except KeyError:
-					e['oktmo'] = None
-				except OKTMO.DoesNotExist:
-					e['oktmo'] = None
+					position['change_reason'] = PlanPositionChangeReason.objects.get(
+						oos_id = position['change_reason_id'])
+				except PlanPositionChangeReason.DoesNotExist:
+					position['change_reason'] = None
 
-				try:
-					e['contact_person_email'] = e['contact_person_email']
-				except KeyError:
-					e['contact_person_email'] = None
+				if position['no_public_discussion'] == 'true':
+					position['public_discussion'] = False
+				else:
+					position['public_discussion'] = True
 
-				try:
-					e['contact_person_phone'] = e['contact_person_phone']
-				except KeyError:
-					e['contact_person_phone'] = None
+				position = PlanGraphPosition.objects.update(
+					plan_graph        = plan_graph,
+					number            = position['number'],
+					ext_number        = position['ext_number'],
+					okveds            = position['okveds'],
+					okpds             = position['okpds'],
+					subject_name      = position['subject_name'],
+					max_price         = position['max_price'],
+					payments          = position['payments'],
+					currency          = position['currency'],
+					placing_way       = position['placing_way'],
+					change_reason     = position['change_reason'],
+					publish_date      = position['publish_date'],
+					public_discussion = position['public_discussion'],
+					placing_year      = position['placing_year'],
+					placing_month     = position['placing_month'],
+					execution_year    = position['execution_year'],
+					execution_month   = position['execution_month'],
+					state             = True)
 
-				try:
-					e['contact_person_fax'] = e['contact_person_fax']
-				except KeyError:
-					e['contact_person_fax'] = None
-
-				try:
-					e['contact_person'] = ContactPerson.objects.take(
-						first_name  = e['contact_person_first_name'],
-						middle_name = e['contact_person_middle_name'],
-						last_name   = e['contact_person_last_name'],
-						email       = e['contact_person_email'],
-						phone       = e['contact_person_phone'],
-						fax         = e['contact_person_fax'])
-				except KeyError:
-					e['contact_person'] = None
-				except OKTMO.DoesNotExist:
-					e['contact_person'] = None
-
-				plan_graph = PlanGraph.objects.update(
-					oos_id         = e['oos_id'],
-					number         = e['number'],
-					year           = e['year'],
-					version        = e['version'],
-					description    = e['description'],
-					owner          = e['owner'],
-					customer       = e['customer'],
-					oktmo          = e['oktmo'],
-					contact_person = e['contact_person'],
-					state          = True,
-					created        = e['created'],
-					confirmed      = e['confirmed'],
-					published      = e['published'])
-
-				try:
-					positions = e['positions']
-					for n, p in enumerate(e['positions']):
-						print("Position {}".format(n))
-				except KeyError:
-					print('Ошибка: не обнаружены позиции.')
-					# TODO Обработать с дополнительного файла
+				print("Позиция плана-графика: {}.".format(position))
 
 
-			# Tender Plan Cancel
-			elif element_list.tag.endswith('tenderPlanCancel'):
-				print('Tender Plan Cancel')
+				# Продукты
+				prs = p.xpath('./products/product')
 
-			# Tender Plan Unstructured
-			elif element_list.tag.endswith('tenderPlanUnstructured'):
-				print('Tender Plan Cancel')
+				for number, pr in enumerate(prs):
+
+					# Продукт
+					product = {}
+
+					product['okpd_code']                 = pr.xpath('./OKPD/code')[0].text
+					print(product['okpd_code'])
 
 
-		return False
+					product['name']                      = pr.xpath('./name')[0].text
+					product['min_requirement']           = pr.xpath('./minRequirement')[0].text
+					product['okei_code']                 = pr.xpath('./OKEI/code')[0].text
+					product['max_sum']                   = pr.xpath('./sumMax')[0].text
+					product['price']                     = pr.xpath('./price')[0].text
+					product['quantity_undefined']        = pr.xpath('./quantityUndefined')[0].text
+					try:
+						product['quantity']              = pr.xpath('./quantity')[0].text
+					except IndexError:
+						product['quantity']              = None
+					try:
+						product['quantity_current_year'] = pr.xpath('./quantityCurrentYear')[0].text
+					except IndexError:
+						product['quantity_current_year'] = None
+
+					try:
+						product['okpd'] = OKPD.objects.get(
+							code = product['okpd_code'])
+					except OKPD.DoesNotExist:
+						product['okpd'] = None
+
+					try:
+						product['okei'] = OKEI.objects.get(
+							code = product['okei_code'])
+					except OKEI.DoesNotExist:
+						product['okei'] = None
+
+
+					product = PlanGraphPositionProduct.objects.update(
+						position              = position,
+						number                = number,
+						okpd                  = product['okpd'],
+						name                  = product['name'],
+						min_requirement       = product['min_requirement'],
+						okei                  = product['okei'],
+						max_sum               = product['max_sum'],
+						price                 = product['price'],
+						quantity_undefined    = product['quantity_undefined'],
+						quantity              = product['quantity'],
+						quantity_current_year = product['quantity_current_year'],
+						state                 = True)
+
+					print(product)
 
 
 	def updateRegions(self):

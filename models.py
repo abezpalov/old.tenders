@@ -65,13 +65,6 @@ class Source(models.Model):
 		return "{}".format(self.name)
 
 
-
-
-
-
-
-
-
 class CountryManager(models.Manager):
 
 	def take(self, code, full_name, name = None, state = True):
@@ -522,17 +515,17 @@ class OKOPF(models.Model):
 
 class OKPDManager(models.Manager):
 
-	def take(self, code, parent_code = None, alias = None, name = None, state = True):
+	def take(self, oos_id, parent_oos_id = None, code = None, name = None, state = True):
 		try:
-			okpd = self.get(code = code)
+			okpd = self.get(oos_id = oos_id)
 		except OKPD.DoesNotExist:
-			okpd             = OKPD()
-			okpd.code        = code
-			okpd.parent_code = parent_code
-			okpd.alias       = alias
-			okpd.name        = name
-			if parent_code:
-				okpd.parent  = self.take(parent_code)
+			okpd               = OKPD()
+			okpd.oos_id        = oos_id
+			okpd.parent_oos_id = parent_oos_id
+			okpd.code          = code
+			okpd.name          = name
+			if parent_oos_id:
+				okpd.parent  = self.take(oos_id = parent_oos_id)
 			else:
 				okpd.parent  = None
 			okpd.state       = state
@@ -541,27 +534,27 @@ class OKPDManager(models.Manager):
 			okpd.save()
 		return okpd
 
-	def update(self, code, parent_code = None, alias = None, name = None, state = True):
+	def update(self, oos_id, parent_oos_id = None, code = None, name = None, state = True):
 		try:
-			okpd             = self.get(code = code)
-			okpd.parent_code = parent_code
-			okpd.alias       = alias
-			okpd.name        = name
-			if parent_code:
-				okpd.parent  = self.take(parent_code)
+			okpd = self.get(oos_id = oos_id)
+			okpd.parent_oos_id = parent_oos_id
+			okpd.code          = code
+			okpd.name          = name
+			if parent_oos_id:
+				okpd.parent  = self.take(oos_id = parent_oos_id)
 			else:
 				okpd.parent  = None
 			okpd.state       = state
 			okpd.modified    = timezone.now()
 			okpd.save()
 		except OKPD.DoesNotExist:
-			okpd             = OKPD()
-			okpd.code        = code
-			okpd.parent_code = parent_code
-			okpd.alias       = alias
-			okpd.name        = name
-			if parent_code:
-				okpd.parent    = self.take(parent_code)
+			okpd = OKPD()
+			okpd.oos_id        = oos_id
+			okpd.parent_oos_id = parent_oos_id
+			okpd.code          = code
+			okpd.name          = name
+			if parent_oos_id:
+				okpd.parent    = self.take(oos_id = parent_oos_id)
 			else:
 				okpd.parent    = None
 			okpd.state         = state
@@ -573,10 +566,10 @@ class OKPDManager(models.Manager):
 
 class OKPD(models.Model):
 
-	code          = models.CharField(max_length = 100, unique = True)
-	alias         = models.CharField(max_length = 100, null = True, default = None)
+	oos_id        = models.CharField(max_length = 100, unique = True)
+	code          = models.CharField(max_length = 100, null = True, default = None)
 	name          = models.TextField(null = True, default = None)
-	parent_code   = models.CharField(max_length = 100, null = True, default = None)
+	parent_oos_id = models.CharField(max_length = 100, null = True, default = None)
 	parent        = models.ForeignKey('self', null = True, default = None)
 	state         = models.BooleanField(default = True)
 	created       = models.DateTimeField()
@@ -585,10 +578,10 @@ class OKPD(models.Model):
 	objects       = OKPDManager()
 
 	def __str__(self):
-		return "{} {}".format(self.alias, self.name)
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
-		ordering = ['alias']
+		ordering = ['code']
 
 
 class OKTMOManager(models.Manager):
@@ -1323,7 +1316,7 @@ class PlanPositionChangeReason(models.Model):
 
 class ContactPersonManager(models.Manager):
 
-	def take(self, first_name, middle_name, last_name, email, phone = None, fax = None, position = None, description = None, state = True):
+	def take(self, first_name, middle_name, last_name, email, phone, fax = None, position = None, description = None, state = True):
 		try:
 			o = self.get(
 				first_name  = first_name,
@@ -1400,55 +1393,48 @@ class ContactPerson(models.Model):
 class PlanGraphManager(models.Manager):
 
 	def take(self, oos_id, number = None, year = None, version = None,
-			description = None, owner = None, customer = None, oktmo = None,
-			contact_person = None, state = True, created = None,
-			confirmed = None, published = None):
+			owner = None, create_date = None, description = None,
+			confirm_date = None, publish_date = None, customer = None,
+			oktmo = None, contact_person = None, state = True):
 		try:
-			o = self.get(oos_id = oos_id)
+			o = self.get(oos_id = oos_id, number = number, version = version)
 		except PlanGraph.DoesNotExist:
 			o                = PlanGraph()
 			o.oos_id         = oos_id
 			o.number         = number
 			o.year           = year
 			o.version        = version
-			o.description    = description
 			o.owner          = owner
+			o.create_date    = create_date
+			o.description    = description
+			o.confirm_date   = confirm_date
+			o.publish_date   = publish_date
 			o.customer       = customer
 			o.oktmo          = oktmo
 			o.contact_person = contact_person
 			o.state          = state
-			o.confirmed      = confirmed
-			o.published      = published
-			o.state          = state
 			o.modified       = timezone.now()
-			if created:
-				o.created    = created
-			else:
-				o.created    = timezone.now()
+			o.created        = timezone.now()
 			o.save()
 		return o
 
 	def update(self, oos_id, number = None, year = None, version = None,
-			description = None, owner = None, customer = None, oktmo = None,
-			contact_person = None, state = True, created = None,
-			confirmed = None, published = None):
+			owner = None, create_date = None, description = None,
+			confirm_date = None, publish_date = None, customer = None,
+			oktmo = None, contact_person = None, state = True):
 		try:
-			o = self.get(oos_id = oos_id)
-			o.number         = number
+			o = self.get(oos_id = oos_id, number = number, version = version)
 			o.year           = year
-			o.version        = version
-			o.description    = description
 			o.owner          = owner
+			o.create_date    = create_date
+			o.description    = description
+			o.confirm_date   = confirm_date
+			o.publish_date   = publish_date
 			o.customer       = customer
 			o.oktmo          = oktmo
 			o.contact_person = contact_person
 			o.state          = state
-			o.confirmed      = confirmed
-			o.published      = published
-			o.state          = state
 			o.modified       = timezone.now()
-			if created:
-				o.created    = created
 			o.save()
 		except PlanGraph.DoesNotExist:
 			o = self.take(
@@ -1456,15 +1442,15 @@ class PlanGraphManager(models.Manager):
 				number         = number,
 				year           = year,
 				version        = version,
-				description    = description,
 				owner          = owner,
+				create_date    = create_date,
+				description    = description,
+				confirm_date   = confirm_date,
+				publish_date   = publish_date,
 				customer       = customer,
 				oktmo          = oktmo,
 				contact_person = contact_person,
-				state          = state,
-				confirmed      = confirmed,
-				published      = published,
-				created        = created)
+				state          = state)
 		return o
 
 
@@ -1474,16 +1460,17 @@ class PlanGraph(models.Model):
 	number         = models.CharField(max_length = 20, null = True, default = None)
 	year           = models.IntegerField(null = True, default = None)
 	version        = models.IntegerField(null = True, default = None)
-	description    = models.TextField(null = True, default = None)
 	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
+	create_date    = models.DateTimeField(null = True, default = None)
+	description    = models.TextField(null = True, default = None)
+	confirm_date   = models.DateTimeField(null = True, default = None)
+	publish_date   = models.DateTimeField(null = True, default = None)
 	customer       = models.ForeignKey(Organisation, related_name = 'plan_graph_customer', null = True, default = None)
 	oktmo          = models.ForeignKey(OKTMO, null = True, default = None)
 	contact_person = models.ForeignKey(ContactPerson, null = True, default = None)
 	state          = models.BooleanField(default = True)
 	created        = models.DateTimeField()
 	modified       = models.DateTimeField()
-	confirmed      = models.DateTimeField(null = True, default = None)
-	published      = models.DateTimeField(null = True, default = None)
 
 	objects        = PlanGraphManager()
 
@@ -1494,43 +1481,212 @@ class PlanGraph(models.Model):
 		ordering = ['year', 'number', 'version']
 
 
-# TODO
+class PlanGraphPositionManager(models.Manager):
+
+	def take(self, plan_graph, number, ext_number = None, okveds = None,
+			okpds = None, subject_name = None, max_price = None,
+			payments = None, currency = None, placing_way = True,
+			change_reason = None, publish_date = None,
+			public_discussion = False, placing_year = None,
+			placing_month = None, execution_year = None, execution_month = None,
+			state = True):
+		try:
+			o = self.get(plan_graph = plan_graph, number = number)
+		except PlanGraphPosition.DoesNotExist:
+			o                   = PlanGraphPosition()
+			o.plan_graph        = plan_graph
+			o.number            = number
+			o.ext_number        = ext_number
+			o.subject_name      = subject_name
+			o.max_price         = max_price
+			o.payments          = payments
+			o.currency          = currency
+			o.placing_way       = placing_way
+			o.change_reason     = change_reason
+			o.publish_date      = publish_date
+			o.public_discussion = public_discussion
+			o.placing_year      = placing_year
+			o.placing_month     = placing_month
+			o.execution_year    = execution_year
+			o.execution_month   = execution_month
+			o.state             = state
+			o.created           = timezone.now()
+			o.modified          = timezone.now()
+			o.save()
+
+			o.okveds            = okveds
+			o.okps              = okpds
+			o.save()
+		return o
+
+	def update(self, plan_graph, number, ext_number = None, okveds = None,
+			okpds = None, subject_name = None, max_price = None,
+			payments = None, currency = None, placing_way = True,
+			change_reason = None, publish_date = None,
+			public_discussion = False, placing_year = None,
+			placing_month = None, execution_year = None, execution_month = None,
+			state = True):
+		try:
+			o = self.get(plan_graph = plan_graph, number = number)
+			o.ext_number        = ext_number
+			o.subject_name      = subject_name
+			o.max_price         = max_price
+			o.payments          = payments
+			o.currency          = currency
+			o.placing_way       = placing_way
+			o.change_reason     = change_reason
+			o.publish_date      = publish_date
+			o.public_discussion = public_discussion
+			o.placing_year      = placing_year
+			o.placing_month     = placing_month
+			o.execution_year    = execution_year
+			o.execution_month   = execution_month
+			o.state             = state
+			o.modified          = timezone.now()
+			o.save()
+
+			o.okveds            = okveds
+			o.okps              = okpds
+			o.save()
+		except PlanGraphPosition.DoesNotExist:
+			o = self.take(
+				plan_graph        = plan_graph,
+				number            = number,
+				ext_number        = ext_number,
+				okveds            = okveds,
+				okpds             = okpds,
+				subject_name      = subject_name,
+				max_price         = max_price,
+				payments          = payments,
+				currency          = currency,
+				placing_way       = placing_way,
+				change_reason     = change_reason,
+				publish_date      = publish_date,
+				public_discussion = public_discussion,
+				placing_year      = placing_year,
+				placing_month     = placing_month,
+				execution_year    = execution_year,
+				execution_month   = execution_month,
+				state             = state)
+		return o
+
+
 class PlanGraphPosition(models.Model):
 
-	number         = models.CharField(max_length = 50, null = True, default = None)
-	plan_graph     = models.ForeignKey(PlanGraph, null = True, default = None)
-	kbks           = models.ManyToManyField(KBKBudget, db_table = 'tenders_plan_graph_position_to_kbk', related_name = 'plan_graph_position_kbk')
+	plan_graph        = models.ForeignKey(PlanGraph, null = True, default = None)
+	number            = models.CharField(max_length = 50, null = True, default = None)
+	ext_number        = models.CharField(max_length = 50, null = True, default = None)
+	okveds            = models.ManyToManyField(OKVED, db_table = 'tenders_plan_graph_position_to_okved', related_name = 'plan_graph_position_okved')
+	okpd              = models.ManyToManyField(OKPD, db_table = 'tenders_plan_graph_position_to_okpd', related_name = 'plan_graph_position_okpd')
+	subject_name      = models.TextField(null = True, default = None)
+	max_price         = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	payments          = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	currency          = models.ForeignKey(Currency, null = True, default = None)
+	placing_way       = models.ForeignKey(PlacingWay, null = True, default = None)
+	change_reason     = models.ForeignKey(PlanPositionChangeReason, null = True, default = None)
+	publish_date      = models.DateTimeField(null = True, default = None)
+	public_discussion = models.BooleanField(default = True)
+	placing_year      = models.IntegerField(null = True, default = None)
+	placing_month     = models.IntegerField(null = True, default = None)
+	execution_year    = models.IntegerField(null = True, default = None)
+	execution_month   = models.IntegerField(null = True, default = None)
+	state             = models.BooleanField(default = True)
+	created           = models.DateTimeField()
+	modified          = models.DateTimeField()
+
+	objects           = PlanGraphPositionManager()
+
+	def __str__(self):
+		return "{} {}".format(self.number, self.subject_name)
+
+	class Meta:
+		ordering = ['number']
 
 
+class PlanGraphPositionProductManager(models.Manager):
+
+	def take(self, position, number, okpd = None, name = None,
+			min_requirement = None, okei = None, max_sum = None, price = None,
+			quantity_undefined = None, quantity = None,
+			quantity_current_year = None, state = True):
+		try:
+			o = self.get(position = position, number = number)
+		except PlanGraphPositionProduct.DoesNotExist:
+			o                       = PlanGraphPositionProduct()
+			o.position              = position
+			o.number                = number
+			o.okpd                  = okpd
+			o.name                  = name
+			o.min_requirement       = min_requirement
+			o.okeivvvvv             = okei
+			o.max_sum               = max_sum
+			o.price                 = price
+			o.quantity_undefined    = quantity_undefined
+			o.quantity              = quantity
+			o.quantity_current_year = quantity_current_year
+			o.state                 = state
+			o.created               = timezone.now()
+			o.modified              = timezone.now()
+			o.save()
+		return o
+
+	def update(self, position, number, okpd = None, name = None,
+			min_requirement = None, okei = None, max_sum = None, price = None,
+			quantity_undefined = None, quantity = None,
+			quantity_current_year = None, state = True):
+		try:
+			o = self.get(position = position, number = number)
+			o.okpd                  = okpd
+			o.name                  = name
+			o.min_requirement       = min_requirement
+			o.okei                  = okei
+			o.max_sum               = max_sum
+			o.price                 = price
+			o.quantity_undefined    = quantity_undefined
+			o.quantity              = quantity
+			o.quantity_current_year = quantity_current_year
+			o.state                 = state
+			o.state             = state
+			o.modified          = timezone.now()
+			o.save()
+		except PlanGraphPositionProduct.DoesNotExist:
+			o = self.take(
+				position              = position,
+				number                = number,
+				okpd                  = okpd,
+				name                  = name,
+				min_requirement       = min_requirement,
+				okei                  = okei,
+				max_sum               = max_sum,
+				price                 = price,
+				quantity_undefined    = quantity_undefined,
+				quantity              = quantity,
+				quantity_current_year = quantity_current_year,
+				state                 = state)
+		return o
 
 
-#	version        = models.IntegerField(null=True, default=None)
-#	description    = models.TextField(null = True, default = None)
-#	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
-#	customer       = models.ForeignKey(Organisation, related_name = 'plan_graph_customer', null = True, default = None)
-#	oktmo          = models.ForeignKey(OKTMO, null = True, default = None)
-#	contact_person = models.ForeignKey(ContactPerson, null = True, default = None)
-#	state          = models.BooleanField(default = True)
-#	created        = models.DateTimeField()
-#	modified       = models.DateTimeField()
-#	confirmed      = models.DateTimeField(null=True, default=None)
-#	published      = models.DateTimeField(null=True, default=None)
+class PlanGraphPositionProduct(models.Model):
 
-#	objects        = PlanGraphManager()
+	position              = models.ForeignKey(PlanGraphPosition, null = True, default = None)
+	number                = models.IntegerField(null = True, default = None)
+	okpd                  = models.ForeignKey(OKPD, null = True, default = None)
+	name                  = models.CharField(max_length = 512, null = True, default = None)
+	min_requipment        = models.CharField(max_length = 512, null = True, default = None)
+	okei                  = models.ForeignKey(OKEI, null = True, default = None)
+	max_sum               = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	price                 = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	quantity_undefined    = models.BooleanField(default = True)
+	quantity              = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	quantity_current_year = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	state                 = models.BooleanField(default = True)
+	created               = models.DateTimeField()
+	modified              = models.DateTimeField()
 
-#	def __str__(self):
-#		return "{} {} {} {} ".format(self.year, self.number, self.version, self.description)
+	objects               = PlanGraphPositionProductManager()
 
-#	class Meta:
-#		ordering = ['year', 'number', 'version']
+	def __str__(self):
+		return "{} {}".format(self.okpd, self.name)
 
-
-
-
-# TODO Plan Graph Product
-
-
-
-
-
-
+	class Meta:
+		ordering = ['number']
