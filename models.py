@@ -1618,7 +1618,7 @@ class PlanGraphPositionProductManager(models.Manager):
 			o.okpd                  = okpd
 			o.name                  = name
 			o.min_requirement       = min_requirement
-			o.okeivvvvv             = okei
+			o.okei                  = okei
 			o.max_sum               = max_sum
 			o.price                 = price
 			o.quantity_undefined    = quantity_undefined
@@ -1671,8 +1671,8 @@ class PlanGraphPositionProduct(models.Model):
 	position              = models.ForeignKey(PlanGraphPosition, null = True, default = None)
 	number                = models.IntegerField(null = True, default = None)
 	okpd                  = models.ForeignKey(OKPD, null = True, default = None)
-	name                  = models.CharField(max_length = 512, null = True, default = None)
-	min_requipment        = models.CharField(max_length = 512, null = True, default = None)
+	name                  = models.TextField(null = True, default = None)
+	min_requipment        = models.TextField(null = True, default = None)
 	okei                  = models.ForeignKey(OKEI, null = True, default = None)
 	max_sum               = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	price                 = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)

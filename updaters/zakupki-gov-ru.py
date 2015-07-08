@@ -91,10 +91,6 @@ class Runner:
 		self.updateEssence('placing_way')
 		self.updateEssence('plan_position_change_reason')
 
-		self.updateEssence('purchase_document_type')
-		self.updateEssence('purchase_preference')
-		self.updateEssence('purchase_reject_reason')
-
 		# Обновляем планы регионов
 		self.updateRegions()
 
@@ -1387,35 +1383,41 @@ class Runner:
 
 				# TODO KBKs Бюджетирование по годам?
 
-				position['okveds']               = p.xpath('./commonInfo/OKVEDs/OKVED/code')
-				position['okpds']                = p.xpath('./products/product/OKPD/code')
-				position['subject_name']         = p.xpath('./commonInfo/contractSubjectName')[0].text
-				position['max_price']            = p.xpath('./commonInfo/contractMaxPrice')[0].text
-				position['payments']             = p.xpath('./commonInfo/payments')[0].text
-				position['currency_code']        = p.xpath('./commonInfo/contractCurrency/code')[0].text
-				position['placing_way_code']     = p.xpath('./commonInfo/placingWay/code')[0].text
+				position['okveds']                   = p.xpath('./commonInfo/OKVEDs/OKVED/code')
+				position['okpds']                    = p.xpath('./products/product/OKPD/code')
+				position['subject_name']             = p.xpath('./commonInfo/contractSubjectName')[0].text
+				position['max_price']                = p.xpath('./commonInfo/contractMaxPrice')[0].text
 				try:
-					position['change_reason_id'] = p.xpath('./commonInfo/positionModification/changeReason/id')[0].text
+					position['payments']             = p.xpath('./commonInfo/payments')[0].text
 				except IndexError:
-					position['change_reason_id'] = None
-				position['publish_date']         = p.xpath('./commonInfo/positionPublishDate')[0].text
-				position['no_public_discussion'] = p.xpath('./commonInfo/noPublicDiscussion')[0].text
+					position['payments']             = None
+				position['currency_code']            = p.xpath('./commonInfo/contractCurrency/code')[0].text
+				position['placing_way_code']         = p.xpath('./commonInfo/placingWay/code')[0].text
 				try:
-					position['placing_year']     = p.xpath('./purchaseConditions/purchaseGraph/year')[0].text
+					position['change_reason_id']     = p.xpath('./commonInfo/positionModification/changeReason/id')[0].text
 				except IndexError:
-					position['placing_year']     = None
+					position['change_reason_id']     = None
+				position['publish_date']             = p.xpath('./commonInfo/positionPublishDate')[0].text
 				try:
-					position['placing_month']    = p.xpath('./purchaseConditions/purchaseGraph/month')[0].text
+					position['no_public_discussion'] = p.xpath('./commonInfo/noPublicDiscussion')[0].text
 				except IndexError:
-					position['placing_month']    = None
+					position['no_public_discussion'] = False
 				try:
-					position['execution_year']   = p.xpath('./purchaseConditions/contractExecutionTerm/year')[0].text
+					position['placing_year']         = p.xpath('./purchaseConditions/purchaseGraph/year')[0].text
 				except IndexError:
-					position['execution_year']   = None
+					position['placing_year']         = None
 				try:
-					position['execution_month']  = p.xpath('./purchaseConditions/contractExecutionTerm/month')[0].text
+					position['placing_month']        = p.xpath('./purchaseConditions/purchaseGraph/month')[0].text
 				except IndexError:
-					position['execution_month']  = None
+					position['placing_month']        = None
+				try:
+					position['execution_year']       = p.xpath('./purchaseConditions/contractExecutionTerm/year')[0].text
+				except IndexError:
+					position['execution_year']       = None
+				try:
+					position['execution_month']      = p.xpath('./purchaseConditions/contractExecutionTerm/month')[0].text
+				except IndexError:
+					position['execution_month']      = None
 
 				for n, okved in enumerate(position['okveds']):
 					try:
@@ -1471,7 +1473,7 @@ class Runner:
 					execution_month   = position['execution_month'],
 					state             = True)
 
-				print("Позиция плана-графика: {}.".format(position))
+				print(" - Позиция плана-графика: {}.".format(position))
 
 
 				# Продукты
@@ -1483,14 +1485,20 @@ class Runner:
 					product = {}
 
 					product['okpd_code']                 = pr.xpath('./OKPD/code')[0].text
-					print(product['okpd_code'])
-
-
 					product['name']                      = pr.xpath('./name')[0].text
 					product['min_requirement']           = pr.xpath('./minRequirement')[0].text
-					product['okei_code']                 = pr.xpath('./OKEI/code')[0].text
-					product['max_sum']                   = pr.xpath('./sumMax')[0].text
-					product['price']                     = pr.xpath('./price')[0].text
+					try:
+						product['okei_code']             = pr.xpath('./OKEI/code')[0].text
+					except IndexError:
+						product['okei_code']             = None
+					try:
+						product['max_sum']               = pr.xpath('./sumMax')[0].text
+					except IndexError:
+						product['max_sum']               = None
+					try:
+						product['price']                 = pr.xpath('./price')[0].text
+					except IndexError:
+						product['price']                 = None
 					product['quantity_undefined']        = pr.xpath('./quantityUndefined')[0].text
 					try:
 						product['quantity']              = pr.xpath('./quantity')[0].text
@@ -1528,7 +1536,7 @@ class Runner:
 						quantity_current_year = product['quantity_current_year'],
 						state                 = True)
 
-					print(product)
+		return True
 
 
 	def updateRegions(self):
