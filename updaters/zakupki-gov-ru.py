@@ -118,7 +118,10 @@ class Runner:
 			for catalog in catalogs:
 
 				# Обрабатываем планы-графики
-				self.updateEssence(essence = 'plangraph', catalog = catalog)
+				self.updateEssence(
+					essence = 'plangraph',
+					catalog = catalog,
+					region = region)
 
 				# TODO Обновляем тендеры регионов
 
@@ -187,7 +190,7 @@ class Runner:
 		return essences
 
 
-	def updateEssence(self, essence, catalog = None):
+	def updateEssence(self, essence, catalog = None, region = None):
 		'Получает файлы сущностей для анализа и обработки'
 
 		# Импортируем
@@ -231,7 +234,7 @@ class Runner:
 
 				# Парсим файл
 				parse = self.parsers[essence]
-				if parse(xml_data): i += 1
+				if parse(xml_data, region): i += 1
 
 			if i == len(xml_names):
 				print("Все файлы архива обработаны.")
@@ -243,7 +246,7 @@ class Runner:
 		return True
 
 
-	def parseCountry(self, xml_data):
+	def parseCountry(self, xml_data, region = None):
 		'Парсит страны'
 
 		# Импортируем
@@ -287,7 +290,7 @@ class Runner:
 		return True
 
 
-	def parseCurrency(self, xml_data):
+	def parseCurrency(self, xml_data, region = None):
 		'Парсит валюты'
 
 		# Импортируем
@@ -334,7 +337,7 @@ class Runner:
 		return True
 
 
-	def parseOKEI(self, xml_data):
+	def parseOKEI(self, xml_data, region = None):
 		'Парсит единицы измерения'
 
 		# Импортируем
@@ -434,7 +437,7 @@ class Runner:
 		return True
 
 
-	def parseKOSGU(self, xml_data):
+	def parseKOSGU(self, xml_data, region = None):
 		'Парсит классификатор операций сектора государственного управления.'
 
 		# Импортируем
@@ -497,7 +500,7 @@ class Runner:
 		return True
 
 
-	def parseOKOPF(self, xml_data):
+	def parseOKOPF(self, xml_data, region = None):
 		'Парсит ОКОПФ.'
 
 		# Импортируем
@@ -566,7 +569,7 @@ class Runner:
 		return True
 
 
-	def parseOKPD(self, xml_data):
+	def parseOKPD(self, xml_data, region = None):
 		'Парсит ОКПД.'
 
 		# Импортируем
@@ -634,7 +637,7 @@ class Runner:
 		return True
 
 
-	def parseOKTMO(self, xml_data):
+	def parseOKTMO(self, xml_data, region = None):
 		'Парсит ОКТМО.'
 
 		# Импортируем
@@ -697,7 +700,7 @@ class Runner:
 		return True
 
 
-	def parseOKVED(self, xml_data):
+	def parseOKVED(self, xml_data, region = None):
 		'Парсит ОКВЭД.'
 
 		# Импортируем
@@ -786,7 +789,7 @@ class Runner:
 		return True
 
 
-	def parseBudget(self, xml_data):
+	def parseBudget(self, xml_data, region = None):
 		'Парсит бюджет.'
 
 		# Импортируем
@@ -837,7 +840,7 @@ class Runner:
 		return True
 
 
-	def parseBudgetType(self, xml_data):
+	def parseBudgetType(self, xml_data, region = None):
 		'Парсит типы бюджета.'
 
 		# Импортируем
@@ -901,7 +904,7 @@ class Runner:
 		return True
 
 
-	def parseKBKBudget(self, xml_data):
+	def parseKBKBudget(self, xml_data, region = None):
 		'Парсит код поступления бюджета.'
 
 		# Импортируем
@@ -959,26 +962,7 @@ class Runner:
 		return True
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	def parseOrganisationType(self, xml_data):
+	def parseOrganisationType(self, xml_data, region = None):
 		'Парсит типы организаций.'
 
 		# Импортируем
@@ -1026,7 +1010,7 @@ class Runner:
 		return True
 
 
-	def parseOrganisation(self, xml_data):
+	def parseOrganisation(self, xml_data, region = None):
 		'Парсит организации.'
 
 		# Импортируем
@@ -1166,7 +1150,7 @@ class Runner:
 		return True
 
 
-	def parsePlacingWay(self, xml_data):
+	def parsePlacingWay(self, xml_data, region = None):
 		'Парсит пути размещения.'
 
 		# Импортируем
@@ -1231,7 +1215,7 @@ class Runner:
 		return True
 
 
-	def parsePlanPositionChangeReason(self, xml_data):
+	def parsePlanPositionChangeReason(self, xml_data, region = None):
 		'Парсит пути причины изменения позиций планов закупок.'
 
 		# Импортируем
@@ -1286,7 +1270,7 @@ class Runner:
 		return True
 
 
-	def parsePlanGraph(self, xml_data):
+	def parsePlanGraph(self, xml_data, region = None):
 		'Парсит планы-графики.'
 
 		# Импортируем

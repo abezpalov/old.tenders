@@ -1393,7 +1393,7 @@ class ContactPerson(models.Model):
 class PlanGraphManager(models.Manager):
 
 	def take(self, oos_id, number = None, year = None, version = None,
-			owner = None, create_date = None, description = None,
+			region = None, owner = None, create_date = None, description = None,
 			confirm_date = None, publish_date = None, customer = None,
 			oktmo = None, contact_person = None, state = True):
 		try:
@@ -1404,6 +1404,7 @@ class PlanGraphManager(models.Manager):
 			o.number         = number
 			o.year           = year
 			o.version        = version
+			o.region         = region
 			o.owner          = owner
 			o.create_date    = create_date
 			o.description    = description
@@ -1419,12 +1420,13 @@ class PlanGraphManager(models.Manager):
 		return o
 
 	def update(self, oos_id, number = None, year = None, version = None,
-			owner = None, create_date = None, description = None,
+			region = None, owner = None, create_date = None, description = None,
 			confirm_date = None, publish_date = None, customer = None,
 			oktmo = None, contact_person = None, state = True):
 		try:
 			o = self.get(oos_id = oos_id, number = number, version = version)
 			o.year           = year
+			o.region         = region
 			o.owner          = owner
 			o.create_date    = create_date
 			o.description    = description
@@ -1442,6 +1444,7 @@ class PlanGraphManager(models.Manager):
 				number         = number,
 				year           = year,
 				version        = version,
+				region         = region,
 				owner          = owner,
 				create_date    = create_date,
 				description    = description,
@@ -1460,6 +1463,7 @@ class PlanGraph(models.Model):
 	number         = models.CharField(max_length = 20, null = True, default = None)
 	year           = models.IntegerField(null = True, default = None)
 	version        = models.IntegerField(null = True, default = None)
+	region         = models.ForeignKey(Region, related_name = 'plan_graph_region', null = True, default = None)
 	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
 	create_date    = models.DateTimeField(null = True, default = None)
 	description    = models.TextField(null = True, default = None)
