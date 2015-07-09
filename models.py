@@ -1395,7 +1395,7 @@ class PlanGraphManager(models.Manager):
 	def take(self, oos_id, number = None, year = None, version = None,
 			region = None, owner = None, create_date = None, description = None,
 			confirm_date = None, publish_date = None, customer = None,
-			oktmo = None, contact_person = None, state = True):
+			oktmo = None, contact_person = None):
 		try:
 			o = self.get(oos_id = oos_id, number = number, version = version)
 		except PlanGraph.DoesNotExist:
@@ -1413,7 +1413,6 @@ class PlanGraphManager(models.Manager):
 			o.customer       = customer
 			o.oktmo          = oktmo
 			o.contact_person = contact_person
-			o.state          = state
 			o.modified       = timezone.now()
 			o.created        = timezone.now()
 			o.save()
@@ -1422,7 +1421,7 @@ class PlanGraphManager(models.Manager):
 	def update(self, oos_id, number = None, year = None, version = None,
 			region = None, owner = None, create_date = None, description = None,
 			confirm_date = None, publish_date = None, customer = None,
-			oktmo = None, contact_person = None, state = True):
+			oktmo = None, contact_person = None):
 		try:
 			o = self.get(oos_id = oos_id, number = number, version = version)
 			o.year           = year
@@ -1435,7 +1434,6 @@ class PlanGraphManager(models.Manager):
 			o.customer       = customer
 			o.oktmo          = oktmo
 			o.contact_person = contact_person
-			o.state          = state
 			o.modified       = timezone.now()
 			o.save()
 		except PlanGraph.DoesNotExist:
@@ -1452,8 +1450,23 @@ class PlanGraphManager(models.Manager):
 				publish_date   = publish_date,
 				customer       = customer,
 				oktmo          = oktmo,
-				contact_person = contact_person,
-				state          = state)
+				contact_person = contact_person)
+		return o
+
+	def cancel(self, oos_id, number):
+		try:
+			o = self.get(oos_id = oos_id, number = number)
+			o.state          = False
+			o.modified       = timezone.now()
+			o.save()
+		except PlanGraph.DoesNotExist:
+			o                = PlanGraph()
+			o.oos_id         = oos_id
+			o.number         = number
+			o.state          = False
+			o.modified       = timezone.now()
+			o.created        = timezone.now()
+			o.save()
 		return o
 
 

@@ -100,15 +100,15 @@ class Runner:
 		for region in regions:
 
 			catalogs = [
-#				"{}/{}/{}".format(
-#					self.urls['regions'],
-#					region.alias,
-#					self.urls['plangraph']),
-#				"{}/{}/{}/{}".format(
-#					self.urls['regions'],
-#					region.alias,
-#					self.urls['plangraph'],
-#					self.urls['prev_month']),
+				"{}/{}/{}".format(
+					self.urls['regions'],
+					region.alias,
+					self.urls['plangraph']),
+				"{}/{}/{}/{}".format(
+					self.urls['regions'],
+					region.alias,
+					self.urls['plangraph'],
+					self.urls['prev_month']),
 				"{}/{}/{}/{}".format(
 					self.urls['regions'],
 					region.alias,
@@ -1297,7 +1297,7 @@ class Runner:
 			plan_graph['version']                    = pg.xpath('./commonInfo/versionNumber')[0].text
 			plan_graph['owner_reg_number']           = pg.xpath('./commonInfo/owner/regNum')[0].text
 			plan_graph['create_date']                = pg.xpath('./commonInfo/createDate')[0].text
-			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text
+			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text.strip()
 			plan_graph['confirm_date']               = pg.xpath('./commonInfo/confirmDate')[0].text
 			plan_graph['publish_date']               = pg.xpath('./commonInfo/publishDate')[0].text
 			plan_graph['customer_reg_number']        = pg.xpath('./customerInfo/customer/regNum')[0].text
@@ -1324,8 +1324,12 @@ class Runner:
 			plan_graph['customer'] = Organisation.objects.take(
 				reg_number = plan_graph['customer_reg_number'])
 
-			plan_graph['oktmo'] = OKTMO.objects.take(
-				code = plan_graph['oktmo_code'])
+			try:
+				plan_graph['oktmo'] = OKTMO.objects.get(
+					code = plan_graph['oktmo_code'])
+			except OKTMO.DoesNotExist:
+				plan_graph['oktmo'] = None
+
 
 			plan_graph['contact_person'] = ContactPerson.objects.take(
 				last_name   = plan_graph['contact_person_last_name'],
@@ -1349,7 +1353,8 @@ class Runner:
 				oktmo          = plan_graph['oktmo'],
 				contact_person = plan_graph['contact_person'])
 
-			print("План-график: {}.".format(plan_graph))
+			msg = "План-график: {}.\n".format(plan_graph)
+			print(msg)
 
 			# Позиции планов-графиков
 			ps = pg.xpath('./providedPurchases/positions/position')
@@ -1369,7 +1374,7 @@ class Runner:
 
 				position['okveds']                   = p.xpath('./commonInfo/OKVEDs/OKVED/code')
 				position['okpds']                    = p.xpath('./products/product/OKPD/code')
-				position['subject_name']             = p.xpath('./commonInfo/contractSubjectName')[0].text
+				position['subject_name']             = p.xpath('./commonInfo/contractSubjectName')[0].text.strip()
 				position['max_price']                = p.xpath('./commonInfo/contractMaxPrice')[0].text
 				try:
 					position['payments']             = p.xpath('./commonInfo/payments')[0].text
@@ -1381,7 +1386,10 @@ class Runner:
 					position['change_reason_id']     = p.xpath('./commonInfo/positionModification/changeReason/id')[0].text
 				except IndexError:
 					position['change_reason_id']     = None
-				position['publish_date']             = p.xpath('./commonInfo/positionPublishDate')[0].text
+				try:
+					position['publish_date']         = p.xpath('./commonInfo/positionPublishDate')[0].text
+				except IndexError:
+					position['publish_date']         = plan_graph.publish_date
 				try:
 					position['no_public_discussion'] = p.xpath('./commonInfo/noPublicDiscussion')[0].text
 				except IndexError:
@@ -1457,8 +1465,7 @@ class Runner:
 					execution_month   = position['execution_month'],
 					state             = True)
 
-				print(" - Позиция плана-графика: {}.".format(position))
-
+#				print(" - Позиция плана-графика: {}.".format(position))
 
 				# Продукты
 				prs = p.xpath('./products/product')
@@ -1519,6 +1526,96 @@ class Runner:
 						quantity              = product['quantity'],
 						quantity_current_year = product['quantity_current_year'],
 						state                 = True)
+
+		# Отмена планов-графиков
+		pgs = tree.xpath('.//tenderPlanCancel')
+
+		for pg in pgs:
+
+			# План-график
+			plan_graph = {}
+
+			plan_graph['oos_id'] = pg.xpath('./id')[0].text
+			plan_graph['number'] = pg.xpath('./planNumber')[0].text
+
+			plan_graph = PlanGraph.objects.cancel(
+				oos_id = plan_graph['oos_id'],
+				number = plan_graph['number'])
+
+			msg = "Отменен план-график: {}.\n".format(plan_graph)
+			print(msg)
+
+		# Планы-графики (неструктурированные)
+		pgs = tree.xpath('.//tenderPlanUnstructured')
+
+		for pg in pgs:
+
+			# План-график
+			plan_graph = {}
+
+			plan_graph['oos_id']                     = pg.xpath('./commonInfo/id')[0].text
+			plan_graph['number']                     = pg.xpath('./commonInfo/planNumber')[0].text
+			plan_graph['year']                       = pg.xpath('./commonInfo/year')[0].text
+			plan_graph['version']                    = pg.xpath('./commonInfo/versionNumber')[0].text
+			plan_graph['owner_reg_number']           = pg.xpath('./commonInfo/owner/regNum')[0].text
+			plan_graph['create_date']                = pg.xpath('./commonInfo/createDate')[0].text
+			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text.strip()
+			plan_graph['confirm_date']               = pg.xpath('./commonInfo/confirmDate')[0].text
+			plan_graph['publish_date']               = pg.xpath('./commonInfo/publishDate')[0].text
+			plan_graph['customer_reg_number']        = pg.xpath('./customerInfo/customer/regNum')[0].text
+			plan_graph['oktmo_code']                 = pg.xpath('./customerInfo/OKTMO/code')[0].text
+			plan_graph['contact_person_last_name']   = pg.xpath('./responsibleContactInfo/lastName')[0].text
+			plan_graph['contact_person_first_name']  = pg.xpath('./responsibleContactInfo/firstName')[0].text
+			plan_graph['contact_person_middle_name'] = pg.xpath('./responsibleContactInfo/middleName')[0].text
+			try:
+				plan_graph['contact_person_phone']   = pg.xpath('./responsibleContactInfo/phone')[0].text
+			except IndexError:
+				plan_graph['contact_person_phone']   = None
+			try:
+				plan_graph['contact_person_fax']     = pg.xpath('./responsibleContactInfo/fax')[0].text
+			except IndexError:
+				plan_graph['contact_person_fax']     = None
+			try:
+				plan_graph['contact_person_email']   = pg.xpath('./responsibleContactInfo/email')[0].text
+			except:
+				plan_graph['contact_person_email']   = None
+
+			plan_graph['owner'] = Organisation.objects.take(
+				reg_number = plan_graph['owner_reg_number'])
+
+			plan_graph['customer'] = Organisation.objects.take(
+				reg_number = plan_graph['customer_reg_number'])
+
+			try:
+				plan_graph['oktmo'] = OKTMO.objects.get(
+					code = plan_graph['oktmo_code'])
+			except OKTMO.DoesNotExist:
+				plan_graph['oktmo'] = None
+
+			plan_graph['contact_person'] = ContactPerson.objects.take(
+				last_name   = plan_graph['contact_person_last_name'],
+				first_name  = plan_graph['contact_person_first_name'],
+				middle_name = plan_graph['contact_person_middle_name'],
+				email       = plan_graph['contact_person_email'],
+				phone       = plan_graph['contact_person_phone'],
+				fax         = plan_graph['contact_person_fax'])
+
+			plan_graph = PlanGraph.objects.update(
+				oos_id         = plan_graph['oos_id'],
+				number         = plan_graph['number'],
+				year           = plan_graph['year'],
+				version        = plan_graph['version'],
+				owner          = plan_graph['owner'],
+				create_date    = plan_graph['create_date'],
+				description    = plan_graph['description'],
+				confirm_date   = plan_graph['confirm_date'],
+				publish_date   = plan_graph['publish_date'],
+				customer       = plan_graph['customer'],
+				oktmo          = plan_graph['oktmo'],
+				contact_person = plan_graph['contact_person'])
+
+			msg = "План-график (неструктурированный): {}.\n".format(plan_graph)
+			print(msg)
 
 		return True
 
