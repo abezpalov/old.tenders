@@ -1,0 +1,59 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: Планы-графики{% endblock %}
+
+{% block content %}
+
+{% if perms.tenders.add_plangraph or perms.tenders.change_plangraph or perms.tenders.delete_plangraph %}
+
+<!-- Таблица со списком загрузчиков -->
+<div class="row collapse">
+	<table>
+		<tr>
+			<th class="text-center">#</th>
+			<th>Год</th>
+			<th>Регион</th>
+			<th>Номер и версия</th>
+			<th>Владелец</th>
+			<th>Заказчик</th>
+			<th>Статус</th>
+			<th>Дата публикации</th>
+		</tr>
+		{% for plangraph in plangraphs %}
+		<tr>
+			<td>{{ forloop.counter }}</td>
+			<td><a>{{ plangraph.year }}</a></td>
+			<td><a>{{ plangraph.region.name }}</a></td>
+			<td><a>{{ plangraph.number }} v{{ plangraph.version }}</a></td>
+			<td><a>{{ plangraph.owner.short_name }}</a></td>
+			<td><a>{{ plangraph.customer.short_name }}</a></td>
+			<td>
+				<div class="switch small">
+					<input id="plangraph-{{ plangraph.id }}-state" data-do="switch-plangraph-state" data-id="{{ plangraph.id }}" data-plangraph-state="{{ plangraph.id }}" type="checkbox"{% if plangraph.state %} checked{% endif %}>
+					<label for="plangraph-{{ plangraph.id }}-state"></label>
+				</div>
+			</td>
+			<td>{{ plangraph.publish_date|date:"d.m.Y H.i" }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% else %}
+
+<div class="row collapse">
+	<div class="small-12 columns">
+		<p class="panel">Недостаточно прав для данной функциональности.</p>
+	</div>
+</div>
+
+{% endif %}
+
+{% include "tenders/modal/edit-region.html" %}
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/edit-region.js" %}
+</script>
+{% endblock %}

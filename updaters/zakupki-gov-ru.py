@@ -1,4 +1,5 @@
 from tenders.models import *
+from django.utils import timezone
 
 
 class Runner:
@@ -64,6 +65,8 @@ class Runner:
 
 	def run(self):
 
+		start = timezone.now()
+
 		# Проверяем наличие параметров авторизации
 		if not self.updater.login or not self.updater.password:
 			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
@@ -124,6 +127,8 @@ class Runner:
 					region = region)
 
 				# TODO Обновляем тендеры регионов
+
+		print("Обработки завершены за {}.".format(timezone.now() - start))
 
 		return True
 

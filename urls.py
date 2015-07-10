@@ -21,4 +21,12 @@ urlpatterns = patterns('',
 	url(r'^ajax/save-region/$', views.ajaxSaveRegion, name='ajaxSaveRegion'),
 	url(r'^ajax/switch-region-state/$', views.ajaxSwitchRegionState, name='ajaxSwitchRegionState'),
 
+	#PlanGraphs
+	# ex: /tenders/plan-graphs/
+	url(r'^plan-graphs/$', views.planGraphs, name='planGraphs'),
+
+	#PlanGraph Positions
+	# ex: /tenders/plan-graph-positions/
+	url(r'^plan-graph-positions/$', views.planGraphPositions, name='planGraphPositions'),
+
 )

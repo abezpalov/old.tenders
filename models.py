@@ -1436,6 +1436,7 @@ class PlanGraphManager(models.Manager):
 			o.contact_person = contact_person
 			o.modified       = timezone.now()
 			o.save()
+
 		except PlanGraph.DoesNotExist:
 			o = self.take(
 				oos_id         = oos_id,
@@ -1451,23 +1452,16 @@ class PlanGraphManager(models.Manager):
 				customer       = customer,
 				oktmo          = oktmo,
 				contact_person = contact_person)
+
+		self.filter(number = number, version__lt = version).update(state = False)
+
 		return o
 
 	def cancel(self, oos_id, number):
-		try:
-			o = self.get(oos_id = oos_id, number = number)
-			o.state          = False
-			o.modified       = timezone.now()
-			o.save()
-		except PlanGraph.DoesNotExist:
-			o                = PlanGraph()
-			o.oos_id         = oos_id
-			o.number         = number
-			o.state          = False
-			o.modified       = timezone.now()
-			o.created        = timezone.now()
-			o.save()
-		return o
+
+		self.filter(number = number).update(state = False)
+
+		return True
 
 
 class PlanGraph(models.Model):
@@ -1492,7 +1486,7 @@ class PlanGraph(models.Model):
 	objects        = PlanGraphManager()
 
 	def __str__(self):
-		return "{} {} {} {} ".format(self.year, self.number, self.version, self.description)
+		return "{} {} v{} {} ".format(self.year, self.number, self.version, self.customer)
 
 	class Meta:
 		ordering = ['year', 'number', 'version']

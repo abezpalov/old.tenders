@@ -351,3 +351,44 @@ def ajaxSwitchRegionState(request):
 
 	# Возвращаем ответ
 	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+# PlanGraph
+
+
+def planGraphs(request):
+	"Представление: список планов-графиков."
+
+	# Импортируем
+	from tenders.models import PlanGraph
+
+	# Проверяем права доступа
+	if request.user.has_perm('tenders.add_plangraph')\
+	or request.user.has_perm('tenders.change_plangraph')\
+	or request.user.has_perm('tenders.delete_plangraph'):
+
+		# Получаем количество объектов
+		plangraphs = PlanGraph.objects.all()[0:100]
+
+	return render(request, 'tenders/plan-graphs.html', locals())
+
+
+# PlanGraph Position
+
+
+def planGraphPositions(request):
+	"Представление: список планов-графиков."
+
+	# Импортируем
+	from tenders.models import PlanGraphPosition
+
+	# Проверяем права доступа
+	if request.user.has_perm('tenders.add_plangraph')\
+	or request.user.has_perm('tenders.change_plangraph')\
+	or request.user.has_perm('tenders.delete_plangraph'):
+
+		# Получаем количество объектов
+		plangraph_positions = PlanGraphPosition.objects.all()[0:100]
+
+	return render(request, 'tenders/plan-graph-positions.html', locals())
+
