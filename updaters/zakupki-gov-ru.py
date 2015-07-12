@@ -103,10 +103,10 @@ class Runner:
 		for region in regions:
 
 			catalogs = [
-				"{}/{}/{}".format(
-					self.urls['regions'],
-					region.alias,
-					self.urls['plangraph']),
+#				"{}/{}/{}".format(
+#					self.urls['regions'],
+#					region.alias,
+#					self.urls['plangraph']),
 				"{}/{}/{}/{}".format(
 					self.urls['regions'],
 					region.alias,
@@ -1358,7 +1358,7 @@ class Runner:
 				oktmo          = plan_graph['oktmo'],
 				contact_person = plan_graph['contact_person'])
 
-			msg = "План-график: {}.\n".format(plan_graph)
+			msg = "План-график: {}.".format(plan_graph)
 			print(msg)
 
 			# Позиции планов-графиков
@@ -1470,7 +1470,7 @@ class Runner:
 					execution_month   = position['execution_month'],
 					state             = True)
 
-#				print(" - Позиция плана-графика: {}.".format(position))
+				print(".", end = "")
 
 				# Продукты
 				prs = p.xpath('./products/product')
@@ -1531,6 +1531,11 @@ class Runner:
 						quantity              = product['quantity'],
 						quantity_current_year = product['quantity_current_year'],
 						state                 = True)
+
+					print(".", end = "")
+
+				
+			print("")
 
 		# Отмена планов-графиков
 		pgs = tree.xpath('.//tenderPlanCancel')
