@@ -368,7 +368,7 @@ def planGraphs(request):
 	or request.user.has_perm('tenders.delete_plangraph'):
 
 		# Получаем количество объектов
-		plangraphs = PlanGraph.objects.all()[0:100]
+		plangraphs = PlanGraph.objects.filter(state = True)[0:100]
 
 	return render(request, 'tenders/plan-graphs.html', locals())
 
@@ -388,7 +388,7 @@ def planGraphPositions(request):
 	or request.user.has_perm('tenders.delete_plangraph'):
 
 		# Получаем количество объектов
-		plangraph_positions = PlanGraphPosition.objects.all()[0:100]
+		plan_graph_positions = PlanGraphPosition.objects.all()[0:100]
 
 	return render(request, 'tenders/plan-graph-positions.html', locals())
 

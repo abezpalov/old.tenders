@@ -94,6 +94,7 @@ class Runner:
 		self.updateEssence('placing_way')
 		self.updateEssence('plan_position_change_reason')
 
+
 		# Обновляем планы регионов
 		self.updateRegions()
 
@@ -103,10 +104,6 @@ class Runner:
 		for region in regions:
 
 			catalogs = [
-#				"{}/{}/{}".format(
-#					self.urls['regions'],
-#					region.alias,
-#					self.urls['plangraph']),
 				"{}/{}/{}/{}".format(
 					self.urls['regions'],
 					region.alias,
@@ -218,11 +215,11 @@ class Runner:
 					zip_name))
 
 			if source.state:
-				print("Файл {} уже обработан.".format(source.url))
+				print("Файл {} уже обработан.".format(zip_name))
 				continue
 
 			# Скачиваем архив
-			print("Скачиваю файл: {}".format(source.url))
+			print("Скачиваю файл: {}".format(zip_name))
 			zip_data = self.getZipFromFTP(zip_name, catalog)
 
 			if not zip_data:
@@ -260,37 +257,30 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiOKSM')
 
-			# Получаем элемент
-			for element in element_list:
+		for element in elements:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			o = {}
 
-				# Обрабатываем значения полей
-				for value in element:
-					if   value.tag.endswith('countryCode'):
-						e['code'] = value.text
-					elif value.tag.endswith('countryFullName'):
-						e['full_name'] = value.text
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
+			o['code']      = element.xpath('./countryCode')[0].text
+			o['full_name'] = element.xpath('./countryFullName')[0].text
 
-				# Обновляем информацию в базе
-				country = Country.objects.update(
-					code         = e['code'],
-					full_name    = e['full_name'],
-					state        = e['state'])
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-				print("Обновлена страна: {}.".format(country))
+			country = Country.objects.update(
+				code         = o['code'],
+				full_name    = o['full_name'],
+				state        = o['state'])
+
+			print("Страна: {}.".format(country))
 
 		return True
 
@@ -304,40 +294,33 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiCurrency')
 
-			# Получаем элемент
-			for element in element_list:
+		for element in elements:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			o = {}
 
-				# Обрабатываем значения полей
-				for value in element:
-					if   value.tag.endswith('code'):
-						e['code'] = value.text
-					elif value.tag.endswith('digitalCode'):
-						e['digital_code'] = value.text
-					elif value.tag.endswith('name'):
-						e['name'] = value.text
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
+			o['code']         = element.xpath('./code')[0].text
+			o['digital_code'] = element.xpath('./digitalCode')[0].text
+			o['name']         = element.xpath('./name')[0].text
 
-				# Обновляем информацию в базе
-				currency = Currency.objects.update(
-					code         = e['code'],
-					digital_code = e['digital_code'],
-					name         = e['name'],
-					state        = e['state'])
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-				print("Обновлена валюта: {}.".format(currency))
+			# Обновляем информацию в базе
+			currency = Currency.objects.update(
+				code         = o['code'],
+				digital_code = o['digital_code'],
+				name         = o['name'],
+				state        = o['state'])
+
+			print("Валюта: {}.".format(currency))
 
 		return True
 
@@ -351,93 +334,53 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiOKEI')
 
-			# Получаем элемент
-			for element in element_list:
+		for element in elements:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			o = {}
 
-				# Обрабатываем значения полей
-				for value in element:
+			o['code']                 = element.xpath('./code')[0].text
+			o['full_name']            = element.xpath('./fullName')[0].text
+			o['section_code']         = element.xpath('./section/code')[0].text
+			o['section_name']         = element.xpath('./section/name')[0].text
+			o['group_code']           = element.xpath('./group/id')[0].text
+			o['group_name']           = element.xpath('./group/name')[0].text
+			o['local_name']           = element.xpath('./localName')[0].text
+			o['international_name']   = element.xpath('./internationalName')[0].text
+			o['local_symbol']         = element.xpath('./localSymbol')[0].text
+			o['international_symbol'] = element.xpath('./internationalSymbol')[0].text
 
-					# code
-					if value.tag.endswith('code'):
-						e['code'] = value.text
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-					# full_name
-					elif value.tag.endswith('fullName'):
-						e['full_name'] = value.text
+			# Обновляем информацию в базе
+			okei_section = OKEISection.objects.update(
+				code  = o['section_code'],
+				name  = o['section_name'],
+				state = True)
+			okei_group = OKEIGroup.objects.update(
+				code  = o['group_code'],
+				name  = o['group_name'],
+				state = True)
+			okei = OKEI.objects.update(
+				code                 = o['code'],
+				full_name            = o['full_name'],
+				section              = okei_section,
+				group                = okei_group,
+				local_name           = o['local_name'],
+				international_name   = o['international_name'],
+				local_symbol         = o['local_symbol'],
+				international_symbol = o['international_symbol'],
+				state                = o['state'])
 
-					# section
-					elif value.tag.endswith('section'):
-
-						for section_value in value:
-
-							if section_value.tag.endswith('code'):
-								e['section_code'] = section_value.text
-							elif section_value.tag.endswith('name'):
-								e['section_name'] = section_value.text
-
-					# group
-					elif value.tag.endswith('group'):
-
-						for group_value in value:
-
-							if group_value.tag.endswith('id'):
-								e['group_code'] = group_value.text
-							elif group_value.tag.endswith('name'):
-								e['group_name'] = group_value.text
-
-					# local_name
-					elif value.tag.endswith('localName'):
-						e['local_name'] = value.text
-
-					# international_name
-					elif value.tag.endswith('internationalName'):
-						e['international_name'] = value.text
-
-					# local_symbol
-					elif value.tag.endswith('localSymbol'):
-						e['local_symbol'] = value.text
-
-					# international_symbol
-					elif value.tag.endswith('internationalSymbol'):
-						e['international_symbol'] = value.text
-
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
-
-				# Обновляем информацию в базе
-				okei_section = OKEISection.objects.update(
-					code         = e['section_code'],
-					name         = e['section_name'],
-					state        = True)
-				okei_group = OKEIGroup.objects.update(
-					code         = e['group_code'],
-					name         = e['group_name'],
-					state        = True)
-				okei = OKEI.objects.update(
-					code                 = e['code'],
-					full_name            = e['full_name'],
-					section              = okei_section,
-					group                = okei_group,
-					local_name           = e['local_name'],
-					international_name   = e['international_name'],
-					local_symbol         = e['local_symbol'],
-					international_symbol = e['international_symbol'],
-					state                = e['state'])
-
-				print("Обновлена единица измерения: {}.".format(okei))
+			print("Единица измерения: {}.".format(okei))
 
 		return True
 
@@ -451,56 +394,39 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiKOSGU')
 
-			# Получаем элемент
-			for element in element_list:
+		for element in elements:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			o = {}
 
-				# Обрабатываем значения полей
-				for value in element:
+			o['code']        = element.xpath('./code')[0].text
+			o['name']        = element.xpath('./name')[0].text
 
-					# code
-					if value.tag.endswith('code'):
-						e['code'] = value.text
+			try:
+				o['parent_code'] = element.xpath('./parentCode')[0].text
+			except IndexError:
+				o['parent_code'] = None
 
-					# parent_code
-					elif value.tag.endswith('parentCode'):
-						if not value.text or value.text == '000':
-							e['parent_code'] = None
-						else:
-							e['parent_code'] = value.text
-	
-					# name
-					elif value.tag.endswith('name'):
-						e['name'] = value.text
+			if o['parent_code'] == '000':
+				o['parent_code'] = None
 
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-				# Обновляем информацию в базе
-				try:
-					e['parent_code'] = e['parent_code']
-				except KeyError:
-					e['parent_code'] = None
+			kosgu = KOSGU.objects.update(
+				code        = o['code'],
+				parent_code = o['parent_code'],
+				name        = o['name'],
+				state       = o['state'])
 
-				kosgu = KOSGU.objects.update(
-					code        = e['code'],
-					parent_code = e['parent_code'],
-					name        = e['name'],
-					state       = e['state'])
-
-				print("Обновлён элемент КОСГУ: {}.".format(kosgu))
+			print("КОСГУ: {}.".format(kosgu))
 
 		return True
 
@@ -514,62 +440,38 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiOKOPF')
 
-			# Получаем элемент
-			for element in element_list:
+		for element in elements:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			o = {}
 
-				# Обрабатываем значения полей
-				for value in element:
+			o['code']          = element.xpath('./code')[0].text
+			o['full_name']     = element.xpath('./fullName')[0].text
+			o['singular_name'] = element.xpath('./singularName')[0].text
 
-					# code
-					if value.tag.endswith('code'):
-						e['code'] = value.text
+			try:
+				o['parent_code'] = element.xpath('./parentCode')[0].text
+			except IndexError:
+				o['parent_code'] = None
 
-					# parent_code
-					elif value.tag.endswith('parentCode'):
-						if not value.text:
-							e['parent_code'] = None
-						else:
-							e['parent_code'] = value.text
-	
-					# full_name
-					elif value.tag.endswith('fullName'):
-						e['full_name'] = value.text
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-					# singular_name
-					elif value.tag.endswith('singularName'):
-						e['singular_name'] = value.text
+			okopf = OKOPF.objects.update(
+				code          = o['code'],
+				parent_code   = o['parent_code'],
+				full_name     = o['full_name'],
+				singular_name = o['singular_name'],
+				state         = o['state'])
 
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
-
-				# Обновляем информацию в базе
-				try:
-					e['parent_code'] = e['parent_code']
-				except KeyError:
-					e['parent_code'] = None
-
-
-				okopf = OKOPF.objects.update(
-					code          = e['code'],
-					parent_code   = e['parent_code'],
-					full_name     = e['full_name'],
-					singular_name = e['singular_name'],
-					state         = e['state'])
-
-				print("Обновлён элемент ОКОПФ: {}.".format(okopf))
+			print("ОКОПФ: {}.".format(okopf))
 
 		return True
 
@@ -1349,6 +1251,7 @@ class Runner:
 				number         = plan_graph['number'],
 				year           = plan_graph['year'],
 				version        = plan_graph['version'],
+				region         = region,
 				owner          = plan_graph['owner'],
 				create_date    = plan_graph['create_date'],
 				description    = plan_graph['description'],
@@ -1615,6 +1518,7 @@ class Runner:
 				number         = plan_graph['number'],
 				year           = plan_graph['year'],
 				version        = plan_graph['version'],
+				region         = region,
 				owner          = plan_graph['owner'],
 				create_date    = plan_graph['create_date'],
 				description    = plan_graph['description'],
