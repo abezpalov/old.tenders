@@ -1453,7 +1453,11 @@ class PlanGraphManager(models.Manager):
 				oktmo          = oktmo,
 				contact_person = contact_person)
 
+		# Корректируем статусы устаревших версий
 		self.filter(number = number, version__lt = version).update(state = False)
+
+		plan_graphs = self.filter(number = number, version__lt = version)
+		PlanGraphPosition.object.filter(plan_graph__in = plan_graphs).update(state = False)
 
 		return o
 
