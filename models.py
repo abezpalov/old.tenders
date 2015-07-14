@@ -1457,7 +1457,7 @@ class PlanGraphManager(models.Manager):
 		self.filter(number = number, version__lt = version).update(state = False)
 
 		plan_graphs = self.filter(number = number, version__lt = version)
-		PlanGraphPosition.object.filter(plan_graph__in = plan_graphs).update(state = False)
+		PlanGraphPosition.objects.filter(plan_graph__in = plan_graphs).update(state = False)
 
 		return o
 

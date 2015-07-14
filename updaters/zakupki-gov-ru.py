@@ -1531,6 +1531,12 @@ class Runner:
 			msg = "План-график (неструктурированный): {}.\n".format(plan_graph)
 			print(msg)
 
+		# Чистим мусор
+		import gc
+
+		del tree
+		gc.collect()		
+
 		return True
 
 
