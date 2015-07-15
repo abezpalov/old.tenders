@@ -1,3 +1,4 @@
+import gc
 from tenders.models import *
 from django.utils import timezone
 
@@ -215,7 +216,7 @@ class Runner:
 					zip_name))
 
 			if source.state:
-				print("Файл {} уже обработан.".format(zip_name))
+				print("Файл уже обработан: {}.".format(zip_name))
 				continue
 
 			# Скачиваем архив
@@ -265,8 +266,7 @@ class Runner:
 
 		for element in elements:
 
-			o = {}
-
+			o              = {}
 			o['code']      = element.xpath('./countryCode')[0].text
 			o['full_name'] = element.xpath('./countryFullName')[0].text
 
@@ -302,8 +302,7 @@ class Runner:
 
 		for element in elements:
 
-			o = {}
-
+			o                 = {}
 			o['code']         = element.xpath('./code')[0].text
 			o['digital_code'] = element.xpath('./digitalCode')[0].text
 			o['name']         = element.xpath('./name')[0].text
@@ -342,8 +341,7 @@ class Runner:
 
 		for element in elements:
 
-			o = {}
-
+			o                         = {}
 			o['code']                 = element.xpath('./code')[0].text
 			o['full_name']            = element.xpath('./fullName')[0].text
 			o['section_code']         = element.xpath('./section/code')[0].text
@@ -403,7 +401,6 @@ class Runner:
 		for element in elements:
 
 			o = {}
-
 			o['code']        = element.xpath('./code')[0].text
 			o['name']        = element.xpath('./name')[0].text
 
@@ -448,8 +445,7 @@ class Runner:
 
 		for element in elements:
 
-			o = {}
-
+			o                  = {}
 			o['code']          = element.xpath('./code')[0].text
 			o['full_name']     = element.xpath('./fullName')[0].text
 			o['singular_name'] = element.xpath('./singularName')[0].text
@@ -1532,10 +1528,8 @@ class Runner:
 			print(msg)
 
 		# Чистим мусор
-		import gc
-
 		del tree
-		gc.collect()		
+		gc.collect()
 
 		return True
 

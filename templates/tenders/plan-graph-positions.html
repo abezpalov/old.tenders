@@ -1,0 +1,77 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: Позиции планов-графиков{% endblock %}
+
+{% block content %}
+
+{% if perms.tenders.add_plangraphposition or perms.tenders.change_plangraphposition or perms.tenders.delete_plangraphposition %}
+
+<!-- Таблица со списком загрузчиков -->
+<div class="row collapse">
+	<p>Количество строк запроса: {{ positions_count }}
+	<table>
+		<tr>
+			<th class="text-center">#</th>
+			<th>Год</th>
+			<th>Регион</th>
+			<th>Заказчик</th>
+			<th>Наименование</th>
+			<th>Цена</th>
+			<th>Статус</th>
+			<th>Размещение</th>
+		</tr>
+		{% for position in positions %}
+		<tr>
+			<td>{{ position.n }}</td>
+			<td><a>{{ position.plan_graph.year }}</a></td>
+			<td><a>{{ position.plan_graph.region.name }}</a></td>
+			<td><a>{{ position.plan_graph.customer.short_name }}</a>{% if position.plan_graph.customer != position.plan_graph.owner %}<br/>Владелец: {{ position.plan_graph.owner.short_name }}{% endif %}</td>
+			<td><a>{{ position.subject_name }}</a></td>
+			<td class="text-right">{% autoescape off %}{{ position.price_str }}{% endautoescape %}</td>
+			<td>
+				<div class="switch small">
+					<input id="plan-graph-position-{{ position.id }}-state" data-do="switch-plan-graph-position-state" data-id="{{ position.id }}" data-plan-graph-position-state="{{ plan_graph_poistion.id }}" type="checkbox"{% if position.state %} checked{% endif %}>
+					<label for="plan-graph-position-{{ position.id }}-state"></label>
+				</div>
+			</td>
+			<td>{% if plang_raph_position.placing_year %}{{ plang_raph_position.placing_year }}{% endif %}{% if plang_raph_position.placing_year and plang_raph_position.placing_month %}&nbsp;{% endif %}{% if plang_raph_position.placing_month %}{{ position.placing_month }}{% endif %}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<!-- Pagination -->
+	{% if pages %}
+	<div class="pagination-centered">
+		<ul class="pagination">
+			<li class="arrow{% if not page_prev %} unavailable{% endif %}"><a{% if page_prev %} href="{{ url }}{% if page_prev > 1 %}page/{{ page_prev }}/{% endif %}"{% endif %}>&laquo; Влево</a></li>
+			{% for n in pages %}
+				{% if n %}
+				<li{% if page == n %} class="current"{% endif %}><a href="{{ url }}page/{{ n }}/">{{ n }}</a></li>
+				{% else %}
+				<li class="unavailable"><a>&hellip;</a></li>
+				{% endif %}
+			{% endfor %}
+			<li class="arrow{% if not page_next %} unavailable{% endif %}"><a{% if page_next %} href="{{ url }}page/{{ page_next }}/"{% endif %}>Вправо &raquo;</a></li>
+		</ul>
+	</div>
+	{% endif %}
+</div>
+
+{% else %}
+
+<div class="row collapse">
+	<div class="small-12 columns">
+		<p class="panel">Недостаточно прав для данной функциональности.</p>
+	</div>
+</div>
+
+{% endif %}
+
+{% include "tenders/modal/edit-region.html" %}
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/edit-region.js" %}
+</script>
+{% endblock %}

@@ -376,19 +376,58 @@ def planGraphs(request):
 # PlanGraph Position
 
 
-def planGraphPositions(request):
+def planGraphPositions(request, page = 1):
 	"Представление: список планов-графиков."
 
 	# Импортируем
 	from tenders.models import PlanGraphPosition
+
+	page = int(page)
 
 	# Проверяем права доступа
 	if request.user.has_perm('tenders.add_plangraph')\
 	or request.user.has_perm('tenders.change_plangraph')\
 	or request.user.has_perm('tenders.delete_plangraph'):
 
-		# Получаем количество объектов
-		plan_graph_positions = PlanGraphPosition.objects.all()[0:100]
+		# Paging
+		url             = '/tenders/plan-graph-positions/'
+		pages           = []
+		positions_count = PlanGraphPosition.objects.filter(state = True).count()
+		items_on_page   = 100
+
+		# Формируем ссылки
+		page_max = positions_count // items_on_page
+		if positions_count % items_on_page:
+			page_max += 1
+
+		for n in range(1, page_max + 1):
+			if n < 4 or n-3 < page < n+3 or n > page_max - 3:
+				pages.append(n)
+			elif (n == 4 or n == page_max - 4) and pages[len(pages)-1]:
+				pages.append(0)
+
+		# Определяем номера предыдущих и последующих страниц
+		page_prev = page - 1
+		if page == page_max:
+			page_next = 0
+		else:
+			page_next = page + 1
+
+
+
+
+
+
+
+		# Получаем список объектов
+		positions = PlanGraphPosition.objects.filter(state = True)[(page - 1) * items_on_page : page * items_on_page]
+
+		# Нумеруем элементы списка
+		for n, position in enumerate(positions):
+			position.n = (page - 1) * items_on_page + n + 1
+
+
+
 
 	return render(request, 'tenders/plan-graph-positions.html', locals())
 

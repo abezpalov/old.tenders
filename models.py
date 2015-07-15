@@ -1614,6 +1614,27 @@ class PlanGraphPosition(models.Model):
 	def __str__(self):
 		return "{} {}".format(self.number, self.subject_name)
 
+	def _get_price_str(self):
+
+		try:
+			price = self.max_price
+			currency = self.currency
+		except: return ''
+
+		if price:
+			price = '{:,}'.format(round(price, 2))
+			price = price.replace(',', '&nbsp;')
+			price = price.replace('.', ',')
+			price = price + '&nbsp;' + currency.code
+		else: return ''
+
+		return price
+
+	price_str = property(_get_price_str)
+
+
+
+
 	class Meta:
 		ordering = ['number']
 

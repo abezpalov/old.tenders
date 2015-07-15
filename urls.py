@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 
 	#PlanGraph Positions
 	# ex: /tenders/plan-graph-positions/
+	url(r'^plan-graph-positions/page/(?P<page>[0-9]+)/$', views.planGraphPositions, name='planGraphPositions'),
 	url(r'^plan-graph-positions/$', views.planGraphPositions, name='planGraphPositions'),
 
 )
