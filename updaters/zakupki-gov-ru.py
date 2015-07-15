@@ -1369,7 +1369,7 @@ class Runner:
 					execution_month   = position['execution_month'],
 					state             = True)
 
-				print(".", end = "")
+				print(position)
 
 				# Продукты
 				prs = p.xpath('./products/product')
@@ -1433,8 +1433,10 @@ class Runner:
 
 					print(".", end = "")
 
-				
-			print("")
+				print("")
+
+
+			print("\n")
 
 		# Отмена планов-графиков
 		pgs = tree.xpath('.//tenderPlanCancel')
