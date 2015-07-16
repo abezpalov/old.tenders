@@ -1530,7 +1530,7 @@ class PlanGraphPositionManager(models.Manager):
 			o.save()
 
 			o.okveds            = okveds
-			o.okps              = okpds
+			o.okpds             = okpds
 			o.save()
 		return o
 
@@ -1561,7 +1561,7 @@ class PlanGraphPositionManager(models.Manager):
 			o.save()
 
 			o.okveds            = okveds
-			o.okps              = okpds
+			o.okpds             = okpds
 			o.save()
 		except PlanGraphPosition.DoesNotExist:
 			o = self.take(
@@ -1592,7 +1592,7 @@ class PlanGraphPosition(models.Model):
 	number            = models.CharField(max_length = 50, null = True, default = None)
 	ext_number        = models.CharField(max_length = 50, null = True, default = None)
 	okveds            = models.ManyToManyField(OKVED, db_table = 'tenders_plan_graph_position_to_okved', related_name = 'plan_graph_position_okved')
-	okpd              = models.ManyToManyField(OKPD, db_table = 'tenders_plan_graph_position_to_okpd', related_name = 'plan_graph_position_okpd')
+	okpds             = models.ManyToManyField(OKPD, db_table = 'tenders_plan_graph_position_to_okpd', related_name = 'plan_graph_position_okpd')
 	subject_name      = models.TextField(null = True, default = None)
 	max_price         = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	payments          = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
@@ -1631,6 +1631,34 @@ class PlanGraphPosition(models.Model):
 		return price
 
 	price_str = property(_get_price_str)
+
+	def _get_placing_str(self):
+
+		result = ""
+
+		if self.placing_month:
+			if   self.placing_month == 1:  result += "январь"
+			elif self.placing_month == 2:  result += "февраль"
+			elif self.placing_month == 3:  result += "март"
+			elif self.placing_month == 4:  result += "апрель"
+			elif self.placing_month == 5:  result += "май"
+			elif self.placing_month == 6:  result += "июнь"
+			elif self.placing_month == 7:  result += "июль"
+			elif self.placing_month == 8:  result += "август"
+			elif self.placing_month == 9:  result += "сентябрь"
+			elif self.placing_month == 10: result += "октябрь"
+			elif self.placing_month == 11: result += "ноябрь"
+			elif self.placing_month == 12: result += "декабрь"
+
+		if self.placing_year and self.placing_month:
+			result += " "
+
+		if self.placing_year:
+			result += str(self.placing_year)
+
+		return result
+
+	placing_str = property(_get_placing_str)
 
 
 
