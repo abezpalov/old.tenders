@@ -171,6 +171,12 @@ def ajaxSwitchUpdaterState(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
+# TODO Source
+
+
+# TODO Country
+
+
 # Region
 
 
@@ -353,6 +359,115 @@ def ajaxSwitchRegionState(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
+
+# TODO Currency
+# TODO OKEI Section
+# TODO OKEI Group
+# TODO OKEI
+# TODO KOSGU
+# TODO OKOPF
+# TODO OKPD
+# TODO OKTMO
+# TODO OKVED Section
+# TODO OKVED SubSection
+# TODO OKVED
+# TODO Subsystem Type
+# TODO Organisation Type
+# TODO Budget
+# TODO Budget Type
+# TODO KBK Budget
+# TODO OKOGU
+
+
+# TODO Organisation
+
+
+def ajaxGetOrganisation(request):
+	"AJAX-представление: Get Plan Graph Position."
+
+	# Импортируем
+	import json
+	from tenders.models import PlanGraphPosition
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_plangraphposition'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Получаем объект
+	try:
+		o = PlanGraphPosition.objects.get(id = request.POST.get('position_id'))
+
+		position = {}
+		position['id']      = o.id
+		position['number']  = o.number
+		position['name']    = o.subject_name
+		position['price']   = o.price_str
+		position['placing'] = o.placing_str
+		position['state']   = o.state
+
+		position['okveds'] = []
+		subs = o.okveds.all()
+		for sub in subs:
+			okved = {
+				'code': sub.code,
+				'name': sub.name
+			}
+			position['okveds'].append(okved)
+
+		position['okpds'] = []
+		subs = o.okpds.all()
+		for sub in subs:
+			okpd = {
+				'code': sub.code,
+				'name': sub.name
+			}
+			position['okpds'].append(okpd)
+
+		position['plan_graph'] = {}
+		try:
+			position['plan_graph']['id'] = o.plan_graph.id
+		except AttributeError:
+			position['plan_graph']['id'] = 0
+
+		position['placing_way'] = {}
+		try:
+			position['placing_way']['id'] = o.placing_way.id
+		except AttributeError:
+			position['placing_way']['id'] = 0
+
+		position['change_reason'] = {}
+		try:
+			position['change_reason']['id'] = o.change_reason.id
+		except AttributeError:
+			position['change_reason']['id'] = 0
+
+		result = {
+			'status':  'success',
+			'message': 'Данные позиции получены.',
+			'position': position
+		}
+
+	except PlanGraphPosition.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: позиция отсутствует в базе.'}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+# TODO Organisation Right
+# TODO Plasing Way
+# TODO Plan Position Change Reason
+# TODO Contact Person
+
+
 # PlanGraph
 
 
@@ -504,22 +619,6 @@ def ajaxGetPlanGraphPosition(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# TODO Plan Graph Position Product
 
 

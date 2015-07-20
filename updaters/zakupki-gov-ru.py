@@ -1299,19 +1299,19 @@ class Runner:
 				except IndexError:
 					position['no_public_discussion'] = False
 				try:
-					position['placing_year']         = p.xpath('./purchaseConditions/purchaseGraph/year')[0].text
+					position['placing_year']         = p.xpath('./purchaseConditions/purchaseGraph/purchasePlacingTerm/year')[0].text
 				except IndexError:
 					position['placing_year']         = None
 				try:
-					position['placing_month']        = p.xpath('./purchaseConditions/purchaseGraph/month')[0].text
+					position['placing_month']        = p.xpath('./purchaseConditions/purchaseGraph/purchasePlacingTerm/month')[0].text
 				except IndexError:
 					position['placing_month']        = None
 				try:
-					position['execution_year']       = p.xpath('./purchaseConditions/contractExecutionTerm/year')[0].text
+					position['execution_year']       = p.xpath('./purchaseConditions/purchaseGraph/contractExecutionTerm/year')[0].text
 				except IndexError:
 					position['execution_year']       = None
 				try:
-					position['execution_month']      = p.xpath('./purchaseConditions/contractExecutionTerm/month')[0].text
+					position['execution_month']      = p.xpath('./purchaseConditions/purchaseGraph/contractExecutionTerm/month')[0].text
 				except IndexError:
 					position['execution_month']      = None
 

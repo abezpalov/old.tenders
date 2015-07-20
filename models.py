@@ -1194,7 +1194,6 @@ class Organisation(models.Model):
 		ordering = ['reg_number']
 
 
-
 # TODO OrganisationRight
 
 
