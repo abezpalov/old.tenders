@@ -5,6 +5,17 @@
 
 {% if perms.tenders.add_plangraphposition or perms.tenders.change_plangraphposition or perms.tenders.delete_plangraphposition %}
 
+<!-- Панель вызова фильтра вывода -->
+<div class="row collapse">
+	<ul class="button-group even-5">
+		<li><button id="filter-positions-filter" data-do="open-filter-positions-filter"{% if filter == None %} class="secondary"{% endif %}><i class="fa fa-filter"></i> Фильтр</button></li>
+		<li><button id="filter-positions-filter" data-do="open-filter-positions-filter"{% if filter == None %} class="secondary"{% endif %}><i class="fa fa-map-marker"></i> Регион</button></li>
+		<li><button id="filter-positions-filter" data-do="open-filter-positions-filter"{% if filter == None %} class="secondary"{% endif %}><i class="fa fa-building-o"></i> Организация</button></li>
+		<li><button id="filter-positions-filter" data-do="open-filter-positions-filter"{% if filter == None %} class="secondary"{% endif %}><i class="fa fa-filter"></i> ОКПД</button></li>
+		<li><button id="filter-positions-filter" data-do="open-filter-positions-filter"{% if filter == None %} class="secondary"{% endif %}><i class="fa fa-filter"></i> ОВЭД</button></li>
+	</ul>
+</div>
+
 <!-- Таблица со списком загрузчиков -->
 <div class="row collapse">
 	<p>Количество строк запроса: {{ positions_count }}
@@ -33,7 +44,7 @@
 					<label for="plan-graph-position-{{ position.id }}-state"></label>
 				</div>
 			</td>
-			<td>{% if plang_raph_position.placing_year %}{{ plang_raph_position.placing_year }}{% endif %}{% if plang_raph_position.placing_year and plang_raph_position.placing_month %}&nbsp;{% endif %}{% if plang_raph_position.placing_month %}{{ position.placing_month }}{% endif %}</td>
+			<td>{{ position.placing_str }}</td>
 		</tr>
 		{% endfor %}
 	</table>

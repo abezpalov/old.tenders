@@ -11,8 +11,15 @@ $("body").delegate("[data-do='open-view-position']", "click", function(){
 			if ('success' == data.status){
 
 				// Заполняем значение полей
-				$('#edit-position-id').val(data.position['id']);
-				$('#edit-position-name').text(data.position['name']);
+				$('#view-position-id').val(data.position['id']);
+				$('#view-position-name').text(data.position['name']);
+
+				$('#view-position-customer').data('id', data.position['customer']['id']);
+				$('#view-position-customer').text(data.position['customer']['name']);
+
+				$('#view-position-number').text(data.position['number']);
+				$('#view-position-price').text(data.position['price']);
+
 
 				// Открываем окно
 				$('#modal-view-plan-graph-position').foundation('reveal', 'open');

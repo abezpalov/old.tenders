@@ -2,10 +2,15 @@
 
 	<h3>Позиция плана</h3>
 
-	<input id="edit-position-id" type="hidden" value="0">
+	<input id="view-position-id" type="hidden" value="0">
 
-	<p id="edit-position-name"></p>
+	<p id="view-position-name"></p>
 
-	<button data-do="view-plan-graph-position-close" class="secondary">Хорошо</button>
+	<table>
+		<tr><td>Заказчик</td><td><a id="view-position-customer" data-do="view-organisation" data-id="0"></a></td></tr>
+		<tr><td>Номер</td><td id="view-position-number"></td></tr>
+		<tr><td>Максимальная цена</td><td id="view-position-price"></td></tr>
+	</table>
+
 	<a class="close-reveal-modal">&#215;</a>
 </div>

@@ -593,6 +593,17 @@ def ajaxGetPlanGraphPosition(request):
 		except AttributeError:
 			position['plan_graph']['id'] = 0
 
+		position['customer'] = {}
+		try:
+			position['customer']['id'] = o.plan_graph.customer.id
+		except AttributeError:
+			position['customer']['id'] = 0
+		try:
+			position['customer']['name'] = o.plan_graph.customer.short_name
+		except AttributeError:
+			position['customer']['name'] = ''
+
+
 		position['placing_way'] = {}
 		try:
 			position['placing_way']['id'] = o.placing_way.id

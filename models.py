@@ -1622,9 +1622,9 @@ class PlanGraphPosition(models.Model):
 
 		if price:
 			price = '{:,}'.format(round(price, 2))
-			price = price.replace(',', '&nbsp;')
+			price = price.replace(',', '\u00a0')
 			price = price.replace('.', ',')
-			price = price + '&nbsp;' + currency.code
+			price = price + '\u00a0' + currency.code
 		else: return ''
 
 		return price
