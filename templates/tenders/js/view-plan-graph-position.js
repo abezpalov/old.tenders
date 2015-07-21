@@ -20,8 +20,19 @@ $("body").delegate("[data-do='open-view-position']", "click", function(){
 				$('#view-position-number').text(data.position['number']);
 				$('#view-position-price').text(data.position['price']);
 
+				okveds = ""
+				for(i = 0; i < data.position.okveds.length; i++) {
+					okved = "<p>" + data.position['okveds'][i].code + " " + data.position['okveds'][i]['name'] + "</p>";
+					okveds = okveds + okved;
+				}
+				$('#view-position-okveds').html(okveds);
 
-
+				okpds = ""
+				for(i = 0; i < data.position.okpds.length; i++) {
+					okpd = "<p>" + data.position['okpds'][i].code + " " + data.position['okpds'][i]['name'] + "</p>";
+					okpds = okpds + okpd;
+				}
+				$('#view-position-okpds').html(okpds);
 
 
 				// Открываем окно
