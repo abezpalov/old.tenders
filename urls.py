@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 	url(r'^ajax/save-updater/$', views.ajaxSaveUpdater, name='ajaxSaveUpdater'),
 	url(r'^ajax/switch-updater-state/$', views.ajaxSwitchUpdaterState, name='ajaxSwitchUpdaterState'),
 
+
 	# Region
 	# ex: /tenders/regions/
 	url(r'^regions/$', views.regions, name='regions'),
@@ -21,9 +22,16 @@ urlpatterns = patterns('',
 	url(r'^ajax/save-region/$', views.ajaxSaveRegion, name='ajaxSaveRegion'),
 	url(r'^ajax/switch-region-state/$', views.ajaxSwitchRegionState, name='ajaxSwitchRegionState'),
 
+
+	# Organisation
+	# AJAX
+	url(r'^ajax/get-organisation/$', views.ajaxGetOrganisation, name='ajaxGetOrganisation'),
+
+
 	#PlanGraphs
 	# ex: /tenders/plan-graphs/
 	url(r'^plan-graphs/$', views.planGraphs, name='planGraphs'),
+
 
 	#PlanGraph Positions
 	# ex: /tenders/plan-graph-positions/

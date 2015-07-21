@@ -1,9 +1,9 @@
 // Открытие окна просмотра
-$("body").delegate("[data-do='open-view-position']", "click", function(){
+$("body").delegate("[data-do='open-view-organisation']", "click", function(){
 
 	// Получаем информацию
-	$.post("/tenders/ajax/get-plan-graph-position/", {
-		position_id: $(this).data('id'),
+	$.post("/tenders/ajax/get-organisation/", {
+		organisation_id: $(this).data('id'),
 		csrfmiddlewaretoken: '{{ csrf_token }}'
 	},
 	function(data) {
@@ -11,21 +11,14 @@ $("body").delegate("[data-do='open-view-position']", "click", function(){
 			if ('success' == data.status){
 
 				// Заполняем значение полей
-				$('#view-position-id').val(data.position['id']);
-				$('#view-position-name').text(data.position['name']);
-
-				$('#view-position-customer').data('id', data.position['customer']['id']);
-				$('#view-position-customer').text(data.position['customer']['name']);
-
-				$('#view-position-number').text(data.position['number']);
-				$('#view-position-price').text(data.position['price']);
-
+				$('#view-organisation-id').val(data.organisation['id']);
+				$('#view-organisation-full-name').text(data.organisation['full_name']);
 
 
 
 
 				// Открываем окно
-				$('#modal-view-plan-graph-position').foundation('reveal', 'open');
+				$('#modal-view-organisation').foundation('reveal', 'open');
 
 			} else {
 

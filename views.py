@@ -383,18 +383,18 @@ def ajaxSwitchRegionState(request):
 
 
 def ajaxGetOrganisation(request):
-	"AJAX-представление: Get Plan Graph Position."
+	"AJAX-представление: Organisation."
 
 	# Импортируем
 	import json
-	from tenders.models import PlanGraphPosition
+	from tenders.models import Organisation
 
 	# Проверяем тип запроса
 	if (not request.is_ajax()) or (request.method != 'POST'):
 		return HttpResponse(status=400)
 
 	# Проверяем права доступа
-	if not request.user.has_perm('tenders.change_plangraphposition'):
+	if not request.user.has_perm('tenders.change_organisation'):
 		result = {
 			'status': 'alert',
 			'message': 'Ошибка 403: отказано в доступе.'}
@@ -402,62 +402,24 @@ def ajaxGetOrganisation(request):
 
 	# Получаем объект
 	try:
-		o = PlanGraphPosition.objects.get(id = request.POST.get('position_id'))
+		o = Organisation.objects.get(id = request.POST.get('organisation_id'))
 
-		position = {}
-		position['id']      = o.id
-		position['number']  = o.number
-		position['name']    = o.subject_name
-		position['price']   = o.price_str
-		position['placing'] = o.placing_str
-		position['state']   = o.state
-
-		position['okveds'] = []
-		subs = o.okveds.all()
-		for sub in subs:
-			okved = {
-				'code': sub.code,
-				'name': sub.name
-			}
-			position['okveds'].append(okved)
-
-		position['okpds'] = []
-		subs = o.okpds.all()
-		for sub in subs:
-			okpd = {
-				'code': sub.code,
-				'name': sub.name
-			}
-			position['okpds'].append(okpd)
-
-		position['plan_graph'] = {}
-		try:
-			position['plan_graph']['id'] = o.plan_graph.id
-		except AttributeError:
-			position['plan_graph']['id'] = 0
-
-		position['placing_way'] = {}
-		try:
-			position['placing_way']['id'] = o.placing_way.id
-		except AttributeError:
-			position['placing_way']['id'] = 0
-
-		position['change_reason'] = {}
-		try:
-			position['change_reason']['id'] = o.change_reason.id
-		except AttributeError:
-			position['change_reason']['id'] = 0
+		organisation = {}
+		organisation['id']        = o.id
+		organisation['name']      = o.short_name
+		organisation['full_name'] = o.full_name
+		organisation['state']     = o.state
 
 		result = {
-			'status':  'success',
-			'message': 'Данные позиции получены.',
-			'position': position
+			'status':      'success',
+			'message':     'Данные позиции получены.',
+			'organisation': organisation
 		}
 
-	except PlanGraphPosition.DoesNotExist:
+	except Organisation.DoesNotExist:
 		result = {
 			'status': 'alert',
-			'message': 'Ошибка: позиция отсутствует в базе.'}
+			'message': 'Ошибка: организация отсутствует в базе.'}
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
