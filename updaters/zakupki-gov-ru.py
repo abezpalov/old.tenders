@@ -1416,6 +1416,8 @@ class Runner:
 					except OKEI.DoesNotExist:
 						product['okei'] = None
 
+					# TODO TEST
+					print("position_id = {}, number = {}".format(position.id, number))
 
 					product = PlanGraphPositionProduct.objects.update(
 						position              = position,
