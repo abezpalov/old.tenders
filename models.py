@@ -1469,10 +1469,10 @@ class PlanGraphManager(models.Manager):
 
 class PlanGraph(models.Model):
 
-	oos_id         = models.CharField(max_length = 20, null = True, default = None)
-	number         = models.CharField(max_length = 20, null = True, default = None)
+	oos_id         = models.CharField(max_length = 20)
+	number         = models.CharField(max_length = 20)
 	year           = models.IntegerField(null = True, default = None)
-	version        = models.IntegerField(null = True, default = None)
+	version        = models.IntegerField()
 	region         = models.ForeignKey(Region, related_name = 'plan_graph_region', null = True, default = None)
 	owner          = models.ForeignKey(Organisation, related_name = 'plan_graph_owner', null = True, default = None)
 	create_date    = models.DateTimeField(null = True, default = None)
@@ -1493,6 +1493,7 @@ class PlanGraph(models.Model):
 
 	class Meta:
 		ordering = ['year', 'number', 'version']
+		unique_together = ("oos_id", "number", "version")
 
 
 class PlanGraphPositionManager(models.Manager):
@@ -1596,8 +1597,8 @@ class PlanGraphPositionManager(models.Manager):
 
 class PlanGraphPosition(models.Model):
 
-	plan_graph        = models.ForeignKey(PlanGraph, null = True, default = None)
-	number            = models.CharField(max_length = 50, null = True, default = None)
+	plan_graph        = models.ForeignKey(PlanGraph)
+	number            = models.CharField(max_length = 50)
 	ext_number        = models.CharField(max_length = 50, null = True, default = None)
 	okveds            = models.ManyToManyField(OKVED, db_table = 'tenders_plan_graph_position_to_okved', related_name = 'plan_graph_position_okved')
 	okpds             = models.ManyToManyField(OKPD, db_table = 'tenders_plan_graph_position_to_okpd', related_name = 'plan_graph_position_okpd')
@@ -1668,11 +1669,9 @@ class PlanGraphPosition(models.Model):
 
 	placing_str = property(_get_placing_str)
 
-
-
-
 	class Meta:
 		ordering = ['number']
+		unique_together = ("plan_graph", "number")
 
 
 class PlanGraphPositionProductManager(models.Manager):
@@ -1762,6 +1761,7 @@ class PlanGraphPositionProduct(models.Model):
 
 	class Meta:
 		ordering = ['number']
+		unique_together = ("position", "number")
 
 
 class PlanGraphPositionQuery(models.Model):
