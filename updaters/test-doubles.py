@@ -51,7 +51,7 @@ class Runner:
 					log = Log.objects.add(
 						subject = "Tenders SQL",
 						channel = "Critical Error",
-						title = "Double Product: position.id = {}, number = {}.".format(position.id, number))
+						title = "Double Product: position.id = {}, number = {}.".format(product.id, product.number))
 
 					print(log)
 

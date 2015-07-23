@@ -1740,8 +1740,8 @@ class PlanGraphPositionProductManager(models.Manager):
 
 class PlanGraphPositionProduct(models.Model):
 
-	position              = models.ForeignKey(PlanGraphPosition, null = True, default = None)
-	number                = models.IntegerField(null = True, default = None)
+	position              = models.ForeignKey(PlanGraphPosition)
+	number                = models.IntegerField()
 	okpd                  = models.ForeignKey(OKPD, null = True, default = None)
 	name                  = models.TextField(null = True, default = None)
 	min_requipment        = models.TextField(null = True, default = None)
@@ -1762,3 +1762,29 @@ class PlanGraphPositionProduct(models.Model):
 
 	class Meta:
 		ordering = ['number']
+
+
+class PlanGraphPositionQuery(models.Model):
+
+	name        = models.CharField(max_length = 100)
+	regions     = models.ManyToManyField(Region,       db_table = 'tenders_plan_graph_position_query_to_region',   related_name = 'plan_graph_position_query_region')
+	customers   = models.ManyToManyField(Organisation, db_table = 'tenders_plan_graph_position_query_to_customer', related_name = 'plan_graph_position_query_customer')
+	owners      = models.ManyToManyField(Organisation, db_table = 'tenders_plan_graph_position_query_to_owner',    related_name = 'plan_graph_position_query_owner')
+	okveds      = models.ManyToManyField(OKVED,        db_table = 'tenders_plan_graph_position_query_to_okved',    related_name = 'plan_graph_position_query_okved')
+	okpds       = models.ManyToManyField(OKPD,         db_table = 'tenders_plan_graph_position_query_to_okpd',     related_name = 'plan_graph_position_query_okpd')
+
+	state       = models.BooleanField(default=True)
+	public      = models.BooleanField(default=False)
+
+	created     = models.DateTimeField()
+	created_by  = models.CharField(max_length=100, null=True, default=None)
+	modified    = models.DateTimeField()
+	modified_by = models.CharField(max_length=100, null=True, default=None)
+
+	def __str__(self):
+		return "{}".format(self.name)
+
+	class Meta:
+		ordering = ['name']
+
+
