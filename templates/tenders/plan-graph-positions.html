@@ -19,7 +19,8 @@
 <!-- Таблица со списком загрузчиков -->
 <div class="row collapse">
 	<p>Количество строк запроса: {{ positions_count }}</p>
-	<table>
+	<table style="width: 100%;">
+		<thead>
 		<tr>
 			<th class="text-center">#</th>
 			<th class="text-center">Год</th>
@@ -30,6 +31,8 @@
 			<th class="text-center">Статус</th>
 			<th class="text-center">Размещение</th>
 		</tr>
+		</thead>
+		<tbody>
 		{% for position in positions %}
 		<tr>
 			<td>{{ position.n }}</td>
@@ -47,6 +50,7 @@
 			<td style="white-space: nowrap;">{{ position.placing_str }}</td>
 		</tr>
 		{% endfor %}
+		</tbody>
 	</table>
 
 	<!-- Pagination -->
