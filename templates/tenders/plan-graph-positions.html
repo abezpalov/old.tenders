@@ -22,29 +22,29 @@
 	<table>
 		<tr>
 			<th class="text-center">#</th>
-			<th>Год</th>
-			<th>Регион</th>
-			<th>Заказчик</th>
-			<th>Наименование</th>
-			<th>Цена</th>
-			<th>Статус</th>
-			<th>Размещение</th>
+			<th class="text-center">Год</th>
+			<th class="text-center">Регион</th>
+			<th class="text-center">Заказчик</th>
+			<th class="text-center">Наименование</th>
+			<th class="text-center">Цена</th>
+			<th class="text-center">Статус</th>
+			<th class="text-center">Размещение</th>
 		</tr>
 		{% for position in positions %}
 		<tr>
 			<td>{{ position.n }}</td>
 			<td><a>{{ position.plan_graph.year }}</a></td>
 			<td><a>{{ position.plan_graph.region.name }}</a></td>
-			<td><a data-do="open-view-organisation" data-id="{{ position.plan_graph.customer.id }}">{{ position.plan_graph.customer.short_name }}</a>{% if position.plan_graph.customer != position.plan_graph.owner %}<br/>Владелец: <a data-do="open-view-organisation" data-id="{{ position.plan_graph.owner.id }}">{{ position.plan_graph.owner.short_name }}</a>{% endif %}</td>
+			<td style="word-break: break-all;"><a data-do="open-view-organisation" data-id="{{ position.plan_graph.customer.id }}">{{ position.plan_graph.customer.short_name }}</a>{% if position.plan_graph.customer != position.plan_graph.owner %}<br/>Владелец: <a data-do="open-view-organisation" data-id="{{ position.plan_graph.owner.id }}">{{ position.plan_graph.owner.short_name }}</a>{% endif %}</td>
 			<td style="word-break: break-all;"><a data-do="open-view-position" data-id="{{ position.id }}">{{ position.subject_name }}</a></td>
-			<td class="text-right">{{ position.price_str }}</td>
+			<td class="text-right" style="white-space: nowrap;">{{ position.price_str }}</td>
 			<td>
 				<div class="switch small">
 					<input id="plan-graph-position-{{ position.id }}-state" data-do="switch-plan-graph-position-state" data-id="{{ position.id }}" data-plan-graph-position-state="{{ plan_graph_poistion.id }}" type="checkbox"{% if position.state %} checked{% endif %}>
 					<label for="plan-graph-position-{{ position.id }}-state"></label>
 				</div>
 			</td>
-			<td>{{ position.placing_str }}</td>
+			<td style="white-space: nowrap;">{{ position.placing_str }}</td>
 		</tr>
 		{% endfor %}
 	</table>
