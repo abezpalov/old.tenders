@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: Запросы{% endblock %}
+
+{% block content %}
+
+{% if perms.tenders.add_plangraphpositionquery or perms.tenders.change_plangraphpositionquery or perms.tenders.delete_plangraphpositionquery %}
+
+<!-- Таблица со списком объектов -->
+<div class="row collapse">
+	<table>
+		<tr>
+			<th class="text-center">#</th>
+			<th>Наименование</th>
+			<th>Страна</th>
+			<th>Статус</th>
+			<th>Последнее обновление</th>
+		</tr>
+		{% for region in regions %}
+		<tr>
+			<td>{{ forloop.counter }}</td>
+			<td><a data-do="open-edit-region" data-id="{{ region.id }}" data-region-name="{{ region.id }}">{{ region.name }}</a></td>
+			<td><a data-do="open-edit-country" data-id="{{ region.country.id }}" data-country-name="{{ region.country.id }}">{{ region.country.name }}</a></td>
+			<td>
+				<div class="switch small">
+					<input id="region-{{ region.id }}-state" data-do="switch-region-state" data-id="{{ region.id }}" data-region-state="{{ region.id }}" type="checkbox"{% if region.state %} checked{% endif %}>
+					<label for="region-{{ region.id }}-state"></label>
+				</div>
+			</td>
+			<td>{{ region.updated|date:"d.m.Y H.i" }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% else %}
+
+<div class="row collapse">
+	<div class="small-12 columns">
+		<p class="panel">Недостаточно прав для данной функциональности.</p>
+	</div>
+</div>
+
+{% endif %}
+
+{% include "tenders/modal/edit-region.html" %}
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/edit-region.js" %}
+</script>
+{% endblock %}
