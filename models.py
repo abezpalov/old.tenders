@@ -1529,9 +1529,17 @@ class PlanGraphPositionManager(models.Manager):
 			o.modified          = timezone.now()
 			o.save()
 
-			o.okveds            = okveds
-			o.okpds             = okpds
-			o.save()
+			try:
+				o.okveds            = okveds
+			except:
+				print("Ошибка связей.")
+
+
+			try:
+				o.okpds             = okpds
+			except:
+				print("Ошибка связей.")
+
 		return o
 
 	def update(self, plan_graph, number, ext_number = None, okveds = None,
