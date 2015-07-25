@@ -22,17 +22,31 @@ $("body").delegate("[data-do='open-view-position']", "click", function(){
 
 				okveds = ""
 				for(i = 0; i < data.position.okveds.length; i++) {
-					okved = "<p>" + data.position['okveds'][i].code + " " + data.position['okveds'][i]['name'] + "</p>";
+					okved = data.position['okveds'][i].code + " " + data.position['okveds'][i]['name'] + "<br/>";
 					okveds = okveds + okved;
 				}
 				$('#view-position-okveds').html(okveds);
 
 				okpds = ""
 				for(i = 0; i < data.position.okpds.length; i++) {
-					okpd = "<p>" + data.position['okpds'][i].code + " " + data.position['okpds'][i]['name'] + "</p>";
+					okpd = data.position['okpds'][i].code + " " + data.position['okpds'][i]['name'] + "<br/>";
 					okpds = okpds + okpd;
 				}
 				$('#view-position-okpds').html(okpds);
+
+				if (data.position.products.length > 0) {
+
+					products = '<table><tr><th>#</th><th>Наименование</th><th colspan="2">Количество</th><th>Цена</th><th>Сумма</th><th>ОКПД</th></tr>'
+
+					for(i = 0; i < data.position.products.length; i++) {
+						product = "<tr><td>" + data.position['products'][i].number + "</td><td>" + data.position['products'][i]['name'] + "</td><td>" + data.position['products'][i]['quantity'] + "</td><td>" + data.position['products'][i]['unit'] + "</td><td>" + data.position['products'][i]['price'] + "</td><td>" + data.position['products'][i]['max_sum'] + "</td><td>" + data.position['products'][i]['okpd'] + "</td></tr>";
+						products = products + product;
+
+					}
+					products = products + "</table>"
+					$('#view-position-products').html(products);
+				}
+
 
 
 				// Открываем окно

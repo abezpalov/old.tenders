@@ -1,4 +1,5 @@
 import gc
+import datetime
 from tenders.models import *
 from django.utils import timezone
 
@@ -34,6 +35,24 @@ class Runner:
 		'prev_month':                  'prevMonth',
 		'curr_month':                  'currMonth'}
 
+	essences = [
+		'country',
+		'currency',
+		'okei',
+		'kosgu',
+		'okopf',
+		'okpd',
+		'oktmo',
+		'okved',
+		'budget',
+		'budget_type',
+		'kbk_budget',
+		'organisation_type',
+		'organisation',
+		'placing_way',
+		'plan_position_change_reason']
+
+	max_time = datetime.timedelta(0, 3000, 0)
 
 	def __init__(self):
 
@@ -66,7 +85,7 @@ class Runner:
 
 	def run(self):
 
-		start = timezone.now()
+		self.start = timezone.now()
 
 		# Проверяем наличие параметров авторизации
 		if not self.updater.login or not self.updater.password:
@@ -74,29 +93,16 @@ class Runner:
 			return False
 
 		# Обновляем справочники
-		self.getEssencesList()
+		for essence in self.essences:
 
-		self.updateEssence('country')
-		self.updateEssence('currency')
-		self.updateEssence('okei')
-		self.updateEssence('kosgu')
-		self.updateEssence('okopf')
-		self.updateEssence('okpd')
-		self.updateEssence('oktmo')
-		self.updateEssence('okved')
+			# Проверяем не вышло ли время
+			if timezone.now() - self.start > self.max_time:
+				print("Время вышло {}.".format(timezone.now() - self.start))
+				return True
 
-		self.updateEssence('budget')
-		self.updateEssence('budget_type')
-		self.updateEssence('kbk_budget')
+			self.updateEssence(essence)
 
-		self.updateEssence('organisation_type')
-		self.updateEssence('organisation')
-
-		self.updateEssence('placing_way')
-		self.updateEssence('plan_position_change_reason')
-
-
-		# Обновляем планы регионов
+		# Обновляем информацию по регионам
 		self.updateRegions()
 
 		# Получаем спиисок "нужных" регионов
@@ -126,8 +132,7 @@ class Runner:
 
 				# TODO Обновляем тендеры регионов
 
-		print("Обработки завершены за {}.".format(timezone.now() - start))
-
+		print("Обработки завершены за {}.".format(timezone.now() - self.start))
 		return True
 
 
@@ -185,14 +190,6 @@ class Runner:
 		return zip_data
 
 
-	def getEssencesList(self):
-		'Получает список сущностей для тестирования'
-
-		essences = self.getFTPCatalog(self.urls['essences'])
-
-		return essences
-
-
 	def updateEssence(self, essence, catalog = None, region = None):
 		'Получает файлы сущностей для анализа и обработки'
 
@@ -205,8 +202,24 @@ class Runner:
 
 		zip_names = self.getFTPCatalog(catalog)
 
+		# Записываем источники в базу
+		for zip_name in zip_names:
+
+			source = Source.objects.take(
+				url = "{}/{}/{}".format(
+					self.urls['base'],
+					catalog,
+					zip_name))
+
 		# Загружаем архивы
 		for zip_name in zip_names:
+
+			# Проверяем не вышло ли время
+			if timezone.now() - self.start > self.max_time:
+				print("Время вышло {}.".format(timezone.now() - self.start))
+				return True
+			else:
+				print("Времени прошло {}.".format(timezone.now() - self.start))
 
 			# Проверяем источник
 			source = Source.objects.take(
@@ -241,7 +254,8 @@ class Runner:
 
 			if i == len(xml_names):
 				print("Все файлы архива обработаны.")
-				source.state = True
+				source.state    = True
+				source.modofied = timezone.now()
 				source.save()
 			else:
 				print("Внимание! Не все файлы архива обработаны.")
@@ -1369,7 +1383,7 @@ class Runner:
 					execution_month   = position['execution_month'],
 					state             = True)
 
-				print(position)
+				print(".", end = "")
 
 				# Продукты
 				prs = p.xpath('./products/product')
@@ -1416,9 +1430,6 @@ class Runner:
 					except OKEI.DoesNotExist:
 						product['okei'] = None
 
-					# TODO TEST
-					print("position_id = {}, number = {}".format(position.id, number))
-
 					product = PlanGraphPositionProduct.objects.update(
 						position              = position,
 						number                = number,
@@ -1434,9 +1445,6 @@ class Runner:
 						state                 = True)
 
 					print(".", end = "")
-
-				print("")
-
 
 			print("\n")
 
@@ -1455,7 +1463,7 @@ class Runner:
 				oos_id = plan_graph['oos_id'],
 				number = plan_graph['number'])
 
-			msg = "Отменен план-график: {}.\n".format(plan_graph)
+			msg = "Отменен план-график."
 			print(msg)
 
 		# Планы-графики (неструктурированные)

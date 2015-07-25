@@ -453,7 +453,7 @@ def planGraphs(request):
 # PlanGraph Position
 
 
-def planGraphPositions(request, page = 1):
+def planGraphPositions(request, page = 1, query = None):
 	"Представление: список планов-графиков."
 
 	# TODO Добавить взможность использования фильтров
@@ -461,12 +461,22 @@ def planGraphPositions(request, page = 1):
 	# Импортируем
 	from tenders.models import PlanGraphPosition
 
-	page = int(page)
+	try:
+		page = int(page)
+	except TypeError:
+		page = 1
 
 	# Проверяем права доступа
 	if request.user.has_perm('tenders.add_plangraph')\
 	or request.user.has_perm('tenders.change_plangraph')\
 	or request.user.has_perm('tenders.delete_plangraph'):
+
+		# TODO Готовим запрос
+		# Если указан запрос - загружаем его параметры
+		# Если указаны параметры выборки - готовим запрос на их основании
+
+
+
 
 		# Paging
 		url             = '/tenders/plan-graph-positions/'
@@ -493,7 +503,7 @@ def planGraphPositions(request, page = 1):
 			page_next = page + 1
 
 		# Получаем список объектов
-		positions = PlanGraphPosition.objects.filter(state = True)[(page - 1) * items_on_page : page * items_on_page]
+		positions = PlanGraphPosition.objects.select_related().filter(state = True)[(page - 1) * items_on_page : page * items_on_page]
 
 		# Нумеруем элементы списка
 		for n, position in enumerate(positions):
@@ -506,7 +516,7 @@ def ajaxGetPlanGraphPosition(request):
 
 	# Импортируем
 	import json
-	from tenders.models import PlanGraphPosition
+	from tenders.models import PlanGraphPosition, PlanGraphPositionProduct
 
 	# Проверяем тип запроса
 	if (not request.is_ajax()) or (request.method != 'POST'):
@@ -577,6 +587,21 @@ def ajaxGetPlanGraphPosition(request):
 			position['change_reason']['id'] = o.change_reason.id
 		except AttributeError:
 			position['change_reason']['id'] = 0
+
+
+		position['products'] = []
+		subs = PlanGraphPositionProduct.objects.filter(position = o)
+		for sub in subs:
+			product = {
+				'number':   sub.number,
+				'name':     sub.name,
+				'quantity': str(sub.quantity),
+				'unit':     sub.okei.local_symbol,
+				'price':    str(sub.price),
+				'max_sum':  str(sub.max_sum),
+				'okpd':     sub.okpd.code
+			}
+			position['products'].append(product)
 
 		result = {
 			'status':  'success',

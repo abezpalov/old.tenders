@@ -1530,13 +1530,13 @@ class PlanGraphPositionManager(models.Manager):
 			o.save()
 
 			try:
-				o.okveds            = okveds
+				o.okveds = okveds
 			except:
 				print("Ошибка связей.")
 
 
 			try:
-				o.okpds             = okpds
+				o.okpds = okpds
 			except:
 				print("Ошибка связей.")
 
@@ -1569,13 +1569,13 @@ class PlanGraphPositionManager(models.Manager):
 			o.save()
 
 			try:
-				o.okveds            = okveds
+				o.okveds = okveds
 			except:
 				print("Ошибка связей.")
 
 
 			try:
-				o.okpds             = okpds
+				o.okpds = okpds
 			except:
 				print("Ошибка связей.")
 
