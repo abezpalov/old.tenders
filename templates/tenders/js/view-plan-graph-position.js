@@ -36,9 +36,14 @@ $("body").delegate("[data-do='open-view-position']", "click", function(){
 
 				if (data.position.products.length > 0) {
 
-					products = '<table><tr><th>#</th><th>Наименование</th><th colspan="2">Количество</th><th>Цена</th><th>Сумма</th><th>ОКПД</th></tr>'
+					products = '<table style="width=100%;"><tr><th>#</th><th style="width: 35%;">Наименование</th><th colspan="2">Количество</th><th>Цена</th><th>Сумма</th><th>ОКПД</th></tr>'
 
 					for(i = 0; i < data.position.products.length; i++) {
+
+						if (data.position['products'][i]['quantity'] == "None") {
+							data.position['products'][i]['quantity'] = '-';
+						}
+
 						product = "<tr><td>" + data.position['products'][i].number + "</td><td>" + data.position['products'][i]['name'] + "</td><td>" + data.position['products'][i]['quantity'] + "</td><td>" + data.position['products'][i]['unit'] + "</td><td>" + data.position['products'][i]['price'] + "</td><td>" + data.position['products'][i]['max_sum'] + "</td><td>" + data.position['products'][i]['okpd'] + "</td></tr>";
 						products = products + product;
 
