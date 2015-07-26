@@ -242,7 +242,6 @@ class Runner:
 
 			# Получаем список файлов в архиве
 			xml_names = zip_data.namelist()
-			i = 0
 			for xml_name in xml_names:
 
 				# Извлекаем файл из архива
@@ -250,15 +249,10 @@ class Runner:
 
 				# Парсим файл
 				parse = self.parsers[essence]
-				if parse(xml_data, region): i += 1
+				parse(xml_data, region)
 
-			if i == len(xml_names):
-				print("Все файлы архива обработаны.")
-				source.state    = True
-				source.modofied = timezone.now()
-				source.save()
-			else:
-				print("Внимание! Не все файлы архива обработаны.")
+			print("Все файлы архива обработаны.")
+			source.complite()
 
 		return True
 

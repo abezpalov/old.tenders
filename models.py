@@ -61,6 +61,12 @@ class Source(models.Model):
 
 	objects  = SourceManager()
 
+	def complite(self):
+		self.state    = True
+		self.modified = timezone.now()
+		self.save()
+		return self
+
 	def __str__(self):
 		return "{}".format(self.name)
 
