@@ -52,7 +52,7 @@ class Runner:
 		'placing_way',
 		'plan_position_change_reason']
 
-	max_time = datetime.timedelta(0, 3000, 0)
+	max_time = datetime.timedelta(0, 82800, 0)
 
 	def __init__(self):
 
