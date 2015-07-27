@@ -592,15 +592,26 @@ def ajaxGetPlanGraphPosition(request):
 		position['products'] = []
 		subs = PlanGraphPositionProduct.objects.filter(position = o)
 		for sub in subs:
-			product = {
-				'number':   sub.number,
-				'name':     sub.name,
-				'quantity': str(sub.quantity),
-				'unit':     sub.okei.local_symbol,
-				'price':    str(sub.price),
-				'max_sum':  str(sub.max_sum),
-				'okpd':     sub.okpd.code
-			}
+
+			product = {}
+
+			product['number']   = sub.number
+			product['name']     = sub.name
+			product['quantity'] = str(sub.quantity)
+
+			try:
+				product['unit'] = sub.okei.local_symbol
+			except AttributeError:
+				product['unit'] = ''
+
+			product['price']    = str(sub.price)
+			product['max_sum']  = str(sub.max_sum)
+
+			try:
+				product'okpd']  = sub.okpd.code
+			except AttributeError:
+				product['okpd'] = ''
+
 			position['products'].append(product)
 
 		result = {
