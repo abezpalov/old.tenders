@@ -597,20 +597,10 @@ def ajaxGetPlanGraphPosition(request):
 
 			product['number']   = sub.number
 			product['name']     = sub.name
-			product['quantity'] = str(sub.quantity)
-
-			try:
-				product['unit'] = sub.okei.local_symbol
-			except AttributeError:
-				product['unit'] = ''
-
-			product['price']    = str(sub.price)
-			product['max_sum']  = str(sub.max_sum)
-
-			try:
-				product['okpd']  = sub.okpd.code
-			except AttributeError:
-				product['okpd'] = ''
+			product['quantity'] = sub.quantity_str
+			product['price']    = sub.price_str
+			product['max_sum']  = sub.max_sum_str
+			product['okpd']     = str(sub.okpd)
 
 			position['products'].append(product)
 

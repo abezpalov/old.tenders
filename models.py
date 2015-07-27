@@ -375,7 +375,7 @@ class OKEI(models.Model):
 	objects              = OKEIManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.full_name)
+		return "{}".format(self.local_symbol)
 
 	class Meta:
 		ordering = ['code']
@@ -584,7 +584,7 @@ class OKPD(models.Model):
 	objects       = OKPDManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+		return "{}".format(self.code)
 
 	class Meta:
 		ordering = ['code']
@@ -1772,6 +1772,60 @@ class PlanGraphPositionProduct(models.Model):
 
 	def __str__(self):
 		return "{} {}".format(self.okpd, self.name)
+
+	def _get_max_sum_str(self):
+
+		try:
+			max_sum  = self.max_sum
+			currency = self.position.currency
+		except: return '-'
+
+		if max_sum:
+			max_sum = '{:,}'.format(round(max_sum, 2))
+			max_sum = max_sum.replace(',', '\u00a0')
+			max_sum = max_sum.replace('.', ',')
+			max_sum = max_sum + '\u00a0' + currency.code
+			return max_sum
+		else:
+			return '-'
+
+	max_sum_str = property(_get_max_sum_str)
+
+	def _get_price_str(self):
+
+		try:
+			price    = self.price
+			currency = self.position.currency
+		except: return '-'
+
+		if price:
+			price = '{:,}'.format(round(price, 2))
+			price = price.replace(',', '\u00a0')
+			price = price.replace('.', ',')
+			price = price + '\u00a0' + currency.code
+			return price
+		else:
+			return '-'
+
+	price_str = property(_get_price_str)
+
+	def _get_quantity_str(self):
+
+		try:
+			quantity = self.quantity
+			unit     = self.okei
+		except: return '-'
+
+		if quantity:
+			quantity = '{:,}'.format(round(quantity, 2))
+			quantity = quantity.replace(',', '\u00a0')
+			quantity = quantity.replace('.', ',')
+			quantity = '{}\u00a0{}'.format(quantity, unit.local_symbol)
+			return quantity
+		else:
+			return '-'
+
+	quantity_str = property(_get_quantity_str)
 
 	class Meta:
 		ordering = ['number']
