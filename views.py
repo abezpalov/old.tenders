@@ -595,7 +595,7 @@ def ajaxGetPlanGraphPosition(request):
 
 			product = {}
 
-			product['number']   = sub.number
+			product['number']   = sub.number + 1
 			product['name']     = sub.name
 			product['quantity'] = sub.quantity_str
 			product['price']    = sub.price_str
