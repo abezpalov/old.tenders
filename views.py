@@ -608,7 +608,7 @@ def ajaxGetPlanGraphPosition(request):
 			product['max_sum']  = str(sub.max_sum)
 
 			try:
-				product'okpd']  = sub.okpd.code
+				product['okpd']  = sub.okpd.code
 			except AttributeError:
 				product['okpd'] = ''
 
