@@ -37,7 +37,7 @@
 			<td>{{ position.n }}</td>
 			<td><a>{{ position.plan_graph.year }}</a></td>
 			<td><a>{{ position.plan_graph.region.name }}</a></td>
-			<td><a data-do="open-view-organisation" data-id="{{ position.plan_graph.customer.id }}">{{ position.plan_graph.customer.short_name }}</a>{% if position.plan_graph.customer != position.plan_graph.owner %}<br/>Владелец: <a data-do="open-view-organisation" data-id="{{ position.plan_graph.owner.id }}">{{ position.plan_graph.owner.short_name }}</a>{% endif %}</td>
+			<td><a data-do="open-view-organisation" data-id="{{ position.plan_graph.customer.id }}">{{ position.plan_graph.customer.short_name }}</a>{% if position.plan_graph.customer != position.plan_graph.owner %}<br/>Автор: <a data-do="open-view-organisation" data-id="{{ position.plan_graph.owner.id }}">{{ position.plan_graph.owner.short_name }}</a>{% endif %}</td>
 			<td><a data-do="open-view-position" data-id="{{ position.id }}">{{ position.subject_name }}</a></td>
 			<td class="text-right" style="white-space: nowrap;">{{ position.price_str }}</td>
 			<td style="white-space: nowrap;">{{ position.placing_str }}</td>
