@@ -1286,12 +1286,17 @@ class Runner:
 
 				position['okveds']                   = p.xpath('./commonInfo/OKVEDs/OKVED/code')
 				position['okpds']                    = p.xpath('./products/product/OKPD/code')
-				position['subject_name']             = p.xpath('./commonInfo/contractSubjectName')[0].text.strip()
+
+				try:
+					position['subject_name']     = p.xpath('./commonInfo/contractSubjectName')[0].text.strip()
+				except AttributeError:
+					position['subject_name']     = 'None'
+
 				position['max_price']                = p.xpath('./commonInfo/contractMaxPrice')[0].text
 				try:
-					position['payments']             = p.xpath('./commonInfo/payments')[0].text
+					position['payments']         = p.xpath('./commonInfo/payments')[0].text
 				except IndexError:
-					position['payments']             = None
+					position['payments']         = None
 				position['currency_code']            = p.xpath('./commonInfo/contractCurrency/code')[0].text
 				position['placing_way_code']         = p.xpath('./commonInfo/placingWay/code')[0].text
 				try:
