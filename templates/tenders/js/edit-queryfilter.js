@@ -188,7 +188,7 @@ $("body").delegate("[data-do='switch-queryfilter-public']", "click", function(){
 	// Отправляем запрос
 	$.post("/tenders/ajax/switch-queryfilter-public/", {
 		queryfilter_id:      $(this).data('id'),
-		queryfilter_state:   $(this).prop('checked'),
+		queryfilter_public:  $(this).prop('checked'),
 		csrfmiddlewaretoken: '{{ csrf_token }}'
 	},
 	function(data) {
