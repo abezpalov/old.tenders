@@ -1,0 +1,30 @@
+{% if perms.tenders.add_queryfilter or perms.tenders.change_queryfilter %}
+<div id="modal-edit-queryfilter" class="reveal-modal large" data-reveal>
+
+	<h2 id="modal-edit-queryfilter-header">&ndsp;</h2>
+
+	<input id="edit-queryfilter-id" type="hidden" value="0">
+
+	<label>Наименование
+		<input id="edit-queryfilter-name" type="text">
+	</label>
+
+	<label>Статус
+		<div class="switch small">
+			<input id="edit-queryfilter-state" type="checkbox">
+			<label for="edit-queryfilter-state"></label>
+		</div>
+	</label>
+
+	<label>Публичный
+		<div class="switch small">
+			<input id="edit-queryfilter-public" type="checkbox">
+			<label for="edit-queryfilter-public"></label>
+		</div>
+	</label>
+
+	<button data-do="edit-queryfilter-save" class="primary"><i class="fa fa-ok"></i>&nbsp;Сохранить</button>
+	<button data-do="edit-queryfilter-cancel" class="secondary">Отменить</button>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+{% endif %}

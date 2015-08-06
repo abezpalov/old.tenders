@@ -28,15 +28,25 @@ urlpatterns = patterns('',
 	url(r'^ajax/get-organisation/$', views.ajaxGetOrganisation, name='ajaxGetOrganisation'),
 
 
-	#PlanGraphs
+	# Plan Graph
 	# ex: /tenders/plan-graphs/
 	url(r'^plan-graphs/$', views.planGraphs, name='planGraphs'),
 
 
-	#PlanGraph Positions
+	# Plan Graph Position
 	# ex: /tenders/plan-graph-positions/
 	url(r'^plan-graph-positions(/query/(?P<query>[0-9]+)){0,1}(/page/(?P<page>[0-9]+)){0,1}/$', views.planGraphPositions, name='planGraphPositions'),
 	# AJAX
 	url(r'^ajax/get-plan-graph-position/$', views.ajaxGetPlanGraphPosition, name='ajaxGetPlanGraphPosition'),
+
+	# Query Filter
+	# ex: /tenders/query-filter/
+	url(r'^query-filters/$', views.queryFilters, name='queryFilters'),
+	# AJAX
+	url(r'^ajax/get-queryfilter/$',           views.ajaxGetQueryFilter,          name='ajaxGetQueryFilter'),
+	url(r'^ajax/save-queryfilter/$',          views.ajaxSaveQueryFilter,         name='ajaxSaveQueryFilter'),
+	url(r'^ajax/switch-queryfilter-state/$',  views.ajaxSwitchQueryFilterState,  name='ajaxSwitchQueryFilterState'),
+	url(r'^ajax/switch-queryfilter-public/$', views.ajaxSwitchQueryFilterPublic, name='ajaxSwitchQueryFilterPublic'),
+
 
 )

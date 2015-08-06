@@ -1,0 +1,67 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: фильтры запросов{% endblock %}
+
+{% block content %}
+
+{% if perms.catalog.add_queryfilter %}
+
+<!-- Панель кнопок -->
+<div class="row collapse">
+	<button data-do="open-new-queryfilter" class="secondary expand"><i class="fa fa-pencil"></i> Добавить фильтр запроса</button>
+</div>
+
+{% endif %}
+
+{% if perms.tenders.add_queryfilter or perms.tenders.change_queryfilter or perms.tenders.delete_queryfilter %}
+
+<!-- Таблица со списком объектов -->
+<div class="row collapse">
+	<table>
+		<tr>
+			<th class="text-center">#</th>
+			<th>Наименование</th>
+			<th>Статус</th>
+			<th>Публичный</th>
+			<th>Автор</th>
+		</tr>
+		{% for queryfilter in queryfilters %}
+		<tr>
+			<td>{{ forloop.counter }}</td>
+			<td><a data-do="open-edit-queryfilter" data-id="{{ queryfilter.id }}" data-queryfilter-name="{{ queryfilter.id }}">{{ queryfilter.name }}</a></td>
+			<td>
+				<div class="switch small">
+					<input id="queryfilter-{{ queryfilter.id }}-state" data-do="switch-queryfilter-state" data-id="{{ queryfilter.id }}" data-queryfilter-state="{{ queryfilter.id }}" type="checkbox"{% if queryfilter.state %} checked{% endif %}>
+					<label for="queryfilter-{{ queryfilter.id }}-state"></label>
+				</div>
+			</td>
+			<td>
+				<div class="switch small">
+					<input id="queryfilter-{{ queryfilter.id }}-public" data-do="switch-queryfilter-public" data-id="{{ queryfilter.id }}" data-queryfilter-public="{{ queryfilter.id }}" type="checkbox"{% if queryfilter.public %} checked{% endif %}>
+					<label for="queryfilter-{{ queryfilter.id }}-public"></label>
+				</div>
+			</td>
+			<td>{{ queryfilter.created }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% else %}
+
+<div class="row collapse">
+	<div class="small-12 columns">
+		<p class="panel">Недостаточно прав для данной функциональности.</p>
+	</div>
+</div>
+
+{% endif %}
+
+{% include "tenders/modal/edit-queryfilter.html" %}
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/edit-queryfilter.js" %}
+</script>
+{% endblock %}

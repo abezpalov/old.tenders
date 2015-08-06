@@ -1771,7 +1771,7 @@ class PlanGraphPositionProduct(models.Model):
 	objects               = PlanGraphPositionProductManager()
 
 	def __str__(self):
-		return "{} {}".format(self.okpd, self.name)
+		return "{}".format(self.name)
 
 	def _get_max_sum_str(self):
 
@@ -1784,7 +1784,7 @@ class PlanGraphPositionProduct(models.Model):
 			max_sum = '{:,}'.format(round(max_sum, 2))
 			max_sum = max_sum.replace(',', '\u00a0')
 			max_sum = max_sum.replace('.', ',')
-			max_sum = max_sum + '\u00a0' + currency.code
+			max_sum = '{}\u00a0{}'.format(max_sum, currency.code)
 			return max_sum
 		else:
 			return '-'
@@ -1802,7 +1802,7 @@ class PlanGraphPositionProduct(models.Model):
 			price = '{:,}'.format(round(price, 2))
 			price = price.replace(',', '\u00a0')
 			price = price.replace('.', ',')
-			price = price + '\u00a0' + currency.code
+			price = '{}\u00a0{}'.format(price, currency.code)
 			return price
 		else:
 			return '-'
@@ -1832,14 +1832,35 @@ class PlanGraphPositionProduct(models.Model):
 		unique_together = ("position", "number")
 
 
-class PlanGraphPositionQuery(models.Model):
+class Word(models.Model):
+
+	word     = models.CharField(max_length = 100, unique = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	def __str__(self):
+		return "{}".format(self.word)
+
+	class Meta:
+		ordering = ['word']
+
+
+class QueryFilter(models.Model):
 
 	name        = models.CharField(max_length = 100)
-	regions     = models.ManyToManyField(Region,       db_table = 'tenders_plan_graph_position_query_to_region',   related_name = 'plan_graph_position_query_region')
-	customers   = models.ManyToManyField(Organisation, db_table = 'tenders_plan_graph_position_query_to_customer', related_name = 'plan_graph_position_query_customer')
-	owners      = models.ManyToManyField(Organisation, db_table = 'tenders_plan_graph_position_query_to_owner',    related_name = 'plan_graph_position_query_owner')
-	okveds      = models.ManyToManyField(OKVED,        db_table = 'tenders_plan_graph_position_query_to_okved',    related_name = 'plan_graph_position_query_okved')
-	okpds       = models.ManyToManyField(OKPD,         db_table = 'tenders_plan_graph_position_query_to_okpd',     related_name = 'plan_graph_position_query_okpd')
+	regions     = models.ManyToManyField(Region,       db_table = 'tenders_queryfilter_to_region',   related_name = 'queryfilter_region')
+	customers   = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_customer', related_name = 'queryfilter_customer')
+	owners      = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_owner',    related_name = 'queryfilter_owner')
+	okveds      = models.ManyToManyField(OKVED,        db_table = 'tenders_queryfilter_to_okved',    related_name = 'queryfilter_okved')
+	okpds       = models.ManyToManyField(OKPD,         db_table = 'tenders_queryfilter_to_okpd',     related_name = 'queryfilter_okpd')
+	words       = models.ManyToManyField(Word,         db_table = 'tenders_queryfilter_to_word',     related_name = 'queryfilter_word')
+
+	regions_in  = models.BooleanField(default=True)
+	customer_in = models.BooleanField(default=True)
+	owner_in    = models.BooleanField(default=True)
+	okveds_in   = models.BooleanField(default=True)
+	okpds_in    = models.BooleanField(default=True)
+	words_in    = models.BooleanField(default=True)
 
 	state       = models.BooleanField(default=True)
 	public      = models.BooleanField(default=False)
@@ -1854,5 +1875,3 @@ class PlanGraphPositionQuery(models.Model):
 
 	class Meta:
 		ordering = ['name']
-
-

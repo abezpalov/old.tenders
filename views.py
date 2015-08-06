@@ -18,7 +18,7 @@ def updaters(request):
 	or request.user.has_perm('tenders.delete_updater'):
 
 		# Получаем список
-		updaters = Updater.objects.all().order_by('name')
+		updaters = Updater.objects.select_related().all().order_by('name')
 
 	return render(request, 'tenders/updaters.html', locals())
 
@@ -78,7 +78,7 @@ def ajaxSaveUpdater(request):
 
 	# Проверяем права доступа
 	try:
-		updater = Updater.objects.get(id = request.POST.get('updater_id'))
+		updater = Updater.objects.select_related().get(id = request.POST.get('updater_id'))
 		if not request.user.has_perm('tenders.change_updater'):
 			return HttpResponse(status = 403)
 	except Updater.DoesNotExist:
@@ -157,7 +157,7 @@ def ajaxSwitchUpdaterState(request):
 		result = {'status': 'warning', 'message': 'Пожалуй, вводные данные не корректны.'}
 	else:
 		try:
-			updater = Updater.objects.get(id=request.POST.get('updater_id'))
+			updater = Updater.objects.select_related().get(id=request.POST.get('updater_id'))
 			if request.POST.get('updater_state') == 'true':
 				updater.state = True
 			else:
@@ -192,8 +192,8 @@ def regions(request):
 	or request.user.has_perm('tenders.delete_region'):
 
 		# Получаем списки объектов
-		regions   = Region.objects.all()
-		countries = Country.objects.all()
+		regions   = Region.objects.select_related().all()
+		countries = Country.objects.select_related().all()
 
 	return render(request, 'tenders/regions.html', locals())
 
@@ -219,7 +219,7 @@ def ajaxGetRegion(request):
 
 	# Получаем объект
 	try:
-		r = Region.objects.get(id = request.POST.get('region_id'))
+		r = Region.objects.select_related().get(id = request.POST.get('region_id'))
 
 		region = {}
 		region['id']        = r.id
@@ -352,7 +352,7 @@ def ajaxSwitchRegionState(request):
 			region.state = False
 		region.save()
 		result = {'status': 'success', 'message': 'Статус региона {} изменен на {}.'.format(region.name, region.state)}
-	except region.DoesNotExist:
+	except Region.DoesNotExist:
 		result = {'status': 'alert', 'message': 'Загрузчик с идентификатором {} отсутствует в базе.'.format(request.POST.get('region_id'))}
 
 	# Возвращаем ответ
@@ -402,7 +402,7 @@ def ajaxGetOrganisation(request):
 
 	# Получаем объект
 	try:
-		o = Organisation.objects.get(id = request.POST.get('organisation_id'))
+		o = Organisation.objects.select_related().get(id = request.POST.get('organisation_id'))
 
 		organisation = {}
 		organisation['id']        = o.id
@@ -432,7 +432,7 @@ def ajaxGetOrganisation(request):
 
 # PlanGraph
 
-
+# TODO Написать нормальное представление и шаблоны
 def planGraphs(request):
 	"Представление: список планов-графиков."
 
@@ -445,7 +445,7 @@ def planGraphs(request):
 	or request.user.has_perm('tenders.delete_plangraph'):
 
 		# Получаем количество объектов
-		plangraphs = PlanGraph.objects.filter(state = True)[0:100]
+		plangraphs = PlanGraph.objects.select_related().filter(state = True)[0:100]
 
 	return render(request, 'tenders/plan-graphs.html', locals())
 
@@ -474,9 +474,6 @@ def planGraphPositions(request, page = 1, query = None):
 		# TODO Готовим запрос
 		# Если указан запрос - загружаем его параметры
 		# Если указаны параметры выборки - готовим запрос на их основании
-
-
-
 
 		# Paging
 		url             = '/tenders/plan-graph-positions/'
@@ -531,7 +528,7 @@ def ajaxGetPlanGraphPosition(request):
 
 	# Получаем объект
 	try:
-		o = PlanGraphPosition.objects.get(id = request.POST.get('position_id'))
+		o = PlanGraphPosition.objects.select_related().get(id = request.POST.get('position_id'))
 
 		position = {}
 		position['id']      = o.id
@@ -590,7 +587,7 @@ def ajaxGetPlanGraphPosition(request):
 
 
 		position['products'] = []
-		subs = PlanGraphPositionProduct.objects.filter(position = o)
+		subs = PlanGraphPositionProduct.objects.select_related().filter(position = o)
 		for sub in subs:
 
 			product = {}
@@ -621,3 +618,184 @@ def ajaxGetPlanGraphPosition(request):
 # TODO Plan Graph Position Product
 
 
+# TODO Query Filter
+def queryFilters(request):
+	"Представление: список фильтров запросов."
+
+	# Импортируем
+	from tenders.models import QueryFilter
+
+	# Получаем количество объектов
+	queryfilters = QueryFilter.objects.select_related().all()
+
+	return render(request, 'tenders/queryfilters.html', locals())
+
+
+def ajaxGetQueryFilter(request):
+	"AJAX-представление: Get QueryFilter."
+
+	# Импортируем
+	import json
+	from tenders.models import QueryFilter
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_queryfilter')\
+	and not request.user.has_perm('tenders.delete_queryfilter'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Получаем объект
+	try:
+		o = QueryFilter.objects.select_related().get(id = request.POST.get('queryfilter_id'))
+
+		queryfilter = {}
+		queryfilter['id']     = o.id
+		queryfilter['name']   = o.name
+		queryfilter['state']  = o.state
+		queryfilter['public'] = o.public
+
+		result = {
+			'status':      'success',
+			'message':     'Данные фильтра запросов получены.',
+			'queryfilter': queryfilter}
+
+	except QueryFilter.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: фильтр запросов {} отсутствует в базе.'.format(request.POST.get('queryfilter_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSaveQueryFilter(request):
+	"AJAX-представление: Save QueryFilter."
+
+	# Импортируем
+	import json
+	import unidecode
+	from django.utils import timezone
+	from tenders.models import QueryFilter
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status = 400)
+
+	# Проверяем права доступа
+	try:
+		queryfilter = QueryFilter.objects.get(id = request.POST.get('queryfilter_id'))
+		if not request.user.has_perm('tenders.change_queryfilter'):
+			return HttpResponse(status = 403)
+	except QueryFilter.DoesNotExist:
+		queryfilter = QueryFilter()
+		if not request.user.has_perm('tenders.add_queryfilter'):
+			return HttpResponse(status = 403)
+		queryfilter.created = timezone.now()
+
+	# name
+	if not request.POST.get('queryfilter_name').strip():
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: отсутствует наименование.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+	queryfilter.name = request.POST.get('queryfilter_name').strip()[:100]
+
+	# state
+	if request.POST.get('queryfilter_state') == 'true':
+		queryfilter.state = True
+	else:
+		queryfilter.state = False
+
+	# public
+	if request.POST.get('queryfilter_public') == 'true':
+		queryfilter.public = True
+	else:
+		queryfilter.public = False
+
+	# modified
+	queryfilter.modified = timezone.now()
+
+	# Сохраняем
+	queryfilter.save()
+
+	# Возвращаем ответ
+	result = {
+		'status': 'success',
+		'message': 'Фильтр запросов {} сохранён.'.format(queryfilter.name)}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSwitchQueryFilterState(request):
+	"AJAX-представление: Switch QueryFilter State."
+
+	# Импортируем
+	import json
+	from datetime import datetime
+	from tenders.models import QueryFilter
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_queryfilter'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Проверяем корректность вводных данных
+	try:
+		queryfilter = QueryFilter.objects.get(id = request.POST.get('queryfilter_id'))
+		if request.POST.get('queryfilter_state') == 'true':
+			queryfilter.state = True
+		else:
+			queryfilter.state = False
+		queryfilter.save()
+		result = {'status': 'success', 'message': 'Статус фильтра запросов {} изменен на {}.'.format(queryfilter.name, queryfilter.state)}
+	except QueryFilter.DoesNotExist:
+		result = {'status': 'alert', 'message': 'Статус фильтра запросов с идентификатором {} отсутствует в базе.'.format(request.POST.get('queryfilter_id'))}
+
+	# Возвращаем ответ
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSwitchQueryFilterPublic(request):
+	"AJAX-представление: Switch QueryFilter Public."
+
+	# Импортируем
+	import json
+	from datetime import datetime
+	from tenders.models import QueryFilter
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Проверяем права доступа
+	if not request.user.has_perm('tenders.change_queryfilter'):
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка 403: отказано в доступе.'}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+
+	# Проверяем корректность вводных данных
+	try:
+		queryfilter = QueryFilter.objects.get(id = request.POST.get('queryfilter_id'))
+		if request.POST.get('queryfilter_public') == 'true':
+			queryfilter.public = True
+		else:
+			queryfilter.public = False
+		queryfilter.save()
+		result = {'status': 'success', 'message': 'Статус "публичности" фильтра запросов {} изменен на {}.'.format(queryfilter.name, queryfilter.public)}
+	except QueryFilter.DoesNotExist:
+		result = {'status': 'alert', 'message': 'Статус "публичности" фильтра запросов с идентификатором {} отсутствует в базе.'.format(request.POST.get('queryfilter_id'))}
+
+	# Возвращаем ответ
+	return HttpResponse(json.dumps(result), 'application/javascript')
