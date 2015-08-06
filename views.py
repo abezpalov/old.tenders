@@ -696,6 +696,7 @@ def ajaxSaveQueryFilter(request):
 		if not request.user.has_perm('tenders.add_queryfilter'):
 			return HttpResponse(status = 403)
 		queryfilter.created = timezone.now()
+		queryfilter.created_by = "{} {}".format(request.user.first_name, request.user.last_name)
 
 	# name
 	if not request.POST.get('queryfilter_name').strip():
@@ -719,6 +720,10 @@ def ajaxSaveQueryFilter(request):
 
 	# modified
 	queryfilter.modified = timezone.now()
+	queryfilter.modified_by = "{} {}".format(request.user.first_name, request.user.last_name)
+
+
+
 
 	# Сохраняем
 	queryfilter.save()
