@@ -804,3 +804,30 @@ def ajaxSwitchQueryFilterPublic(request):
 
 	# Возвращаем ответ
 	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+# Essences
+def essences(request):
+	"Представление: список справочников."
+
+	# Импортируем
+	# TODO from tenders.models import Essence
+
+	# Получаем количество объектов
+	# TODO essences = Essence.objects.select_related().all()
+
+	return render(request, 'tenders/essences.html', locals())
+
+
+# OKPD
+def OKPDs(request):
+	"Представление: ОКПД."
+
+	# Импортируем
+	from tenders.models import OKPD
+
+	# TODO Исправить модель - не строки, а целые положительные числа
+	# Получаем количество объектов
+	okpds = OKPD.objects.select_related().filter(parent_oos_id = None, state = True)
+
+	return render(request, 'tenders/okpd.html', locals())

@@ -48,5 +48,9 @@ urlpatterns = patterns('',
 	url(r'^ajax/switch-queryfilter-state/$',  views.ajaxSwitchQueryFilterState,  name='ajaxSwitchQueryFilterState'),
 	url(r'^ajax/switch-queryfilter-public/$', views.ajaxSwitchQueryFilterPublic, name='ajaxSwitchQueryFilterPublic'),
 
+	# Eccences
+	# ex: /tenders/eccences/
+	url(r'^essences/$', views.essences, name='essences'),
+	url(r'^essence/okpd/$', views.OKPDs, name='OKPDs'),
 
 )

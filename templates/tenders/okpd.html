@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: ОКПД{% endblock %}
+
+{% block content %}
+
+<!-- Таблица со списком объектов -->
+<div class="row">
+	<div class="small-12 columns">
+	<ul>
+	{% for okpd in okpds %}
+		<li>
+			<span> - </span>
+			<span>{{ okpd.code }}</span>
+			<span>{{ okpd.name }}</span>
+		</li>
+	{% endfor %}
+	</ul>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/view-okpd.js" %}
+</script>
+{% endblock %}
