@@ -52,7 +52,9 @@ urlpatterns = patterns('',
 	# ex: /tenders/eccences/
 	url(r'^essences/$', views.essences, name='essences'),
 	url(r'^essence/okpd/$', views.OKPDs, name='OKPDs'),
+	url(r'^essence/okved/$', views.OKVEDs, name='OKVEDs'),
 	# AJAX
-	url(r'^ajax/get-okpd-childrens/$', views.ajaxGetOKPDChildrens, name='ajaxGetOKPDChildrens'),
+	url(r'^ajax/get-okpd-childrens/$',  views.ajaxGetOKPDChildrens,  name='ajaxGetOKPDChildrens'),
+	url(r'^ajax/get-okved-childrens/$', views.ajaxGetOKVEDChildrens, name='ajaxGetOKVEDChildrens'),
 
 )

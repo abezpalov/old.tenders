@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: ОКВЭД{% endblock %}
+
+{% block content %}
+
+<!-- Таблица со списком объектов -->
+<div class="row">
+	<div class="small-12 columns">
+		<ul class="no-bullet">
+			{% for okved in okveds %}
+			<li>
+				{% if okved.childs_count %}
+				<i data-do="switch-li-okved-status" data-id="{{ okved.id }}" data-state="closed" class="fa fa-plus-square-o"></i>
+				{% else %}
+				<i class="fa fa-circle-thin"></i>
+				{% endif %}
+				{% if okved.code %}
+				<span>{{ okved.code }}</span>
+				{% endif %}
+				<span>{{ okved.name }}</span>
+				{% if okved.childs_count %}
+				<ul id="okved-{{ okved.id }}-childs"></ul>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/view-okved.js" %}
+</script>
+{% endblock %}

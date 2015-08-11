@@ -825,7 +825,7 @@ def OKPDs(request):
 
 	# TODO Исправить модель - не строки, а целые положительные числа
 	# Получаем количество объектов
-	okpds = OKPD.objects.select_related().filter(parent_oos_id = None, state = True)
+	okpds = OKPD.objects.select_related().filter(parent = None, state = True)
 
 	for okpd in okpds:
 		okpd.childs_count = OKPD.objects.filter(parent = okpd).count()
@@ -871,5 +871,64 @@ def ajaxGetOKPDChildrens(request):
 		result = {
 			'status': 'alert',
 			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okpd_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+# OKVED
+def OKVEDs(request):
+	"Представление: ОКВЭД."
+
+	# Импортируем
+	from tenders.models import OKVED
+
+	# TODO Исправить модель - не строки, а целые положительные числа
+	# Получаем количество объектов
+	okveds = OKVED.objects.select_related().filter(parent = None, state = True)
+
+	for okved in okveds:
+		okved.childs_count = OKVED.objects.filter(parent = okved).count()
+
+	return render(request, 'tenders/okved.html', locals())
+
+
+def ajaxGetOKVEDChildrens(request):
+	"AJAX-представление: Get OKVED Childrens."
+
+	# Импортируем
+	import json
+	from tenders.models import OKVED
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объект
+	try:
+		okved = OKVED.objects.get(id = request.POST.get('okved_id'))
+
+		os = OKVED.objects.filter(parent = okved, state = True)
+
+		okveds = []
+
+		for o in os:
+
+			okved                 = {}
+			okved['id']           = o.id
+			okved['code']         = o.code
+			okved['name']         = o.name
+			okved['childs_count'] = OKVED.objects.filter(parent = o).count()
+
+			okveds.append(okved)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные дочерних объектов получены.',
+			'okveds':   okveds}
+
+	except OKVED.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okved_id'))}
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
