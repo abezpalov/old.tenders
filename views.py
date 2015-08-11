@@ -848,7 +848,7 @@ def ajaxGetOKPDChildrens(request):
 	try:
 		okpd = OKPD.objects.get(id = request.POST.get('okpd_id'))
 
-		os = OKPD.objects.filter(parent = okpd)
+		os = OKPD.objects.filter(parent = okpd, state = True)
 
 		okpds = []
 

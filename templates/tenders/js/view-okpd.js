@@ -13,15 +13,32 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 		},
 		function(data) {
 			if (null != data.status) {
+
 				if ('success' == data.status){
+
 					html_data = ""
 
 					for(i = 0; i < data.okpds.length; i++) {
-						li = "<li>" + data.okpds[i]['code'] + "</li>";
+						li = "<li>"
+						if (data.okpds[i].childs_count > 0) {
+							li = li + '<i data-do="switch-li-okpd-status" data-id="' + data.okpds[i]['id'] + '" data-state="closed" class="fa fa-plus-square-o"></i>'
+						} else {
+							li = li + '<i class="fa fa-circle-thin"></i>'
+						}
+						li = li + '<span>' + data.okpds[i]['code'] + '</span>'
+						li = li + '<span>' + data.okpds[i]['name'] + '</span>'
+						if (data.okpds[i].childs_count > 0) {
+							li = li + '<ul id="okpd-' + data.okpds[i]['id'] + '-childs"></ul>'
+						}
+
+
+						li = li + '</li>'
+
 						html_data = html_data + li;
 					}
-					alert('#okpd-' + okpd_id + '-childs')
+
 					$('#okpd-' + okpd_id + '-childs').html(html_data);
+
 				} else {
 					var notification = new NotificationFx({
 						wrapper: document.body,
