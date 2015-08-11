@@ -52,5 +52,7 @@ urlpatterns = patterns('',
 	# ex: /tenders/eccences/
 	url(r'^essences/$', views.essences, name='essences'),
 	url(r'^essence/okpd/$', views.OKPDs, name='OKPDs'),
+	# AJAX
+	url(r'^ajax/get-okpd-childrens/$', views.ajaxGetOKPDChildrens, name='ajaxGetOKPDChildrens'),
 
 )

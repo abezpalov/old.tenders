@@ -722,9 +722,6 @@ def ajaxSaveQueryFilter(request):
 	queryfilter.modified = timezone.now()
 	queryfilter.modified_by = "{} {}".format(request.user.first_name, request.user.last_name)
 
-
-
-
 	# Сохраняем
 	queryfilter.save()
 
@@ -830,4 +827,49 @@ def OKPDs(request):
 	# Получаем количество объектов
 	okpds = OKPD.objects.select_related().filter(parent_oos_id = None, state = True)
 
+	for okpd in okpds:
+		okpd.childs_count = OKPD.objects.filter(parent = okpd).count()
+
 	return render(request, 'tenders/okpd.html', locals())
+
+
+def ajaxGetOKPDChildrens(request):
+	"AJAX-представление: Get OKPD Childrens."
+
+	# Импортируем
+	import json
+	from tenders.models import OKPD
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объект
+	try:
+		okpd = OKPD.objects.get(id = request.POST.get('okpd_id'))
+
+		os = OKPD.objects.filter(parent = okpd)
+
+		okpds = []
+
+		for o in os:
+
+			okpd                 = {}
+			okpd['id']           = o.id
+			okpd['code']         = o.code
+			okpd['name']         = o.name
+			okpd['childs_count'] = OKPD.objects.filter(parent = o).count()
+
+			okpds.append(okpd)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные дочерних объектов получены.',
+			'okpds':   okpds}
+
+	except OKPD.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okpd_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')

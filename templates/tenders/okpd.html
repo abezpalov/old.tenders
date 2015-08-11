@@ -6,15 +6,23 @@
 <!-- Таблица со списком объектов -->
 <div class="row">
 	<div class="small-12 columns">
-	<ul>
-	{% for okpd in okpds %}
-		<li>
-			<span> - </span>
-			<span>{{ okpd.code }}</span>
-			<span>{{ okpd.name }}</span>
-		</li>
-	{% endfor %}
-	</ul>
+		<ul class="no-bullet">
+			{% for okpd in okpds %}
+			<li>
+				{% if okpd.childs_count %}
+				<i data-do="switch-li-okpd-status" data-id="{{ okpd.id }}" data-state="closed" class="fa fa-plus-square-o"></i>
+				{% else %}
+				<i class="fa fa-circle-thin"></i>
+				{% endif %}
+				<span>{{ okpd.code }}</span>
+				<span>{{ okpd.name }}</span>
+				{% if okpd.childs_count %}
+				<ul id="okpd-{{ okpd.id }}-childs"></ul>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
 </div>
 
 {% endblock %}
