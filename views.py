@@ -623,10 +623,24 @@ def queryFilters(request):
 	"Представление: список фильтров запросов."
 
 	# Импортируем
-	from tenders.models import QueryFilter
+	from tenders.models import QueryFilter, Region, OKVED, OKPD
 
-	# Получаем количество объектов
+	# Фильтры запросов
 	queryfilters = QueryFilter.objects.select_related().all()
+
+	# Справочник регионов
+	regions = Region.objects.select_related().filter(state = True)
+
+	# Справочник ОКВЭД
+	okveds = OKVED.objects.select_related().filter(parent = None, state = True)
+	for okved in okveds:
+		okved.childs_count = OKVED.objects.filter(parent = okved).count()
+
+	# Справочник ОКПД
+	okpds = OKPD.objects.select_related().filter(parent = None, state = True)
+	for okpd in okpds:
+		okpd.childs_count = OKPD.objects.filter(parent = okpd).count()
+
 
 	return render(request, 'tenders/queryfilters.html', locals())
 
@@ -659,6 +673,18 @@ def ajaxGetQueryFilter(request):
 		queryfilter['name']   = o.name
 		queryfilter['state']  = o.state
 		queryfilter['public'] = o.public
+
+
+
+
+		queryfilter['regions_in']   = o.regions_in
+		queryfilter['customers_in'] = o.customers_in
+		queryfilter['owners_in']    = o.owners_in
+		queryfilter['okveds_in']    = o.okveds_in
+		queryfilter['okpds_in']     = o.okpds_in
+		queryfilter['words_in']     = o.words_in
+
+
 
 		result = {
 			'status':      'success',

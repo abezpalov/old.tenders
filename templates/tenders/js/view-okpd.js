@@ -1,12 +1,10 @@
-// Открытие/закрытие ветви категорий
+// Открытие/закрытие ветви категорий ОКПД
 $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 	if ($(this).data('state') == 'closed') {
 
 		okpd_id = $(this).data('id')
 
-
-		// TODO AJAX
-		// Дочерние объекты на сервере
+		// Получаем дочерние объекты с сервера
 		$.post("/tenders/ajax/get-okpd-childrens/", {
 			okpd_id:             $(this).data('id'),
 			csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -30,7 +28,6 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 						if (data.okpds[i].childs_count > 0) {
 							li = li + '<ul id="okpd-' + data.okpds[i]['id'] + '-childs"></ul>'
 						}
-
 
 						li = li + '</li>'
 
@@ -67,10 +64,6 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 		$(this).removeClass('fa-minus-square-o');
 		$(this).addClass('fa-plus-square-o');
 		$(this).data('state', 'closed');
-
-
-
-
 	}
 	return false;
 });

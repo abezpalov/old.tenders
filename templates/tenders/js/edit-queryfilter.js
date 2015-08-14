@@ -182,7 +182,7 @@ $("body").delegate("[data-do='switch-queryfilter-state']", "click", function(){
 });
 
 
-// Смена статуса "публичнсоти"
+// Смена статуса "публичности"
 $("body").delegate("[data-do='switch-queryfilter-public']", "click", function(){
 
 	// Отправляем запрос
@@ -211,6 +211,5 @@ $("body").delegate("[data-do='switch-queryfilter-public']", "click", function(){
 
 	return true;
 });
-
 
 {% endif %}

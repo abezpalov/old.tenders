@@ -3,25 +3,183 @@
 
 	<h2 id="modal-edit-queryfilter-header">&ndsp;</h2>
 
-	<input id="edit-queryfilter-id" type="hidden" value="0">
+	<dl class="tabs" data-tab>
+		<dd id="modal-edit-queryfilter-main-dd" class="active"><a href="#modal-edit-queryfilter-main">Основное</a></dd>
+		<dd id="modal-edit-queryfilter-regions-dd"><a href="#modal-edit-queryfilter-regions">Регион</a></dd>
+		<dd id="modal-edit-queryfilter-customers-dd"><a href="#modal-edit-queryfilter-customers">Заказчик</a></dd>
+		<dd id="modal-edit-queryfilter-owners-dd"><a href="#modal-edit-queryfilter-owners">Владелец</a></dd>
+		<dd id="modal-edit-queryfilter-okveds-dd"><a href="#modal-edit-queryfilter-okveds">ОКВЭД</a></dd>
+		<dd id="modal-edit-queryfilter-okpds-dd"><a href="#modal-edit-queryfilter-okpds">ОКПД</a></dd>
+		<dd id="modal-edit-queryfilter-words-dd"><a href="#modal-edit-queryfilter-words">Ключевые слова</a></dd>
+	</dl>
+	<div class="tabs-content">
+		<div id="modal-edit-queryfilter-main" class="content active">
 
-	<label>Наименование
-		<input id="edit-queryfilter-name" type="text">
-	</label>
+			<input id="edit-queryfilter-id" type="hidden" value="0">
 
-	<label>Статус
-		<div class="switch small">
-			<input id="edit-queryfilter-state" type="checkbox">
-			<label for="edit-queryfilter-state"></label>
+			<label>Наименование
+				<input id="edit-queryfilter-name" type="text">
+			</label>
+
+			<label>Статус
+				<div class="switch small">
+					<input id="edit-queryfilter-state" type="checkbox">
+					<label for="edit-queryfilter-state"></label>
+				</div>
+			</label>
+
+			<label>Публичный
+				<div class="switch small">
+					<input id="edit-queryfilter-public" type="checkbox">
+					<label for="edit-queryfilter-public"></label>
+				</div>
+			</label>
+
 		</div>
-	</label>
 
-	<label>Публичный
-		<div class="switch small">
-			<input id="edit-queryfilter-public" type="checkbox">
-			<label for="edit-queryfilter-public"></label>
+		<div id="modal-edit-queryfilter-regions" class="content">
+
+			<label>Поиск региона
+				<input data-do="modal-edit-queryfilters-regions-search" type="text">
+			</label>
+
+			<ul class="no-bullet">
+				{% for region in regions %}
+				<li><a data-do="modal-edit-queryfilter-region-select"><span>{{ region.name }}</span></a></li>
+				{% endfor %}
+			</ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-regions-in" type="checkbox">
+					<label for="edit-queryfilter-regions-in"></label>
+				</div>
+			</label>
+
 		</div>
-	</label>
+
+		<div id="modal-edit-queryfilter-customers" class="content">
+
+			<label>Поиск заказчика
+				<input data-do="modal-edit-queryfilters-customers-search" type="text">
+			</label>
+
+			<ul id="modal-edit-queryfilter-customers-result"></ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-customers-in" type="checkbox">
+					<label for="edit-queryfilter-customers-in"></label>
+				</div>
+			</label>
+
+		</div>
+
+		<div id="modal-edit-queryfilter-owners" class="content">
+
+			<label>Поиск владельца
+				<input data-do="modal-edit-queryfilters-owners-search" type="text">
+			</label>
+
+			<ul id="modal-edit-queryfilter-owners-result"></ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-owners-in" type="checkbox">
+					<label for="edit-queryfilter-owners-in"></label>
+				</div>
+			</label>
+
+		</div>
+
+		<div id="modal-edit-queryfilter-okveds" class="content">
+
+			<label>Поиск по справочнику ОКВЭД
+				<input data-do="modal-edit-queryfilters-okveds-search" type="text">
+			</label>
+
+			<ul id="modal-edit-queryfilter-okveds-result"></ul>
+
+			<ul id="modal-edit-queryfilter-okveds-catalog" class="no-bullet">
+				{% for okved in okveds %}
+				<li>
+					{% if okved.childs_count %}
+					<i data-do="switch-li-okved-status" data-id="{{ okved.id }}" data-state="closed" class="fa fa-plus-square-o"></i>
+					{% else %}
+					<i class="fa fa-circle-thin"></i>
+					{% endif %}
+					{% if okved.code %}
+					<span>{{ okved.code }}</span>
+					{% endif %}
+					<span>{{ okved.name }}</span>
+					{% if okved.childs_count %}
+					<ul id="okved-{{ okved.id }}-childs"></ul>
+					{% endif %}
+				</li>
+				{% endfor %}
+			</ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-okveds-in" type="checkbox">
+					<label for="edit-queryfilter-okveds-in"></label>
+				</div>
+			</label>
+
+		</div>
+
+		<div id="modal-edit-queryfilter-okpds" class="content">
+
+			<label>Поиск по справочнику ОКПД
+				<input data-do="modal-edit-queryfilters-okpds-search" type="text">
+			</label>
+
+			<ul id="modal-edit-queryfilter-okpds-result"></ul>
+
+			<ul id="modal-edit-queryfilter-okpds-catalog" class="no-bullet">
+				{% for okpd in okpds %}
+				<li>
+					{% if okpd.childs_count %}
+					<i data-do="switch-li-okpd-status" data-id="{{ okpd.id }}" data-state="closed" class="fa fa-plus-square-o"></i>
+					{% else %}
+					<i class="fa fa-circle-thin"></i>
+					{% endif %}
+					<span>{{ okpd.code }}</span>
+					<span>{{ okpd.name }}</span>
+					{% if okpd.childs_count %}
+					<ul id="okpd-{{ okpd.id }}-childs"></ul>
+					{% endif %}
+				</li>
+				{% endfor %}
+			</ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-okpds-in" type="checkbox">
+					<label for="edit-queryfilter-okpds-in"></label>
+				</div>
+			</label>
+
+		</div>
+
+		<div id="modal-edit-queryfilter-words" class="content">
+
+			<label>Ключевое слово
+				<input data-do="modal-edit-queryfilters-word-input" type="text">
+			</label>
+
+			<ul id="modal-edit-queryfilter-words-list"></ul>
+
+			<label>Включить/исключить
+				<div class="switch small">
+					<input id="edit-queryfilter-words-in" type="checkbox">
+					<label for="edit-queryfilter-words-in"></label>
+				</div>
+			</label>
+
+		</div>
+
+	</div>
 
 	<button data-do="edit-queryfilter-save" class="primary"><i class="fa fa-ok"></i>&nbsp;Сохранить</button>
 	<button data-do="edit-queryfilter-cancel" class="secondary">Отменить</button>
