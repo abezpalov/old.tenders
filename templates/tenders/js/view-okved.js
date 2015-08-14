@@ -70,3 +70,60 @@ $("body").delegate("[data-do='switch-li-okved-status']", "click", function(){
 	return false;
 });
 
+
+// Поиск по справочнику
+$("body").delegate("[data-do='okveds-search']", "keypress", function(e){
+	var search_text = $(this).val().toLowerCase();
+	var key         = e.which;
+
+	if(key == 13) {
+
+		// Если в строке поиска пусто, показываем полный каталог
+		if (search_text == '') {
+			$("[data-content='okveds-search-result']").addClass('hidden');
+			$("[data-content='okveds-catalog']").removeClass('hidden');
+			$("[data-content='okveds-search-result']").html('');
+		// Иначе, прячем каталог и показываем результаты поиска
+		} else {
+			$("[data-content='okveds-search-result']").removeClass('hidden');
+			$("[data-content='okveds-catalog']").addClass('hidden');
+
+			// Получаем объекты с сервера
+			$.post("/tenders/ajax/search-okveds/", {
+				search_text:         search_text,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			function(data) {
+				if (null != data.status) {
+
+					if ('success' == data.status){
+
+						html_data = ""
+
+						for(i = 0; i < data.okveds.length; i++) {
+							li = '<li><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></li>'
+							html_data = html_data + li;
+						}
+
+						$("[data-content='okveds-search-result']").html(html_data);
+
+					} else {
+						var notification = new NotificationFx({
+							wrapper: document.body,
+							message: '<p>' + data.message + '</p>',
+							layout: 'growl',
+							effect: 'genie',
+							type: data.status,
+							ttl: 3000,
+							onClose: function() { return false; },
+							onOpen: function() { return false; }
+						});
+						notification.show();
+					}
+				}
+			}, "json");
+		}
+	}
+});
+
+

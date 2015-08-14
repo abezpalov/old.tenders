@@ -427,16 +427,6 @@ def ajaxGetOKPDChildrens(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-
-
-
-
-
-
-
-
-
-
 def ajaxSearchOKPDs(request):
 	"AJAX-представление: Search OKPDs."
 
@@ -449,15 +439,8 @@ def ajaxSearchOKPDs(request):
 	if (not request.is_ajax()) or (request.method != 'POST'):
 		return HttpResponse(status=400)
 
-
-
-
-
+	# Получаем слова поиска
 	words = request.POST.get('search_text').split(' ')
-
-
-
-
 
 	# Получаем объекты
 	os = []
@@ -485,14 +468,6 @@ def ajaxSearchOKPDs(request):
 		'okpds':   okpds}
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
-
-
-
-
-
-
-
-
 
 
 # TODO OKTMO
@@ -555,6 +530,49 @@ def ajaxGetOKVEDChildrens(request):
 		result = {
 			'status': 'alert',
 			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okved_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxSearchOKVEDs(request):
+	"AJAX-представление: Search OKVEDs."
+
+	# Импортируем
+	import json
+	from django.db.models import Q
+	from tenders.models import OKVED
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем слова поиска
+	words = request.POST.get('search_text').split(' ')
+
+	# Получаем объекты
+	os = []
+	for n, word in enumerate(words):
+		if not n:
+			new_okveds = OKVED.objects.filter(Q(code__icontains=word) | Q(name__icontains=word)).filter(state=True)
+		else:
+			new_okveds = new_okveds.filter(Q(code__icontains=word) | Q(name__icontains=word)).filter(state=True)
+		os.extend(new_okveds)
+
+	okveds = []
+
+	for o in os:
+
+		okved                 = {}
+		okved['id']           = o.id
+		okved['code']         = o.code
+		okved['name']         = o.name
+
+		okveds.append(okved)
+
+	result = {
+		'status':  'success',
+		'message': 'Данные дочерних объектов получены.',
+		'okveds':  okveds}
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
 

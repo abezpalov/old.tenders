@@ -69,7 +69,6 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 });
 
 
-
 // Поиск по справочнику
 $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 	var search_text = $(this).val().toLowerCase();
@@ -121,21 +120,6 @@ $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 					}
 				}
 			}, "json");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		}
 	}
 });

@@ -6,7 +6,14 @@
 <!-- Таблица со списком объектов -->
 <div class="row">
 	<div class="small-12 columns">
-		<ul class="no-bullet">
+
+		<label>Поиск по справочнику ОКВЭД
+			<input data-do="okveds-search" type="text">
+		</label>
+
+		<ul class="no-bullet hidden" data-content="okveds-search-result"></ul>
+
+		<ul class="no-bullet" data-content="okveds-catalog">
 			{% for okved in okveds %}
 			<li>
 				{% if okved.childs_count %}
