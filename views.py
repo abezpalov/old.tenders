@@ -366,11 +366,199 @@ def ajaxSwitchRegionState(request):
 # TODO OKEI
 # TODO KOSGU
 # TODO OKOPF
-# TODO OKPD
+
+
+# OKPD
+def OKPDs(request):
+	"Представление: ОКПД."
+
+	# Импортируем
+	from tenders.models import OKPD
+
+	# TODO Исправить модель - не строки, а целые положительные числа
+	# Получаем количество объектов
+	okpds = OKPD.objects.select_related().filter(parent = None, state = True)
+
+	for okpd in okpds:
+		okpd.childs_count = OKPD.objects.filter(parent = okpd).count()
+
+	return render(request, 'tenders/okpd.html', locals())
+
+
+def ajaxGetOKPDChildrens(request):
+	"AJAX-представление: Get OKPD Childrens."
+
+	# Импортируем
+	import json
+	from tenders.models import OKPD
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объект
+	try:
+		okpd = OKPD.objects.get(id = request.POST.get('okpd_id'))
+
+		os = OKPD.objects.filter(parent = okpd, state = True)
+
+		okpds = []
+
+		for o in os:
+
+			okpd                 = {}
+			okpd['id']           = o.id
+			okpd['code']         = o.code
+			okpd['name']         = o.name
+			okpd['childs_count'] = OKPD.objects.filter(parent = o).count()
+
+			okpds.append(okpd)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные дочерних объектов получены.',
+			'okpds':   okpds}
+
+	except OKPD.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okpd_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+
+
+
+
+
+
+
+
+
+
+def ajaxSearchOKPDs(request):
+	"AJAX-представление: Search OKPDs."
+
+	# Импортируем
+	import json
+	from django.db.models import Q
+	from tenders.models import OKPD
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+
+
+
+
+	words = request.POST.get('search_text').split(' ')
+
+
+
+
+
+	# Получаем объекты
+	os = []
+	for n, word in enumerate(words):
+		if not n:
+			new_okpds = OKPD.objects.filter(Q(code__icontains=word) | Q(name__icontains=word)).filter(state=True)
+		else:
+			new_okpds = new_okpds.filter(Q(code__icontains=word) | Q(name__icontains=word)).filter(state=True)
+		os.extend(new_okpds)
+
+	okpds = []
+
+	for o in os:
+
+		okpd                 = {}
+		okpd['id']           = o.id
+		okpd['code']         = o.code
+		okpd['name']         = o.name
+
+		okpds.append(okpd)
+
+	result = {
+		'status':  'success',
+		'message': 'Данные дочерних объектов получены.',
+		'okpds':   okpds}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+
+
+
+
+
+
+
+
 # TODO OKTMO
 # TODO OKVED Section
 # TODO OKVED SubSection
-# TODO OKVED
+
+
+# OKVED
+def OKVEDs(request):
+	"Представление: ОКВЭД."
+
+	# Импортируем
+	from tenders.models import OKVED
+
+	# TODO Исправить модель - не строки, а целые положительные числа
+	# Получаем количество объектов
+	okveds = OKVED.objects.select_related().filter(parent = None, state = True)
+
+	for okved in okveds:
+		okved.childs_count = OKVED.objects.filter(parent = okved).count()
+
+	return render(request, 'tenders/okved.html', locals())
+
+
+def ajaxGetOKVEDChildrens(request):
+	"AJAX-представление: Get OKVED Childrens."
+
+	# Импортируем
+	import json
+	from tenders.models import OKVED
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объект
+	try:
+		okved = OKVED.objects.get(id = request.POST.get('okved_id'))
+
+		os = OKVED.objects.filter(parent = okved, state = True)
+
+		okveds = []
+
+		for o in os:
+
+			okved                 = {}
+			okved['id']           = o.id
+			okved['code']         = o.code
+			okved['name']         = o.name
+			okved['childs_count'] = OKVED.objects.filter(parent = o).count()
+
+			okveds.append(okved)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные дочерних объектов получены.',
+			'okveds':   okveds}
+
+	except OKVED.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okved_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
 # TODO Subsystem Type
 # TODO Organisation Type
 # TODO Budget
@@ -840,121 +1028,3 @@ def essences(request):
 	# TODO essences = Essence.objects.select_related().all()
 
 	return render(request, 'tenders/essences.html', locals())
-
-
-# OKPD
-def OKPDs(request):
-	"Представление: ОКПД."
-
-	# Импортируем
-	from tenders.models import OKPD
-
-	# TODO Исправить модель - не строки, а целые положительные числа
-	# Получаем количество объектов
-	okpds = OKPD.objects.select_related().filter(parent = None, state = True)
-
-	for okpd in okpds:
-		okpd.childs_count = OKPD.objects.filter(parent = okpd).count()
-
-	return render(request, 'tenders/okpd.html', locals())
-
-
-def ajaxGetOKPDChildrens(request):
-	"AJAX-представление: Get OKPD Childrens."
-
-	# Импортируем
-	import json
-	from tenders.models import OKPD
-
-	# Проверяем тип запроса
-	if (not request.is_ajax()) or (request.method != 'POST'):
-		return HttpResponse(status=400)
-
-	# Получаем объект
-	try:
-		okpd = OKPD.objects.get(id = request.POST.get('okpd_id'))
-
-		os = OKPD.objects.filter(parent = okpd, state = True)
-
-		okpds = []
-
-		for o in os:
-
-			okpd                 = {}
-			okpd['id']           = o.id
-			okpd['code']         = o.code
-			okpd['name']         = o.name
-			okpd['childs_count'] = OKPD.objects.filter(parent = o).count()
-
-			okpds.append(okpd)
-
-		result = {
-			'status':  'success',
-			'message': 'Данные дочерних объектов получены.',
-			'okpds':   okpds}
-
-	except OKPD.DoesNotExist:
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okpd_id'))}
-
-	return HttpResponse(json.dumps(result), 'application/javascript')
-
-
-# OKVED
-def OKVEDs(request):
-	"Представление: ОКВЭД."
-
-	# Импортируем
-	from tenders.models import OKVED
-
-	# TODO Исправить модель - не строки, а целые положительные числа
-	# Получаем количество объектов
-	okveds = OKVED.objects.select_related().filter(parent = None, state = True)
-
-	for okved in okveds:
-		okved.childs_count = OKVED.objects.filter(parent = okved).count()
-
-	return render(request, 'tenders/okved.html', locals())
-
-
-def ajaxGetOKVEDChildrens(request):
-	"AJAX-представление: Get OKVED Childrens."
-
-	# Импортируем
-	import json
-	from tenders.models import OKVED
-
-	# Проверяем тип запроса
-	if (not request.is_ajax()) or (request.method != 'POST'):
-		return HttpResponse(status=400)
-
-	# Получаем объект
-	try:
-		okved = OKVED.objects.get(id = request.POST.get('okved_id'))
-
-		os = OKVED.objects.filter(parent = okved, state = True)
-
-		okveds = []
-
-		for o in os:
-
-			okved                 = {}
-			okved['id']           = o.id
-			okved['code']         = o.code
-			okved['name']         = o.name
-			okved['childs_count'] = OKVED.objects.filter(parent = o).count()
-
-			okveds.append(okved)
-
-		result = {
-			'status':  'success',
-			'message': 'Данные дочерних объектов получены.',
-			'okveds':   okveds}
-
-	except OKVED.DoesNotExist:
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okved_id'))}
-
-	return HttpResponse(json.dumps(result), 'application/javascript')

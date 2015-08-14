@@ -68,3 +68,75 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 	return false;
 });
 
+
+
+// Поиск по справочнику
+$("body").delegate("[data-do='okpds-search']", "keypress", function(e){
+	var search_text = $(this).val().toLowerCase();
+	var key         = e.which;
+
+	if(key == 13) {
+
+		// Если в строке поиска пусто, показываем полный каталог
+		if (search_text == '') {
+			$("[data-content='okpds-search-result']").addClass('hidden');
+			$("[data-content='okpds-catalog']").removeClass('hidden');
+			$("[data-content='okpds-search-result']").html('');
+		// Иначе, прячем каталог и показываем результаты поиска
+		} else {
+			$("[data-content='okpds-search-result']").removeClass('hidden');
+			$("[data-content='okpds-catalog']").addClass('hidden');
+
+			// Получаем объекты с сервера
+			$.post("/tenders/ajax/search-okpds/", {
+				search_text:         search_text,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			function(data) {
+				if (null != data.status) {
+
+					if ('success' == data.status){
+
+						html_data = ""
+
+						for(i = 0; i < data.okpds.length; i++) {
+							li = '<li><span>' + data.okpds[i]['code'] + '</span><span>' + data.okpds[i]['name'] + '</span></li>'
+							html_data = html_data + li;
+						}
+
+						$("[data-content='okpds-search-result']").html(html_data);
+
+					} else {
+						var notification = new NotificationFx({
+							wrapper: document.body,
+							message: '<p>' + data.message + '</p>',
+							layout: 'growl',
+							effect: 'genie',
+							type: data.status,
+							ttl: 3000,
+							onClose: function() { return false; },
+							onOpen: function() { return false; }
+						});
+						notification.show();
+					}
+				}
+			}, "json");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		}
+	}
+});
+
