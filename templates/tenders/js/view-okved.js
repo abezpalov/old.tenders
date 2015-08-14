@@ -100,11 +100,14 @@ $("body").delegate("[data-do='okveds-search']", "keypress", function(e){
 
 						html_data = ""
 
-						for(i = 0; i < data.okveds.length; i++) {
-							li = '<li><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></li>'
-							html_data = html_data + li;
+						if (data.okveds.length > 0) {
+							for(i = 0; i < data.okveds.length; i++) {
+								li = '<li><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></li>'
+								html_data = html_data + li;
+							}
+						} else {
+							html_data = '<li class="alert-box secondary radius">Ничего не найдено.</li>'
 						}
-
 						$("[data-content='okveds-search-result']").html(html_data);
 
 					} else {
@@ -125,5 +128,3 @@ $("body").delegate("[data-do='okveds-search']", "keypress", function(e){
 		}
 	}
 });
-
-
