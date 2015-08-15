@@ -245,7 +245,14 @@ class Runner:
 			for xml_name in xml_names:
 
 				# Извлекаем файл из архива
-				xml_data = zip_data.open(xml_name)
+				try:
+					xml_data = zip_data.open(xml_name)
+				except:
+					Log.objects.add(
+						subject     = "Tenders Updater Zakupki.gov.ru: {}".format(updater),
+						channel     = "error",
+						title       = "Exception",
+						description = "Не удалось извлечь файл {} из архива {}. {}".format(xml_name, zip_name, error))
 
 				# Парсим файл
 				parse = self.parsers[essence]
