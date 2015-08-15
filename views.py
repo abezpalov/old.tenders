@@ -363,7 +363,112 @@ def ajaxSwitchRegionState(request):
 # TODO Currency
 # TODO OKEI Section
 # TODO OKEI Group
-# TODO OKEI
+
+
+# OKEI
+def OKEIs(request):
+	"Представление: ОКЕИ."
+
+	# Импортируем
+	from tenders.models import OKEI
+
+	# Получаем объекты
+	okeis = OKEI.objects.select_related().filter(state = True)
+
+	return render(request, 'tenders/okei.html', locals())
+
+
+
+
+
+
+def ajaxGetOKEI(request):
+	"AJAX-представление: Get OKEI."
+
+	# Импортируем
+	import json
+	from tenders.models import OKEI
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объект
+	try:
+		o = OKEI.objects.select_related().get(id = request.POST.get('okei_id'))
+
+		okei                         = {}
+		okei['id']                   = o.id
+		okei['code']                 = o.code
+		okei['full_name']            = o.full_name
+		okei['section']              = str(o.section)
+		okei['group']                = str(o.group)
+		okei['local_name']           = o.local_name
+		okei['international_name']   = o.international_name
+		okei['local_symbol']         = o.local_symbol
+		okei['international_symbol'] = o.international_symbol
+		okei['state']                = o.state
+
+		result = {
+			'status':  'success',
+			'message': 'Данные позиции получены.',
+			'okei':    okei
+		}
+
+	except OKEI.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект отсутствует в базе.'}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+
+
+
+def ajaxSearchOKEIs(request):
+	"AJAX-представление: Search OKEIs."
+
+	# Импортируем
+	import json
+	from django.db.models import Q
+	from tenders.models import OKEI
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем слова поиска
+	words = request.POST.get('search_text').split(' ')
+
+	# Получаем объекты
+	os = []
+	for n, word in enumerate(words):
+		if not n:
+			new_okeis = OKEI.objects.filter(Q(full_name__icontains=word) | Q(local_name__icontains=word)).filter(state=True)
+		else:
+			new_okeis = new_okeis.filter(Q(full_name__icontains=word) | Q(local_name__icontains=word)).filter(state=True)
+		os.extend(new_okeis)
+
+	okeis = []
+
+	for o in os:
+
+		okei               = {}
+		okei['id']         = o.id
+		okei['full_name']  = o.full_name
+		okei['local_name'] = o.local_name
+
+		okeis.append(okei)
+
+	result = {
+		'status':  'success',
+		'message': 'Данные дочерних объектов получены.',
+		'okeis':   okeis}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
 # TODO KOSGU
 # TODO OKOPF
 

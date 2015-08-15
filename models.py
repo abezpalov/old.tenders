@@ -254,7 +254,7 @@ class OKEISection(models.Model):
 	objects  = OKEISectionManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -302,7 +302,7 @@ class OKEIGroup(models.Model):
 	objects  = OKEIGroupManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['code']

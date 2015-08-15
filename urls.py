@@ -50,13 +50,23 @@ urlpatterns = patterns('',
 
 	# Eccences
 	# ex: /tenders/eccences/
-	url(r'^essences/$', views.essences, name='essences'),
-	url(r'^essence/okpd/$', views.OKPDs, name='OKPDs'),
-	url(r'^essence/okved/$', views.OKVEDs, name='OKVEDs'),
-	# AJAX
+	url(r'^essences/$',      views.essences, name='essences'),
+
+	url(r'^essence/okpd/$',             views.OKPDs,                 name='OKPDs'),
 	url(r'^ajax/get-okpd-childrens/$',  views.ajaxGetOKPDChildrens,  name='ajaxGetOKPDChildrens'),
-	url(r'^ajax/search-okpds/$',        views.ajaxSearchOKPDs,       name='ajaxGetOKPDs'),
+	url(r'^ajax/search-okpds/$',        views.ajaxSearchOKPDs,       name='ajaxSearchOKPDs'),
+
+	url(r'^essence/okved/$',            views.OKVEDs,                name='OKVEDs'),
 	url(r'^ajax/get-okved-childrens/$', views.ajaxGetOKVEDChildrens, name='ajaxGetOKVEDChildrens'),
-	url(r'^ajax/search-okveds/$',       views.ajaxSearchOKVEDs,      name='ajaxGetOKVEDs'),
+	url(r'^ajax/search-okveds/$',       views.ajaxSearchOKVEDs,      name='ajaxSearchOKVEDs'),
+
+	url(r'^essence/okei/$',             views.OKEIs,                 name='OKEIs'),
+	url(r'^ajax/get-okei/$',            views.ajaxGetOKEI,           name='ajaxGetOKEI'),
+	url(r'^ajax/search-okeis/$',        views.ajaxSearchOKEIs,       name='ajaxSearchOKEIs'),
+
+#	url(r'^essence/kogsu/$', views.KOGSUs,   name='KOGSUs'),
+#	url(r'^essence/oktmo/$', views.OKTMOs,   name='OKTMOs'),
+#	url(r'^essence/okopf/$', views.OKOPFs,   name='OKOPFs'),
+	# AJAX
 
 )

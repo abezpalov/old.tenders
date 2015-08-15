@@ -14,9 +14,6 @@ $("body").delegate("[data-do='open-view-organisation']", "click", function(){
 				$('#view-organisation-id').val(data.organisation['id']);
 				$('#view-organisation-full-name').text(data.organisation['full_name']);
 
-
-
-
 				// Открываем окно
 				$('#modal-view-organisation').foundation('reveal', 'open');
 

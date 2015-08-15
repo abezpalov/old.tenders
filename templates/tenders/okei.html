@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block title %}Anodos.Tenders: ОКЕИ (общеросийский классификатор единиц измерения){% endblock %}
+
+{% block content %}
+
+<!-- Таблица со списком объектов -->
+<div class="row">
+	<div class="small-12 columns">
+
+		<label>Поиск по справочнику ОКЕИ
+			<input data-do="okeis-search" type="text">
+		</label>
+
+		<ul class="no-bullet hidden" data-content="okeis-search-result"></ul>
+
+		<ul class="no-bullet" data-content="okeis-catalog">
+			{% for okei in okeis %}
+			<li>
+				<a data-do="open-view-okei" data-id="{{ okei.id }}">
+					<span>{{ okei.full_name }}</span>
+					{% if okei.local_name %}
+					<span> ({{ okei.local_name }})</span>
+					{% endif %}
+				</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+
+{% include "tenders/modal/view-okei.html" %}
+
+{% endblock %}
+
+{% block js-content %}
+<script>
+{% include "tenders/js/view-okei.js" %}
+</script>
+{% endblock %}
