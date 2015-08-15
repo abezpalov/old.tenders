@@ -1,6 +1,6 @@
 import datetime
-from catalog.models import Updater
 from project.models import Log
+from tenders.models import Updater
 from django.utils import timezone
 
 
