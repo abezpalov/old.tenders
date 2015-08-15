@@ -248,7 +248,7 @@ class Runner:
 				# Извлекаем файл из архива
 				try:
 					xml_data = zip_data.open(xml_name)
-				except:
+				except Exception as error:
 					Log.objects.add(
 						subject     = "Tenders Updater: Zakupki.gov.ru",
 						channel     = "error",
