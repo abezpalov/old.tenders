@@ -250,7 +250,7 @@ class Runner:
 					xml_data = zip_data.open(xml_name)
 				except:
 					Log.objects.add(
-						subject     = "Tenders Updater Zakupki.gov.ru: {}".format(updater),
+						subject     = "Tenders Updater: Zakupki.gov.ru",
 						channel     = "error",
 						title       = "Exception",
 						description = "Не удалось извлечь файл {} из архива {}. {}".format(xml_name, zip_name, error))
