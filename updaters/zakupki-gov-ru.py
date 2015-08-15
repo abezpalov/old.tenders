@@ -1,7 +1,7 @@
 import gc
 import datetime
 from tenders.models import *
-from tenders.project import Log
+from project.models import Log
 from django.utils import timezone
 
 
