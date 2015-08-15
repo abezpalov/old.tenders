@@ -1,6 +1,7 @@
 import gc
 import datetime
 from tenders.models import *
+from tenders.project import Log
 from django.utils import timezone
 
 
@@ -253,6 +254,7 @@ class Runner:
 						channel     = "error",
 						title       = "Exception",
 						description = "Не удалось извлечь файл {} из архива {}. {}".format(xml_name, zip_name, error))
+					continue
 
 				# Парсим файл
 				parse = self.parsers[essence]
