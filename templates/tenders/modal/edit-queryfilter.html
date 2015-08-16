@@ -39,6 +39,8 @@
 
 		<div id="modal-edit-queryfilter-regions" class="content">
 
+			<input id="edit-queryfilter-regions" type="hidden" value="">
+
 			<label>Поиск региона
 				<input data-do="modal-edit-queryfilters-regions-search" type="text">
 			</label>
@@ -60,6 +62,8 @@
 
 		<div id="modal-edit-queryfilter-customers" class="content">
 
+			<input id="edit-queryfilter-customers" type="hidden" value="">
+
 			<label>Поиск заказчика
 				<input data-do="modal-edit-queryfilters-customers-search" type="text">
 			</label>
@@ -77,11 +81,13 @@
 
 		<div id="modal-edit-queryfilter-owners" class="content">
 
+			<input id="edit-queryfilter-owners" type="hidden" value="">
+
 			<label>Поиск владельца
 				<input data-do="modal-edit-queryfilters-owners-search" type="text">
 			</label>
 
-			<ul id="modal-edit-queryfilter-owners-result"></ul>
+			<ul id="modal-edit-queryfilter-owners-result" class="no-bullet"></ul>
 
 			<label>Включить/исключить
 				<div class="switch small">
@@ -94,13 +100,15 @@
 
 		<div id="modal-edit-queryfilter-okveds" class="content">
 
+			<input id="edit-queryfilter-okveds" type="hidden" value="">
+
 			<label>Поиск по справочнику ОКВЭД
-				<input data-do="modal-edit-queryfilters-okveds-search" type="text">
+				<input data-do="okveds-search" type="text">
 			</label>
 
-			<ul id="modal-edit-queryfilter-okveds-result"></ul>
+			<ul data-content="okveds-search-result" class="no-bullet"></ul>
 
-			<ul id="modal-edit-queryfilter-okveds-catalog" class="no-bullet">
+			<ul data-content="okveds-catalog" class="no-bullet">
 				{% for okved in okveds %}
 				<li>
 					{% if okved.childs_count %}
@@ -130,13 +138,15 @@
 
 		<div id="modal-edit-queryfilter-okpds" class="content">
 
+			<input id="edit-queryfilter-okpds" type="hidden" value="">
+
 			<label>Поиск по справочнику ОКПД
-				<input data-do="modal-edit-queryfilters-okpds-search" type="text">
+				<input data-do="okpds-search" type="text">
 			</label>
 
-			<ul id="modal-edit-queryfilter-okpds-result"></ul>
+			<ul data-content="okpds-search-result" class="no-bullet"></ul>
 
-			<ul id="modal-edit-queryfilter-okpds-catalog" class="no-bullet">
+			<ul data-content="okpds-catalog" class="no-bullet">
 				{% for okpd in okpds %}
 				<li>
 					{% if okpd.childs_count %}
@@ -144,8 +154,10 @@
 					{% else %}
 					<i class="fa fa-circle-thin"></i>
 					{% endif %}
-					<span>{{ okpd.code }}</span>
-					<span>{{ okpd.name }}</span>
+					<a data-do="select-okpd" data-id="{{ okpd.id }}" data-okpd="{{ okpd.id }}">
+						<span>{{ okpd.code }}</span>
+						<span>{{ okpd.name }}</span>
+					</a>
 					{% if okpd.childs_count %}
 					<ul id="okpd-{{ okpd.id }}-childs"></ul>
 					{% endif %}
@@ -163,6 +175,8 @@
 		</div>
 
 		<div id="modal-edit-queryfilter-words" class="content">
+
+			<input id="edit-queryfilter-words" type="hidden" value="">
 
 			<label>Ключевое слово
 				<input data-do="modal-edit-queryfilters-word-input" type="text">

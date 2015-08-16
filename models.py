@@ -1180,9 +1180,9 @@ class Organisation(models.Model):
 	head_agency       = models.ForeignKey('self', related_name = 'organisation_head_agency', null = True, default = None)
 	ordering_agency   = models.ForeignKey('self', related_name = 'organisation_ordering_agency', null = True, default = None)
 	okogu             = models.ForeignKey(OKOGU, null = True, default = None)
-	inn               = models.CharField(max_length = 20, null = True, default = None)
-	kpp               = models.CharField(max_length = 20, null = True, default = None)
-	okpo              = models.CharField(max_length = 20, null = True, default = None)
+	inn               = models.CharField(max_length = 10, null = True, default = None)
+	kpp               = models.CharField(max_length = 10, null = True, default = None)
+	okpo              = models.CharField(max_length = 10, null = True, default = None)
 	# okved
 	organisation_type = models.ForeignKey(OrganisationType, null = True, default = None)
 	oktmo             = models.ForeignKey(OKTMO, null = True, default = None)

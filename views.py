@@ -423,9 +423,6 @@ def ajaxGetOKEI(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-
-
-
 def ajaxSearchOKEIs(request):
 	"AJAX-представление: Search OKEIs."
 
@@ -762,8 +759,6 @@ def planGraphs(request):
 
 
 # PlanGraph Position
-
-
 def planGraphPositions(request, page = 1, query = None):
 	"Представление: список планов-графиков."
 
@@ -818,6 +813,7 @@ def planGraphPositions(request, page = 1, query = None):
 			position.n = (page - 1) * items_on_page + n + 1
 
 	return render(request, 'tenders/plan-graph-positions.html', locals())
+
 
 def ajaxGetPlanGraphPosition(request):
 	"AJAX-представление: Get Plan Graph Position."
@@ -929,7 +925,7 @@ def ajaxGetPlanGraphPosition(request):
 # TODO Plan Graph Position Product
 
 
-# TODO Query Filter
+# Query Filter
 def queryFilters(request):
 	"Представление: список фильтров запросов."
 
@@ -985,8 +981,49 @@ def ajaxGetQueryFilter(request):
 		queryfilter['state']  = o.state
 		queryfilter['public'] = o.public
 
+		queryfilter['regions'] = []
+		for r in o.regions.all():
+			region         = {}
+			region['id']   = r.id
+			region['name'] = r.name
+			queryfilter['regions'].append(region)
 
+		queryfilter['customers'] = []
+		for r in o.customers.all():
+			customer         = {}
+			customer['id']   = r.id
+			customer['name'] = r.short_name
+			queryfilter['customers'].append(customer)
 
+		queryfilter['owners'] = []
+		for r in o.owners.all():
+			owner         = {}
+			owner['id']   = r.id
+			owner['name'] = r.short_name
+			queryfilter['owners'].append(owner)
+
+		queryfilter['okveds'] = []
+		for r in o.okveds.all():
+			okved         = {}
+			okved['id']   = r.id
+			okved['code'] = r.code
+			okved['name'] = r.name
+			queryfilter['okveds'].append(okved)
+
+		queryfilter['okpds'] = []
+		for r in o.okpds.all():
+			okpd         = {}
+			okpd['id']   = r.id
+			okpd['code'] = r.code
+			okpd['name'] = r.name
+			queryfilter['okpds'].append(okpd)
+
+		queryfilter['words'] = []
+		for r in o.words.all():
+			word         = {}
+			word['id']   = r.id
+			word['word'] = r.word
+			queryfilter['words'].append(word)
 
 		queryfilter['regions_in']   = o.regions_in
 		queryfilter['customers_in'] = o.customers_in
@@ -994,8 +1031,6 @@ def ajaxGetQueryFilter(request):
 		queryfilter['okveds_in']    = o.okveds_in
 		queryfilter['okpds_in']     = o.okpds_in
 		queryfilter['words_in']     = o.words_in
-
-
 
 		result = {
 			'status':      'success',
