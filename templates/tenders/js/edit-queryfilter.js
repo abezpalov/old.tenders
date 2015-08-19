@@ -1,6 +1,15 @@
 {% if perms.catalog.add_queryfilter or perms.tenders.change_queryfilter %}
 
-var queryfilter = new Object()
+var queryfilter = {
+	regions   : [],
+	customers : [],
+	owners    : [],
+	okveds    : [],
+	okpds     : [],
+	words     : []
+};
+
+var result = new Object()
 
 {% endif %}
 
@@ -251,13 +260,24 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 					html_data = ""
 
 					for(i = 0; i < data.okpds.length; i++) {
+						selected = false
+						for(k = 0; k < queryfilter.okpds.length; k++) {
+							if (queryfilter.okpds[k]['id'] == data.okpds[i]['id']) {
+								selected = true;
+								break;
+							}
+						}
 						li = "<li>"
 						if (data.okpds[i].childs_count > 0) {
 							li = li + '<i data-do="switch-li-okpd-status" data-id="' + data.okpds[i]['id'] + '" data-state="closed" class="fa fa-plus-square-o"></i>'
 						} else {
 							li = li + '<i class="fa fa-circle-thin"></i>'
 						}
-						li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '">'
+						li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '" '
+						if (selected) {
+							li = li + 'class = "bold"';
+						}
+						li = li + '>'
 						li = li + '<span>' + data.okpds[i]['code'] + '</span>'
 						li = li + '<span>' + data.okpds[i]['name'] + '</span>'
 						li = li + '</a>'
@@ -336,8 +356,20 @@ $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 
 						if (data.okpds.length > 0) {
 							for(i = 0; i < data.okpds.length; i++) {
+
+								selected = false
+								for(k = 0; k < queryfilter.okpds.length; k++) {
+									if (queryfilter.okpds[k]['id'] == data.okpds[i]['id']) {
+										selected = true;
+										break;
+									}
+								}
 								li = '<li>'
-								li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '">'
+								li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '" '
+								if (selected) {
+									li = li + 'class = "bold"';
+								}
+								li = li + '>'
 								li = li + '<span>' + data.okpds[i]['code'] + '</span>'
 								li = li + '<span>' + data.okpds[i]['name'] + '</span>'
 								li = li + '</a></li>'
@@ -366,6 +398,107 @@ $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 		}
 	}
 });
+
+
+// Выделение элемента ОКПД
+$("body").delegate("[data-do='select-okpd']", "click", function(){
+
+	okpd_id = $(this).data('id');
+
+	// Выясняем выбран ли элемент?
+	select = true
+	for(i = 0; i < queryfilter.okpds.length; i++) {
+		if (queryfilter.okpds[i]['id'] == okpd_id) {
+			select = false;
+			break;
+		}
+	}
+
+	// Получаем дочерние объекты с сервера
+	$.post("/tenders/ajax/get-okpd-thread/", {
+		okpd_id:            okpd_id,
+		csrfmiddlewaretoken: '{{ csrf_token }}'
+	},
+	function(data) {
+		if (null != data.status) {
+
+			if ('success' == data.status){
+
+				// Меняем состав выбранных элементов
+				if (select) {
+					for (i = 0; i < data.okpds.length; i++) {
+						add = true;
+						for (k = 0; k < queryfilter.okpds.length; k++) {
+							if (data.okpds[i]['id'] == queryfilter.okpds[k]['id']) {
+								add = false;
+								break;
+							}
+						}
+						if (add) {
+							queryfilter.okpds.push(data.okpds[i]);
+						}
+					}
+				} else {
+					old_okpds = queryfilter.okpds;
+					queryfilter.okpds = [];
+
+
+					for (i = 0; i < old_okpds.length; i++) {
+						add = true;
+						for (k = 0; k < data.okpds.length; k++) {
+							if (old_okpds[i]['id'] == data.okpds[k]['id']) {
+								add = false;
+								break;
+							}
+						}
+						if (add) {
+							queryfilter.okpds.push(old_okpds[i]);
+						}
+					}
+				}
+
+				// Покрасить!!
+				$("[data-okpd]").removeClass('bold');
+				for (k = 0; k < queryfilter.okpds.length; k++) {
+					$("[data-okpd='" + queryfilter.okpds[k]['id'] + "']").addClass('bold');
+					
+				}
+
+
+			} else {
+				var notification = new NotificationFx({
+					wrapper: document.body,
+					message: '<p>' + data.message + '</p>',
+					layout: 'growl',
+					effect: 'genie',
+					type: data.status,
+					ttl: 3000,
+					onClose: function() { return false; },
+					onOpen: function() { return false; }
+				});
+				notification.show();
+			}
+		}
+	}, "json");
+	return false;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Открытие/закрытие ветви категорий ОКВЭД

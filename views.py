@@ -529,6 +529,70 @@ def ajaxGetOKPDChildrens(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
+def ajaxGetOKPDThread(request):
+	"AJAX-представление: Get OKPD Thread."
+
+	# Импортируем
+	import json
+	from tenders.models import OKPD
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объекты
+	try:
+		okpd = OKPD.objects.get(id = request.POST.get('okpd_id'))
+
+		thread = [okpd]
+		i = 0
+
+		while(len(thread) > i):
+
+			childs = OKPD.objects.filter(parent = thread[i], state = True)
+
+			for child in childs:
+				thread.append(child)
+
+			i += 1
+
+		okpds = []
+
+		for o in thread:
+
+			okpd                 = {}
+			okpd['id']           = o.id
+			okpd['code']         = o.code
+			okpd['name']         = o.name
+
+			okpds.append(okpd)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные ветви объектов получены.',
+			'okpds':   okpds}
+
+	except OKPD.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okpd_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def ajaxSearchOKPDs(request):
 	"AJAX-представление: Search OKPDs."
 
