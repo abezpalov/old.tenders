@@ -484,23 +484,6 @@ $("body").delegate("[data-do='select-okpd']", "click", function(){
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Открытие/закрытие ветви категорий ОКВЭД
 $("body").delegate("[data-do='switch-li-okved-status']", "click", function(){
 	if ($(this).data('state') == 'closed') {
@@ -517,25 +500,35 @@ $("body").delegate("[data-do='switch-li-okved-status']", "click", function(){
 
 				if ('success' == data.status){
 
-					html_data = ""
+					html_data = "";
 
 					for(i = 0; i < data.okveds.length; i++) {
-						li = "<li>"
+						selected = false
+						for(k = 0; k < queryfilter.okveds.length; k++) {
+							if (queryfilter.okveds[k]['id'] == data.okveds[i]['id']) {
+								selected = true;
+								break;
+							}
+						}
+						li = "<li>";
 						if (data.okveds[i].childs_count > 0) {
-							li = li + '<i data-do="switch-li-okved-status" data-id="' + data.okveds[i]['id'] + '" data-state="closed" class="fa fa-plus-square-o"></i>'
+							li = li + '<i data-do="switch-li-okved-status" data-id="' + data.okveds[i]['id'] + '" data-state="closed" class="fa fa-plus-square-o"></i>';
 						} else {
-							li = li + '<i class="fa fa-circle-thin"></i>'
+							li = li + '<i class="fa fa-circle-thin"></i>';
 						}
+						li = li + '<a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '" ';
+						if (selected) {
+							li = li + 'class = "bold"';
+						}
+						li = li + '>';
 						if (data.okveds[i]['code']) {
-							li = li + '<span>' + data.okveds[i]['code'] + '</span>'
+							li = li + '<span>' + data.okveds[i]['code'] + '</span>';
 						}
-						li = li + '<span>' + data.okveds[i]['name'] + '</span>'
+						li = li + '<span>' + data.okveds[i]['name'] + '</span></a>';
 						if (data.okveds[i].childs_count > 0) {
-							li = li + '<ul id="okved-' + data.okveds[i]['id'] + '-childs"></ul>'
+							li = li + '<ul id="okved-' + data.okveds[i]['id'] + '-childs"></ul>';
 						}
-
-						li = li + '</li>'
-
+						li = li + '</li>';
 						html_data = html_data + li;
 					}
 
@@ -601,11 +594,22 @@ $("body").delegate("[data-do='okveds-search']", "keypress", function(e){
 
 					if ('success' == data.status){
 
-						html_data = ""
+						html_data = "";
 
 						if (data.okveds.length > 0) {
 							for(i = 0; i < data.okveds.length; i++) {
-								li = '<li><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></li>'
+								selected = false;
+								for(k = 0; k < queryfilter.okveds.length; k++) {
+									if (queryfilter.okveds[k]['id'] == data.okveds[i]['id']) {
+										selected = true;
+										break;
+									}
+								}
+								li = '<li><a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '" '
+								if (selected) {
+									li = li + 'class = "bold"';
+								}
+								li = li + '><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></a></li>'
 								html_data = html_data + li;
 							}
 						} else {
@@ -630,6 +634,87 @@ $("body").delegate("[data-do='okveds-search']", "keypress", function(e){
 			}, "json");
 		}
 	}
+});
+
+
+// Выделение элемента ОКВЭД
+$("body").delegate("[data-do='select-okved']", "click", function(){
+
+	okved_id = $(this).data('id');
+
+	// Выясняем выбран ли элемент?
+	select = true
+	for(i = 0; i < queryfilter.okveds.length; i++) {
+		if (queryfilter.okveds[i]['id'] == okved_id) {
+			select = false;
+			break;
+		}
+	}
+
+	// Получаем дочерние объекты с сервера
+	$.post("/tenders/ajax/get-okved-thread/", {
+		okved_id:            okved_id,
+		csrfmiddlewaretoken: '{{ csrf_token }}'
+	},
+	function(data) {
+		if (null != data.status) {
+
+			if ('success' == data.status){
+
+				// Меняем состав выбранных элементов
+				if (select) {
+					for (i = 0; i < data.okveds.length; i++) {
+						add = true;
+						for (k = 0; k < queryfilter.okveds.length; k++) {
+							if (data.okveds[i]['id'] == queryfilter.okveds[k]['id']) {
+								add = false;
+								break;
+							}
+						}
+						if (add) {
+							queryfilter.okveds.push(data.okveds[i]);
+						}
+					}
+				} else {
+					old_okveds = queryfilter.okveds;
+					queryfilter.okveds = [];
+
+					for (i = 0; i < old_okveds.length; i++) {
+						add = true;
+						for (k = 0; k < data.okveds.length; k++) {
+							if (old_okveds[i]['id'] == data.okveds[k]['id']) {
+								add = false;
+								break;
+							}
+						}
+						if (add) {
+							queryfilter.okveds.push(old_okveds[i]);
+						}
+					}
+				}
+
+				// Покрасить!!
+				$("[data-okved]").removeClass('bold');
+				for (k = 0; k < queryfilter.okveds.length; k++) {
+					$("[data-okved='" + queryfilter.okveds[k]['id'] + "']").addClass('bold');
+				}
+
+			} else {
+				var notification = new NotificationFx({
+					wrapper: document.body,
+					message: '<p>' + data.message + '</p>',
+					layout: 'growl',
+					effect: 'genie',
+					type: data.status,
+					ttl: 3000,
+					onClose: function() { return false; },
+					onOpen: function() { return false; }
+				});
+				notification.show();
+			}
+		}
+	}, "json");
+	return false;
 });
 
 {% endif %}

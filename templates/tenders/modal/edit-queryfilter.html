@@ -116,10 +116,12 @@
 					{% else %}
 					<i class="fa fa-circle-thin"></i>
 					{% endif %}
-					{% if okved.code %}
-					<span>{{ okved.code }}</span>
-					{% endif %}
-					<span>{{ okved.name }}</span>
+					<a data-do="select-okved" data-id="{{ okved.id }}" data-okved="{{ okved.id }}">
+						{% if okved.code %}
+						<span>{{ okved.code }}</span>
+						{% endif %}
+						<span>{{ okved.name }}</span>
+					</a>
 					{% if okved.childs_count %}
 					<ul id="okved-{{ okved.id }}-childs"></ul>
 					{% endif %}

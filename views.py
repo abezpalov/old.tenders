@@ -580,19 +580,6 @@ def ajaxGetOKPDThread(request):
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 def ajaxSearchOKPDs(request):
 	"AJAX-представление: Search OKPDs."
 
@@ -690,6 +677,57 @@ def ajaxGetOKVEDChildrens(request):
 		result = {
 			'status':  'success',
 			'message': 'Данные дочерних объектов получены.',
+			'okveds':   okveds}
+
+	except OKVED.DoesNotExist:
+		result = {
+			'status': 'alert',
+			'message': 'Ошибка: объект {} отсутствует в базе.'.format(request.POST.get('okved_id'))}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajaxGetOKVEDThread(request):
+	"AJAX-представление: Get OKVED Thread."
+
+	# Импортируем
+	import json
+	from tenders.models import OKVED
+
+	# Проверяем тип запроса
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	# Получаем объекты
+	try:
+		okved = OKVED.objects.get(id = request.POST.get('okved_id'))
+
+		thread = [okved]
+		i = 0
+
+		while(len(thread) > i):
+
+			childs = OKVED.objects.filter(parent = thread[i], state = True)
+
+			for child in childs:
+				thread.append(child)
+
+			i += 1
+
+		okveds = []
+
+		for o in thread:
+
+			okved                 = {}
+			okved['id']           = o.id
+			okved['code']         = o.code
+			okved['name']         = o.name
+
+			okveds.append(okved)
+
+		result = {
+			'status':  'success',
+			'message': 'Данные ветви объектов получены.',
 			'okveds':   okveds}
 
 	except OKVED.DoesNotExist:

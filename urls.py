@@ -59,6 +59,7 @@ urlpatterns = patterns('',
 
 	url(r'^essence/okved/$',            views.OKVEDs,                name='OKVEDs'),
 	url(r'^ajax/get-okved-childrens/$', views.ajaxGetOKVEDChildrens, name='ajaxGetOKVEDChildrens'),
+	url(r'^ajax/get-okved-thread/$',    views.ajaxGetOKVEDThread,    name='ajaxGetOKVEDThread'),
 	url(r'^ajax/search-okveds/$',       views.ajaxSearchOKVEDs,      name='ajaxSearchOKVEDs'),
 
 	url(r'^essence/okei/$',             views.OKEIs,                 name='OKEIs'),
