@@ -1848,6 +1848,7 @@ class Word(models.Model):
 class QueryFilter(models.Model):
 
 	name         = models.CharField(max_length = 100)
+
 	regions      = models.ManyToManyField(Region,       db_table = 'tenders_queryfilter_to_region',   related_name = 'queryfilter_region')
 	customers    = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_customer', related_name = 'queryfilter_customer')
 	owners       = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_owner',    related_name = 'queryfilter_owner')

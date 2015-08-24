@@ -1,12 +1,28 @@
 {% if perms.catalog.add_queryfilter or perms.tenders.change_queryfilter %}
 
 var queryfilter = {
+
 	regions   : [],
 	customers : [],
 	owners    : [],
 	okveds    : [],
 	okpds     : [],
-	words     : []
+	words     : [],
+
+	okveds_rebold : function(){
+		$("[data-okved]").removeClass('bold');
+		for (k = 0; k < queryfilter.okveds.length; k++) {
+			$("[data-okved='" + queryfilter.okveds[k]['id'] + "']").addClass('bold');
+		}
+	},
+
+	okpds_rebold : function(){
+		$("[data-okpd]").removeClass('bold');
+		for (k = 0; k < queryfilter.okpds.length; k++) {
+			$("[data-okpd='" + queryfilter.okpds[k]['id'] + "']").addClass('bold');
+		}
+	}
+
 };
 
 var result = new Object()
@@ -68,6 +84,10 @@ $("body").delegate("[data-do='open-edit-queryfilter']", "click", function(){
 				$('#edit-queryfilter-state').prop('checked', data.queryfilter['state']);
 				$('#edit-queryfilter-public').prop('checked', data.queryfilter['public']);
 
+				// Красим
+				queryfilter.okpds_rebold()
+				queryfilter.okveds_rebold()
+
 				// Открываем окно
 				$('#modal-edit-queryfilter').foundation('reveal', 'open');
 
@@ -101,13 +121,29 @@ $("body").delegate("[data-do='open-edit-queryfilter']", "click", function(){
 // Сохранение
 $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 
+	okpd_ids = '';
+	for(i = 0; i < queryfilter.okpds.length; i++) {
+		if(i > 0){
+			okpd_ids = okpd_ids + ',';
+		}
+		okpd_ids = okpd_ids + queryfilter.okpds[i].id;
+	}
+
 	// Отправляем запрос
 	$.post("/tenders/ajax/save-queryfilter/", {
-		queryfilter_id:      $('#edit-queryfilter-id').val(),
-		queryfilter_name:    $('#edit-queryfilter-name').val(),
-		queryfilter_state:   $('#edit-queryfilter-state').prop('checked'),
-		queryfilter_public:  $('#edit-queryfilter-public').prop('checked'),
-		csrfmiddlewaretoken: '{{ csrf_token }}'
+		queryfilter_id        : $('#edit-queryfilter-id').val(),
+		queryfilter_name      : $('#edit-queryfilter-name').val(),
+
+		queryfilter_regions   : queryfilter.regions,
+		queryfilter_customers : queryfilter.customers,
+		queryfilter_owners    : queryfilter.owners,
+		queryfilter_okveds    : queryfilter.okveds,
+		queryfilter_okpd_ids  : okpd_ids,
+		queryfilter_words     : queryfilter.words,
+
+		queryfilter_state     : $('#edit-queryfilter-state').prop('checked'),
+		queryfilter_public    : $('#edit-queryfilter-public').prop('checked'),
+		csrfmiddlewaretoken   : '{{ csrf_token }}'
 	},
 	function(data) {
 		if (null != data.status) {
@@ -150,6 +186,10 @@ $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 					$('#edit-queryfilter-name').val('');
 					$('#edit-queryfilter-state').prop('checked', true);
 					$('#edit-queryfilter-public').prop('checked', false);
+
+					queryfilter.okpds_rebold();
+					queryfilter.okveds_rebold();
+
 				}
 			}
 		}
@@ -258,41 +298,25 @@ $("body").delegate("[data-do='switch-li-okpd-status']", "click", function(){
 				if ('success' == data.status){
 
 					html_data = ""
-
 					for(i = 0; i < data.okpds.length; i++) {
-						selected = false
-						for(k = 0; k < queryfilter.okpds.length; k++) {
-							if (queryfilter.okpds[k]['id'] == data.okpds[i]['id']) {
-								selected = true;
-								break;
-							}
-						}
 						li = "<li>"
 						if (data.okpds[i].childs_count > 0) {
 							li = li + '<i data-do="switch-li-okpd-status" data-id="' + data.okpds[i]['id'] + '" data-state="closed" class="fa fa-plus-square-o"></i>'
 						} else {
 							li = li + '<i class="fa fa-circle-thin"></i>'
 						}
-						li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '" '
-						if (selected) {
-							li = li + 'class = "bold"';
-						}
-						li = li + '>'
-						li = li + '<span>' + data.okpds[i]['code'] + '</span>'
-						li = li + '<span>' + data.okpds[i]['name'] + '</span>'
-						li = li + '</a>'
+						li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '"><span>' + data.okpds[i]['code'] + '</span><span>' + data.okpds[i]['name'] + '</span></a>'
 						if (data.okpds[i].childs_count > 0) {
 							li = li + '<ul id="okpd-' + data.okpds[i]['id'] + '-childs"></ul>'
 						}
-
 						li = li + '</li>'
-
 						html_data = html_data + li;
 					}
-
 					$('#okpd-' + okpd_id + '-childs').html(html_data);
+					queryfilter.okpds_rebold()
 
 				} else {
+
 					var notification = new NotificationFx({
 						wrapper: document.body,
 						message: '<p>' + data.message + '</p>',
@@ -353,33 +377,16 @@ $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 					if ('success' == data.status){
 
 						html_data = ""
-
 						if (data.okpds.length > 0) {
 							for(i = 0; i < data.okpds.length; i++) {
-
-								selected = false
-								for(k = 0; k < queryfilter.okpds.length; k++) {
-									if (queryfilter.okpds[k]['id'] == data.okpds[i]['id']) {
-										selected = true;
-										break;
-									}
-								}
-								li = '<li>'
-								li = li + '<a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '" '
-								if (selected) {
-									li = li + 'class = "bold"';
-								}
-								li = li + '>'
-								li = li + '<span>' + data.okpds[i]['code'] + '</span>'
-								li = li + '<span>' + data.okpds[i]['name'] + '</span>'
-								li = li + '</a></li>'
+								li = '<li><a data-do="select-okpd" data-id="' + data.okpds[i]['id'] + '" data-okpd="' + data.okpds[i]['id'] + '"><span>' + data.okpds[i]['code'] + '</span><span>' + data.okpds[i]['name'] + '</span></a></li>'
 								html_data = html_data + li;
 							}
 						} else {
 							html_data = '<li class="alert-box secondary radius">Ничего не найдено.</li>'
 						}
 						$("[data-content='okpds-search-result']").html(html_data);
-
+						queryfilter.okpds_rebold()
 					} else {
 						var notification = new NotificationFx({
 							wrapper: document.body,
@@ -456,14 +463,7 @@ $("body").delegate("[data-do='select-okpd']", "click", function(){
 						}
 					}
 				}
-
-				// Покрасить!!
-				$("[data-okpd]").removeClass('bold');
-				for (k = 0; k < queryfilter.okpds.length; k++) {
-					$("[data-okpd='" + queryfilter.okpds[k]['id'] + "']").addClass('bold');
-					
-				}
-
+				queryfilter.okpds_rebold()
 
 			} else {
 				var notification = new NotificationFx({
@@ -516,11 +516,7 @@ $("body").delegate("[data-do='switch-li-okved-status']", "click", function(){
 						} else {
 							li = li + '<i class="fa fa-circle-thin"></i>';
 						}
-						li = li + '<a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '" ';
-						if (selected) {
-							li = li + 'class = "bold"';
-						}
-						li = li + '>';
+						li = li + '<a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '">';
 						if (data.okveds[i]['code']) {
 							li = li + '<span>' + data.okveds[i]['code'] + '</span>';
 						}
@@ -533,6 +529,7 @@ $("body").delegate("[data-do='switch-li-okved-status']", "click", function(){
 					}
 
 					$('#okved-' + okved_id + '-childs').html(html_data);
+					queryfilter.okveds_rebold()
 
 				} else {
 					var notification = new NotificationFx({
@@ -605,17 +602,14 @@ $("body").delegate("[data-do='okveds-search']", "keypress", function(e){
 										break;
 									}
 								}
-								li = '<li><a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '" '
-								if (selected) {
-									li = li + 'class = "bold"';
-								}
-								li = li + '><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></a></li>'
+								li = '<li><a data-do="select-okved" data-id="' + data.okveds[i]['id'] + '" data-okved="' + data.okveds[i]['id'] + '"><span>' + data.okveds[i]['code'] + '</span><span>' + data.okveds[i]['name'] + '</span></a></li>'
 								html_data = html_data + li;
 							}
 						} else {
 							html_data = '<li class="alert-box secondary radius">Ничего не найдено.</li>'
 						}
 						$("[data-content='okveds-search-result']").html(html_data);
+						queryfilter.okveds_rebold()
 
 					} else {
 						var notification = new NotificationFx({
@@ -692,12 +686,7 @@ $("body").delegate("[data-do='select-okved']", "click", function(){
 						}
 					}
 				}
-
-				// Покрасить!!
-				$("[data-okved]").removeClass('bold');
-				for (k = 0; k < queryfilter.okveds.length; k++) {
-					$("[data-okved='" + queryfilter.okveds[k]['id'] + "']").addClass('bold');
-				}
+				queryfilter.okveds_rebold();
 
 			} else {
 				var notification = new NotificationFx({

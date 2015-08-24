@@ -981,7 +981,6 @@ def ajaxGetPlanGraphPosition(request):
 		except AttributeError:
 			position['customer']['name'] = ''
 
-
 		position['placing_way'] = {}
 		try:
 			position['placing_way']['id'] = o.placing_way.id
@@ -1154,7 +1153,7 @@ def ajaxSaveQueryFilter(request):
 	import json
 	import unidecode
 	from django.utils import timezone
-	from tenders.models import QueryFilter
+	from tenders.models import QueryFilter, Region, Organisation, OKVED, OKPD, Word
 
 	# Проверяем тип запроса
 	if (not request.is_ajax()) or (request.method != 'POST'):
@@ -1179,6 +1178,58 @@ def ajaxSaveQueryFilter(request):
 			'message': 'Ошибка: отсутствует наименование.'}
 		return HttpResponse(json.dumps(result), 'application/javascript')
 	queryfilter.name = request.POST.get('queryfilter_name').strip()[:100]
+
+	# TODO regions
+	# TODO customers
+	# TODO owners
+	# TODO okveds
+	# TODO okpds
+	okpds = []
+	for o in request.POST.get('queryfilter_okpd_ids').split(','):
+		try:
+			okpd = OKPD.objects.get(id = o)
+			okpds.append(okpd)
+		except OKPD.DoesNotExist:
+			continue
+	queryfilter.okpds = okpds
+
+	# TODO words
+
+	# regions_in
+	if request.POST.get('queryfilter_regions_in') == 'true':
+		queryfilter.region_in = True
+	else:
+		queryfilter.region_in = False
+
+	# customers_in
+	if request.POST.get('queryfilter_customers_in') == 'true':
+		queryfilter.customers_in = True
+	else:
+		queryfilter.customers_in = False
+
+	# owners_in
+	if request.POST.get('queryfilter_owners_in') == 'true':
+		queryfilter.owners_in = True
+	else:
+		queryfilter.owners_in = False
+
+	# okveds_in
+	if request.POST.get('queryfilter_okveds_in') == 'true':
+		queryfilter.okveds_in = True
+	else:
+		queryfilter.okveds_in = False
+
+	# okpds_in
+	if request.POST.get('queryfilter_okpds_in') == 'true':
+		queryfilter.okpds_in = True
+	else:
+		queryfilter.okpds_in = False
+
+	# words_in
+	if request.POST.get('queryfilter_words_in') == 'true':
+		queryfilter.words_in = True
+	else:
+		queryfilter.words_in = False
 
 	# state
 	if request.POST.get('queryfilter_state') == 'true':
