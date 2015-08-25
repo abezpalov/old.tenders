@@ -38,6 +38,21 @@ $("body").delegate("[data-do='open-new-queryfilter']", "click", function(){
 	$('#modal-edit-queryfilter-header').text('Добавить фильтр запроса');
 	$('#edit-queryfilter-id').val('0');
 	$('#edit-queryfilter-name').val('');
+
+	queryfilter.regions   = [];
+	queryfilter.customers = [];
+	queryfilter.owners    = [];
+	queryfilter.okveds    = [];
+	queryfilter.okpds     = [];
+	queryfilter.words     = [];
+
+	$('#edit-queryfilter-regions-in').prop('checked', true);
+	$('#edit-queryfilter-customers-in').prop('checked', true);
+	$('#edit-queryfilter-owners-in').prop('checked', true);
+	$('#edit-queryfilter-okveds-in').prop('checked', true);
+	$('#edit-queryfilter-okpds-in').prop('checked', true);
+	$('#edit-queryfilter-words-in').prop('checked', true);
+
 	$('#edit-queryfilter-state').prop('checked', true);
 	$('#edit-queryfilter-public').prop('checked', false);
 
@@ -121,29 +136,57 @@ $("body").delegate("[data-do='open-edit-queryfilter']", "click", function(){
 // Сохранение
 $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 
-	okpd_ids = '';
-	for(i = 0; i < queryfilter.okpds.length; i++) {
-		if(i > 0){
-			okpd_ids = okpd_ids + ',';
-		}
-		okpd_ids = okpd_ids + queryfilter.okpds[i].id;
+	regions_ids = '';
+	for (i = 0; i < queryfilter.regions.length; i++) {
+		if (i > 0) { regions_ids = regions_ids + ','; }
+		regions_ids = regions_ids + queryfilter.regions[i].id;
+	}
+
+	customers_ids = '';
+	for (i = 0; i < queryfilter.customers.length; i++) {
+		if (i > 0) { customers_ids = customers_ids + ','; }
+		customers_ids = customers_ids + queryfilter.customers[i].id;
+	}
+
+	owners_ids = '';
+	for (i = 0; i < queryfilter.owners.length; i++) {
+		if (i > 0) { owners_ids = owner_ids + ','; }
+		owners_ids = owners_ids + queryfilter.owners[i].id;
+	}
+
+	okveds_ids = '';
+	for (i = 0; i < queryfilter.okveds.length; i++) {
+		if (i > 0) { okveds_ids = okveds_ids + ','; }
+		okveds_ids = okveds_ids + queryfilter.okveds[i].id;
+	}
+
+	okpds_ids = '';
+	for (i = 0; i < queryfilter.okpds.length; i++) {
+		if (i > 0) { okpds_ids = okpds_ids + ','; }
+		okpds_ids = okpds_ids + queryfilter.okpds[i].id;
+	}
+
+	words_ids = '';
+	for (i = 0; i < queryfilter.words.length; i++) {
+		if (i > 0) { words_ids = words_ids + ','; }
+		words_ids = words_ids + queryfilter.words[i].id;
 	}
 
 	// Отправляем запрос
 	$.post("/tenders/ajax/save-queryfilter/", {
-		queryfilter_id        : $('#edit-queryfilter-id').val(),
-		queryfilter_name      : $('#edit-queryfilter-name').val(),
+		queryfilter_id            : $('#edit-queryfilter-id').val(),
+		queryfilter_name          : $('#edit-queryfilter-name').val(),
 
-		queryfilter_regions   : queryfilter.regions,
-		queryfilter_customers : queryfilter.customers,
-		queryfilter_owners    : queryfilter.owners,
-		queryfilter_okveds    : queryfilter.okveds,
-		queryfilter_okpd_ids  : okpd_ids,
-		queryfilter_words     : queryfilter.words,
+		queryfilter_regions_ids   : regions_ids,
+		queryfilter_customers_ids : customers_ids,
+		queryfilter_owners_ids    : owners_ids,
+		queryfilter_okveds_ids    : okveds_ids,
+		queryfilter_okpds_ids     : okpds_ids,
+		queryfilter_words_ids     : words_ids,
 
-		queryfilter_state     : $('#edit-queryfilter-state').prop('checked'),
-		queryfilter_public    : $('#edit-queryfilter-public').prop('checked'),
-		csrfmiddlewaretoken   : '{{ csrf_token }}'
+		queryfilter_state         : $('#edit-queryfilter-state').prop('checked'),
+		queryfilter_public        : $('#edit-queryfilter-public').prop('checked'),
+		csrfmiddlewaretoken       : '{{ csrf_token }}'
 	},
 	function(data) {
 		if (null != data.status) {

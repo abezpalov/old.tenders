@@ -1179,21 +1179,71 @@ def ajaxSaveQueryFilter(request):
 		return HttpResponse(json.dumps(result), 'application/javascript')
 	queryfilter.name = request.POST.get('queryfilter_name').strip()[:100]
 
-	# TODO regions
-	# TODO customers
-	# TODO owners
-	# TODO okveds
-	# TODO okpds
-	okpds = []
-	for o in request.POST.get('queryfilter_okpd_ids').split(','):
+	# regions
+	regions = []
+	for o in request.POST.get('queryfilter_regions_ids').split(','):
 		try:
-			okpd = OKPD.objects.get(id = o)
-			okpds.append(okpd)
-		except OKPD.DoesNotExist:
-			continue
-	queryfilter.okpds = okpds
+			region = Region.objects.get(id = int(o))
+			regions.append(region)
+		except Region.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.regions = regions
+	del(regions)
 
-	# TODO words
+	# customers
+	customers = []
+	for o in request.POST.get('queryfilter_customers_ids').split(','):
+		try:
+			customer = Organisation.objects.get(id = int(o))
+			customers.append(customer)
+		except Organisation.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.customers = customers
+	del(customers)
+
+	# owners
+	owners = []
+	for o in request.POST.get('queryfilter_owners_ids').split(','):
+		try:
+			owner = Organisation.objects.get(id = int(o))
+			owners.append(owner)
+		except Organisation.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.owners = owners
+	del(owners)
+
+	# okveds
+	okveds = []
+	for o in request.POST.get('queryfilter_okveds_ids').split(','):
+		try:
+			okved = OKVED.objects.get(id = int(o))
+			okveds.append(okved)
+		except OKVED.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.okveds = okveds
+	del(okveds)
+
+	# okpds
+	okpds = []
+	for o in request.POST.get('queryfilter_okpds_ids').split(','):
+		try:
+			okpd = OKPD.objects.get(id = int(o))
+			okpds.append(okpd)
+		except OKPD.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.okpds = okpds
+	del(okpds)
+
+	# words
+	words = []
+	for o in request.POST.get('queryfilter_words_ids').split(','):
+		try:
+			word = Word.objects.get(id = int(o))
+			words.append(word)
+		except Word.DoesNotExist: continue
+		except ValueError: continue
+	queryfilter.words = words
+	del(words)
 
 	# regions_in
 	if request.POST.get('queryfilter_regions_in') == 'true':
