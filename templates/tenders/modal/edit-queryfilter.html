@@ -47,7 +47,7 @@
 
 			<ul class="no-bullet">
 				{% for region in regions %}
-				<li><a data-do="modal-edit-queryfilter-region-select"><span>{{ region.name }}</span></a></li>
+				<li><a data-do="select-region" data-id="{{ region.id }}" data-region="{{ region.id }}"><span>{{ region.name }}</span></a></li>
 				{% endfor %}
 			</ul>
 

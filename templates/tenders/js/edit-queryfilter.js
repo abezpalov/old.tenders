@@ -1,31 +1,85 @@
 {% if perms.catalog.add_queryfilter or perms.tenders.change_queryfilter %}
 
+// Инициализация
 var queryfilter = {
-
 	regions   : [],
 	customers : [],
 	owners    : [],
 	okveds    : [],
 	okpds     : [],
 	words     : [],
-
-	okveds_rebold : function(){
+	regions_rebold: function(){
+		$("[data-region]").removeClass('bold');
+		for (k = 0; k < queryfilter.regions.length; k++) {
+			$("[data-region='" + queryfilter.regions[k]['id'] + "']").addClass('bold');
+		}
+	},
+	customers_rebold: function(){
+		$("[data-customer]").removeClass('bold');
+		for (k = 0; k < queryfilter.customers.length; k++) {
+			$("[data-customer='" + queryfilter.customer[k]['id'] + "']").addClass('bold');
+		}
+	},
+	owners_rebold: function(){
+		$("[data-owner]").removeClass('bold');
+		for (k = 0; k < queryfilter.owners.length; k++) {
+			$("[data-owner='" + queryfilter.owner[k]['id'] + "']").addClass('bold');
+		}
+	},
+	okveds_rebold: function(){
 		$("[data-okved]").removeClass('bold');
 		for (k = 0; k < queryfilter.okveds.length; k++) {
 			$("[data-okved='" + queryfilter.okveds[k]['id'] + "']").addClass('bold');
 		}
 	},
-
-	okpds_rebold : function(){
+	okpds_rebold: function(){
 		$("[data-okpd]").removeClass('bold');
 		for (k = 0; k < queryfilter.okpds.length; k++) {
 			$("[data-okpd='" + queryfilter.okpds[k]['id'] + "']").addClass('bold');
 		}
+	},
+	words_rebold: function(){
+		$("[data-word]").removeClass('bold');
+		for (k = 0; k < queryfilter.words.length; k++) {
+			$("[data-word='" + queryfilter.words[k]['id'] + "']").addClass('bold');
+		}
+	},
+	rebold: function(){
+		this.regions_rebold()
+		this.customers_rebold()
+		this.owners_rebold()
+		this.okveds_rebold()
+		this.okpds_rebold()
+		this.words_rebold()
+	},
+	clear: function() {
+		$('#modal-edit-queryfilter-header').text('');
+		$('#edit-queryfilter-id').val('0');
+		$('#edit-queryfilter-name').val('');
+		this.regions   = [];
+		this.customers = [];
+		this.owners    = [];
+		this.okveds    = [];
+		this.okpds     = [];
+		this.words     = [];
+		$('#edit-queryfilter-regions-in').prop('checked', true);
+		$('#edit-queryfilter-customers-in').prop('checked', true);
+		$('#edit-queryfilter-owners-in').prop('checked', true);
+		$('#edit-queryfilter-okveds-in').prop('checked', true);
+		$('#edit-queryfilter-okpds-in').prop('checked', true);
+		$('#edit-queryfilter-words-in').prop('checked', true);
+		$('#edit-queryfilter-state').prop('checked', true);
+		$('#edit-queryfilter-public').prop('checked', false);
+	},
+	get_ids: function(os) {
+		ids = '';
+		for (i = 0; i < os.length; i++) {
+			if (i > 0) { ids = ids + ','; }
+			ids = ids + os[i].id;
+		}
+		return ids;
 	}
-
 };
-
-var result = new Object()
 
 {% endif %}
 
@@ -34,27 +88,11 @@ var result = new Object()
 // Открытие окна создания
 $("body").delegate("[data-do='open-new-queryfilter']", "click", function(){
 
-	// Заполняем значение полей
-	$('#modal-edit-queryfilter-header').text('Добавить фильтр запроса');
-	$('#edit-queryfilter-id').val('0');
-	$('#edit-queryfilter-name').val('');
+	// Обнуляем значения
+	queryfilter.clear()
 
-	queryfilter.regions   = [];
-	queryfilter.customers = [];
-	queryfilter.owners    = [];
-	queryfilter.okveds    = [];
-	queryfilter.okpds     = [];
-	queryfilter.words     = [];
-
-	$('#edit-queryfilter-regions-in').prop('checked', true);
-	$('#edit-queryfilter-customers-in').prop('checked', true);
-	$('#edit-queryfilter-owners-in').prop('checked', true);
-	$('#edit-queryfilter-okveds-in').prop('checked', true);
-	$('#edit-queryfilter-okpds-in').prop('checked', true);
-	$('#edit-queryfilter-words-in').prop('checked', true);
-
-	$('#edit-queryfilter-state').prop('checked', true);
-	$('#edit-queryfilter-public').prop('checked', false);
+	// Красим
+	queryfilter.rebold()
 
 	// Открываем модальное окно
 	$('#modal-edit-queryfilter').foundation('reveal', 'open');
@@ -100,8 +138,7 @@ $("body").delegate("[data-do='open-edit-queryfilter']", "click", function(){
 				$('#edit-queryfilter-public').prop('checked', data.queryfilter['public']);
 
 				// Красим
-				queryfilter.okpds_rebold()
-				queryfilter.okveds_rebold()
+				queryfilter.rebold()
 
 				// Открываем окно
 				$('#modal-edit-queryfilter').foundation('reveal', 'open');
@@ -136,41 +173,12 @@ $("body").delegate("[data-do='open-edit-queryfilter']", "click", function(){
 // Сохранение
 $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 
-	regions_ids = '';
-	for (i = 0; i < queryfilter.regions.length; i++) {
-		if (i > 0) { regions_ids = regions_ids + ','; }
-		regions_ids = regions_ids + queryfilter.regions[i].id;
-	}
-
-	customers_ids = '';
-	for (i = 0; i < queryfilter.customers.length; i++) {
-		if (i > 0) { customers_ids = customers_ids + ','; }
-		customers_ids = customers_ids + queryfilter.customers[i].id;
-	}
-
-	owners_ids = '';
-	for (i = 0; i < queryfilter.owners.length; i++) {
-		if (i > 0) { owners_ids = owner_ids + ','; }
-		owners_ids = owners_ids + queryfilter.owners[i].id;
-	}
-
-	okveds_ids = '';
-	for (i = 0; i < queryfilter.okveds.length; i++) {
-		if (i > 0) { okveds_ids = okveds_ids + ','; }
-		okveds_ids = okveds_ids + queryfilter.okveds[i].id;
-	}
-
-	okpds_ids = '';
-	for (i = 0; i < queryfilter.okpds.length; i++) {
-		if (i > 0) { okpds_ids = okpds_ids + ','; }
-		okpds_ids = okpds_ids + queryfilter.okpds[i].id;
-	}
-
-	words_ids = '';
-	for (i = 0; i < queryfilter.words.length; i++) {
-		if (i > 0) { words_ids = words_ids + ','; }
-		words_ids = words_ids + queryfilter.words[i].id;
-	}
+	regions_ids   = queryfilter.get_ids(queryfilter.regions)
+	customers_ids = queryfilter.get_ids(queryfilter.customers)
+	owners_ids    = queryfilter.get_ids(queryfilter.owners)
+	okveds_ids    = queryfilter.get_ids(queryfilter.okveds)
+	okpds_ids     = queryfilter.get_ids(queryfilter.okpds)
+	words_ids     = queryfilter.get_ids(queryfilter.words)
 
 	// Отправляем запрос
 	$.post("/tenders/ajax/save-queryfilter/", {
@@ -183,6 +191,13 @@ $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 		queryfilter_okveds_ids    : okveds_ids,
 		queryfilter_okpds_ids     : okpds_ids,
 		queryfilter_words_ids     : words_ids,
+
+		queryfilter_regions_in    : $('#edit-queryfilter-regions-in').prop('checked'),
+		queryfilter_customers_in  : $('#edit-queryfilter-customers-in').prop('checked'),
+		queryfilter_owners_in     : $('#edit-queryfilter-owners-in').prop('checked'),
+		queryfilter_okveds_in     : $('#edit-queryfilter-okveds-in').prop('checked'),
+		queryfilter_okpds_in      : $('#edit-queryfilter-okpds-in').prop('checked'),
+		queryfilter_words_in      : $('#edit-queryfilter-words-in').prop('checked'),
 
 		queryfilter_state         : $('#edit-queryfilter-state').prop('checked'),
 		queryfilter_public        : $('#edit-queryfilter-public').prop('checked'),
@@ -230,8 +245,7 @@ $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 					$('#edit-queryfilter-state').prop('checked', true);
 					$('#edit-queryfilter-public').prop('checked', false);
 
-					queryfilter.okpds_rebold();
-					queryfilter.okveds_rebold();
+					queryfilter.rebold()
 
 				}
 			}
@@ -245,11 +259,11 @@ $("body").delegate("[data-do='edit-queryfilter-save']", "click", function(){
 // Отмена редактирования
 $("body").delegate("[data-do*='edit-queryfilter-cancel']", "click", function(){
 
-	// Заполняем значение полей
-	$('#edit-queryfilter-id').val('0');
-	$('#edit-queryfilter-name').val('');
-	$('#edit-queryfilter-state').prop('checked', true);
-	$('#edit-queryfilter-public').prop('checked', false);
+	// Обнуляем значения
+	queryfilter.clear()
+
+	// Красим
+	queryfilter.rebold()
 
 	// Закрываем окно
 	$('#modal-edit-queryfilter').foundation('reveal', 'close');
@@ -448,6 +462,75 @@ $("body").delegate("[data-do='okpds-search']", "keypress", function(e){
 		}
 	}
 });
+
+
+// Выделение элемента Регион
+$("body").delegate("[data-do='select-region']", "click", function(){
+
+	region_id = $(this).data('id');
+
+	// Выясняем выбран ли элемент?
+	select = true
+	for(i = 0; i < queryfilter.regions.length; i++) {
+		if (queryfilter.regions[i]['id'] == region_id) {
+			select = false;
+			break;
+		}
+	}
+
+	// Получаем объект с сервера
+	$.post("/tenders/ajax/get-region/", {
+		region_id:           region_id,
+		csrfmiddlewaretoken: '{{ csrf_token }}'
+	},
+	function(data) {
+		if (null != data.status) {
+
+			if ('success' == data.status){
+
+				// Меняем состав выбранных элементов
+				if (select) {
+					add = true;
+					for (k = 0; k < queryfilter.regions.length; k++) {
+						if (data.region['id'] == queryfilter.regions[k]['id']) {
+							add = false;
+							break;
+						}
+					}
+					if (add) {
+						queryfilter.regions.push(data.region);
+					}
+				} else {
+					old_regions = queryfilter.regions;
+					queryfilter.regions = [];
+
+					for (i = 0; i < old_regions.length; i++) {
+						if (old_regions[i]['id'] != data.region['id']) {
+							queryfilter.regions.push(old_regions[i]);
+						}
+					}
+				}
+				queryfilter.regions_rebold()
+
+			} else {
+				var notification = new NotificationFx({
+					wrapper: document.body,
+					message: '<p>' + data.message + '</p>',
+					layout: 'growl',
+					effect: 'genie',
+					type: data.status,
+					ttl: 3000,
+					onClose: function() { return false; },
+					onOpen: function() { return false; }
+				});
+				notification.show();
+			}
+		}
+	}, "json");
+	return false;
+});
+
+
 
 
 // Выделение элемента ОКПД
