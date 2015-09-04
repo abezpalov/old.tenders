@@ -77,21 +77,26 @@ class CountryManager(models.Manager):
 		try:
 			o = self.get(code = code)
 		except Country.DoesNotExist:
-			o = Country(
-				code      = code[:100],
-				name      = name,
-				full_name = full_name,
-				created   = timezone.now(),
-				modified  = timezone.now())
+			o = Country()
+			o.code      = code[:100]
+			o.full_name = full_name
+			if name:
+				o.name  = name
+			else:
+				o.name  = full_name
+			o.created   = timezone.now()
+			o.modified  = timezone.now()
 			o.save()
 		return o
 
 	def update(self, code, full_name, name = None, state = True):
 		try:
 			o           = self.get(code = code)
+			o.full_name = full_name
 			if name:
 				o.name  = name
-			o.full_name = full_name
+			else:
+				o.name  = full_name
 			o.state     = state
 			o.modified  = timezone.now()
 			o.save()
@@ -107,8 +112,8 @@ class CountryManager(models.Manager):
 class Country(models.Model):
 
 	code      = models.CharField(max_length = 10, unique = True)
-	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
+	name      = models.TextField(null = True, default = None)
 	state     = models.BooleanField(default = True)
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
@@ -120,6 +125,7 @@ class Country(models.Model):
 
 	class Meta:
 		ordering = ['name']
+
 
 class RegionManager(models.Manager):
 
@@ -142,11 +148,12 @@ class Region(models.Model):
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 	alias     = models.CharField(max_length = 100, unique = True)
-	country   = models.ForeignKey(Country, null = True, default = None)
 	state     = models.BooleanField(default = False)
 	created   = models.DateTimeField()
 	modified  = models.DateTimeField()
 	updated   = models.DateTimeField(null = True, default = None)
+
+	country   = models.ForeignKey(Country, null = True, default = None)
 
 	objects   = RegionManager()
 	
@@ -159,38 +166,35 @@ class Region(models.Model):
 
 class CurrencyManager(models.Manager):
 
-	def take(self, code, digital_code, name = None, state = True):
+	def take(self, code, digital_code = None, name = None, state = True):
 		try:
-			currency = self.get(code = code)
+			o = self.get(code = code)
 		except Currency.DoesNotExist:
-			currency              = Currency()
-			currency.code         = code
-			currency.digital_code = digital_code
-			currency.name         = name
-			currency.state        = state
-			currency.created      = timezone.now()
-			currency.modified     = timezone.now()
-			currency.save()
-		return currency
+			o              = Currency()
+			o.code         = code
+			o.digital_code = digital_code
+			o.name         = name
+			o.state        = state
+			o.created      = timezone.now()
+			o.modified     = timezone.now()
+			o.save()
+		return o
 
-	def update(self, code, digital_code, name = None, state = True):
+	def update(self, code, digital_code = None, name = None, state = True):
 		try:
-			currency = self.get(code = code)
-			currency.digital_code = digital_code
-			currency.name         = name
-			currency.state        = state
-			currency.modified     = timezone.now()
-			currency.save()
+			o              = self.get(code = code)
+			o.digital_code = digital_code
+			o.name         = name
+			o.state        = state
+			o.modified     = timezone.now()
+			o.save()
 		except Currency.DoesNotExist:
-			currency              = Currency()
-			currency.code         = code
-			currency.digital_code = digital_code
-			currency.name         = name
-			currency.state        = state
-			currency.created      = timezone.now()
-			currency.modified     = timezone.now()
-			currency.save()
-		return currency
+			o = self.take(
+				code         = code,
+				digital_code = digital_code,
+				name         = name,
+				state        = state)
+		return o
 
 
 class Currency(models.Model):
@@ -205,7 +209,7 @@ class Currency(models.Model):
 	objects      = CurrencyManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+		return "{}".format(self.code)
 
 	class Meta:
 		ordering = ['code']
@@ -215,36 +219,34 @@ class OKEISectionManager(models.Manager):
 
 	def take(self, code, name = None, state = True):
 		try:
-			okei_section = self.get(code = code)
+			o = self.get(code = code)
 		except OKEISection.DoesNotExist:
-			okei_section          = OKEISection()
-			okei_section.code     = code
-			okei_section.name     = name
-			okei_section.state    = state
-			okei_section.created  = timezone.now()
-			okei_section.modified = timezone.now()
-			okei_section.save()
-		return okei_section
+			o          = OKEISection()
+			o.code     = code
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
 
 	def update(self, code, name = None, state = True):
 		try:
-			okei_section          = self.get(code = code)
-			okei_section.name     = name
-			okei_section.state    = state
-			okei_section.modified = timezone.now()
-			okei_section.save()
+			o          = self.get(code = code)
+			o.name     = name
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKEISection.DoesNotExist:
-			okei_section          = OKEISection()
-			okei_section.code     = code
-			okei_section.name     = name
-			okei_section.state    = state
-			okei_section.created  = timezone.now()
-			okei_section.modified = timezone.now()
-			okei_section.save()
-		return okei_section
+			o = self.take(
+				code  = code,
+				name  = name,
+				state = state)
+		return o
 
 
 class OKEISection(models.Model):
+
 	code     = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -264,36 +266,34 @@ class OKEIGroupManager(models.Manager):
 
 	def take(self, code, name = None, state = True):
 		try:
-			okei_group = self.get(code = code)
+			o = self.get(code = code)
 		except OKEIGroup.DoesNotExist:
-			okei_group          = OKEIGroup()
-			okei_group.code     = code
-			okei_group.name     = name
-			okei_group.state    = state
-			okei_group.created  = timezone.now()
-			okei_group.modified = timezone.now()
-			okei_group.save()
+			o          = OKEIGroup()
+			o.code     = code
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
 		return okei_group
 
 	def update(self, code, name = None, state = True):
 		try:
-			okei_group          = self.get(code = code)
-			okei_group.name     = name
-			okei_group.state    = state
-			okei_group.modified = timezone.now()
-			okei_group.save()
+			o          = self.get(code = code)
+			o.name     = name
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKEIGroup.DoesNotExist:
-			okei_group          = OKEIGroup()
-			okei_group.code     = code
-			okei_group.name     = name
-			okei_group.state    = state
-			okei_group.created  = timezone.now()
-			okei_group.modified = timezone.now()
-			okei_group.save()
-		return okei_group
+			o = self.take(
+				code  = code,
+				name  = name,
+				state = state)
+		return o
 
 
 class OKEIGroup(models.Model):
+
 	code     = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -312,58 +312,54 @@ class OKEIManager(models.Manager):
 
 	def take(self, code, full_name = None, section = None, group = None, local_name = None, international_name = None, local_symbol = None, international_symbol = None, state = True):
 		try:
-			okei = self.get(code = code)
+			o = self.get(code = code)
 		except OKEI.DoesNotExist:
-			okei                      = OKEI()
-			okei.code                 = code
-			okei.full_name            = full_name
-			okei.section              = section
-			okei.group                = group
-			okei.local_name           = local_name
-			okei.international_name   = international_name
-			okei.local_symbol         = local_symbol
-			okei.international_symbol = international_symbol
-			okei.state                = state
-			okei.created              = timezone.now()
-			okei.modified             = timezone.now()
-			okei.save()
-		return okei
+			o                      = OKEI()
+			o.code                 = code
+			o.full_name            = full_name
+			o.section              = section
+			o.group                = group
+			o.local_name           = local_name
+			o.international_name   = international_name
+			o.local_symbol         = local_symbol
+			o.international_symbol = international_symbol
+			o.state                = state
+			o.created              = timezone.now()
+			o.modified             = timezone.now()
+			o.save()
+		return o
 
 	def update(self, code, full_name = None, section = None, group = None, local_name = None, international_name = None, local_symbol = None, international_symbol = None, state = True):
 		try:
-			okei                      = self.get(code = code)
-			okei.full_name            = full_name
-			okei.section              = section
-			okei.group                = group
-			okei.local_name           = local_name
-			okei.international_name   = international_name
-			okei.local_symbol         = local_symbol
-			okei.international_symbol = international_symbol
-			okei.state                = state
-			okei.modified             = timezone.now()
-			okei.save()
+			o                      = self.get(code = code)
+			o.full_name            = full_name
+			o.section              = section
+			o.group                = group
+			o.local_name           = local_name
+			o.international_name   = international_name
+			o.local_symbol         = local_symbol
+			o.international_symbol = international_symbol
+			o.state                = state
+			o.modified             = timezone.now()
+			o.save()
 		except OKEI.DoesNotExist:
-			okei                      = OKEI()
-			okei.code                 = code
-			okei.full_name            = full_name
-			okei.section              = section
-			okei.group                = group
-			okei.local_name           = local_name
-			okei.international_name   = international_name
-			okei.local_symbol         = local_symbol
-			okei.international_symbol = international_symbol
-			okei.state                = state
-			okei.created              = timezone.now()
-			okei.modified             = timezone.now()
-			okei.save()
-		return okei
+			o = self.take(
+				code                 = code,
+				full_name            = full_name,
+				section              = section,
+				group                = group,
+				local_name           = local_name,
+				international_name   = international_name,
+				local_symbol         = local_symbol,
+				international_symbol = international_symbol,
+				state                = state)
+		return o
 
 
 class OKEI(models.Model):
+
 	code                 = models.CharField(max_length = 10, unique = True)
 	full_name            = models.TextField(null = True, default = None)
-	section              = models.ForeignKey(OKEISection, null = True, default = None)
-	group                = models.ForeignKey(OKEIGroup, null = True, default = None)
 	local_name           = models.TextField(null = True, default = None)
 	international_name   = models.TextField(null = True, default = None)
 	local_symbol         = models.TextField(null = True, default = None)
@@ -371,6 +367,9 @@ class OKEI(models.Model):
 	state                = models.BooleanField(default = True)
 	created              = models.DateTimeField()
 	modified             = models.DateTimeField()
+
+	section              = models.ForeignKey(OKEISection, null = True, default = None)
+	group                = models.ForeignKey(OKEIGroup, null = True, default = None)
 
 	objects              = OKEIManager()
 
@@ -383,66 +382,51 @@ class OKEI(models.Model):
 
 class KOSGUManager(models.Manager):
 
-	def take(self, code, parent_code = None, name = None, parent = None, state = True):
+	def take(self, code, parent = None, name = None, parent = None, state = True):
 		try:
-			kosgu = self.get(code = code)
+			o = self.get(code = code)
 		except KOSGU.DoesNotExist:
-			kosgu             = KOSGU()
-			kosgu.code        = code
-			kosgu.parent_code = parent_code
-			kosgu.name        = name
-			if parent_code:
-				kosgu.parent  = self.take(parent_code)
-			else:
-				kosgu.parent  = None
-			kosgu.state       = state
-			kosgu.created     = timezone.now()
-			kosgu.modified    = timezone.now()
-			kosgu.save()
+			o          = KOSGU()
+			o.code     = code
+			o.name     = name
+			o.parent   = parent
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
 		return kosgu
 
-	def update(self, code, parent_code = None, name = None, parent = None, state = True):
+	def update(self, code, parent = None, name = None, parent = None, state = True):
 		try:
-			kosgu             = self.get(code = code)
-			kosgu.parent_code = parent_code
-			kosgu.name        = name
-			if parent_code:
-				kosgu.parent  = self.take(parent_code)
-			else:
-				kosgu.parent  = None
-			kosgu.state       = state
-			kosgu.modified    = timezone.now()
-			kosgu.save()
+			o             = self.get(code = code)
+			o.name        = name
+			o.parent      = parent
+			o.state       = state
+			o.modified    = timezone.now()
+			o.save()
 		except KOSGU.DoesNotExist:
-			kosgu             = KOSGU()
-			kosgu.code        = code
-			kosgu.parent_code = parent_code
-			kosgu.name        = name
-			if parent_code:
-				kosgu.parent  = self.take(parent_code)
-			else:
-				kosgu.parent  = None
-			kosgu.state       = state
-			kosgu.created     = timezone.now()
-			kosgu.modified    = timezone.now()
-			kosgu.save()
-		return kosgu
+			o = self.take(
+				code   = position,
+				name   = number,
+				parent = okpd,
+				state  = state)
+		return o
 
 
 class KOSGU(models.Model):
 
 	code        = models.CharField(max_length = 10, unique = True)
-	parent_code = models.CharField(max_length = 10, null = True, default = None)
 	name        = models.TextField(null = True, default = None)
-	parent      = models.ForeignKey('self', null = True, default = None)
 	state       = models.BooleanField(default = True)
 	created     = models.DateTimeField()
 	modified    = models.DateTimeField()
 
+	parent      = models.ForeignKey('self', null = True, default = None)
+
 	objects     = KOSGUManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+		return "{}".format(self.code)
 
 	class Meta:
 		ordering = ['code']
@@ -450,53 +434,38 @@ class KOSGU(models.Model):
 
 class OKOPFManager(models.Manager):
 
-	def take(self, code, parent_code = None, full_name = None, singular_name = None, parent = None, state = True):
+	def take(self, code, full_name = None, singular_name = None, parent = None, state = True):
 		try:
-			okopf = self.get(code = code)
+			o = self.get(code = code)
 		except OKOPF.DoesNotExist:
-			okopf               = OKOPF()
-			okopf.code          = code
-			okopf.parent_code   = parent_code
-			okopf.full_name     = full_name
-			okopf.singular_name = singular_name
-			if parent_code:
-				okopf.parent    = self.take(parent_code)
-			else:
-				okopf.parent    = None
-			okopf.state         = state
-			okopf.created       = timezone.now()
-			okopf.modified      = timezone.now()
-			okopf.save()
-		return okopf
+			o               = OKOPF()
+			o.code          = code
+			o.full_name     = full_name
+			o.singular_name = singular_name
+			o.parent        = parent
+			o.state         = state
+			o.created       = timezone.now()
+			o.modified      = timezone.now()
+			o.save()
+		return o
 
-	def update(self, code, parent_code = None, full_name = None, singular_name = None, parent = None, state = True):
+	def update(self, code, full_name = None, singular_name = None, parent = None, state = True):
 		try:
-			okopf               = self.get(code = code)
-			okopf.parent_code   = parent_code
-			okopf.full_name     = full_name
-			okopf.singular_name = singular_name
-			if parent_code:
-				okopf.parent    = self.take(parent_code)
-			else:
-				okopf.parent    = None
-			okopf.state         = state
-			okopf.modified      = timezone.now()
-			okopf.save()
+			o               = self.get(code = code)
+			o.full_name     = full_name
+			o.singular_name = singular_name
+			o.parent        = parent
+			o.state         = state
+			o.modified      = timezone.now()
+			o.save()
 		except OKOPF.DoesNotExist:
-			okopf               = OKOPF()
-			okopf.code          = code
-			okopf.parent_code   = parent_code
-			okopf.full_name     = full_name
-			okopf.singular_name = singular_name
-			if parent_code:
-				okopf.parent    = self.take(parent_code)
-			else:
-				okopf.parent    = None
-			okopf.state         = state
-			okopf.created       = timezone.now()
-			okopf.modified      = timezone.now()
-			okopf.save()
-		return okopf
+			o = self.take(
+				code          = code,
+				full_name     = full_name,
+				singular_name = singular_name,
+				parent        = parent,
+				state         = state)
+		return o
 
 
 class OKOPF(models.Model):
@@ -504,16 +473,16 @@ class OKOPF(models.Model):
 	code          = models.CharField(max_length = 10, unique = True)
 	full_name     = models.TextField(null = True, default = None)
 	singular_name = models.TextField(null = True, default = None)
-	parent_code   = models.CharField(max_length = 10, null = True, default = None)
-	parent        = models.ForeignKey('self', null = True, default = None)
 	state         = models.BooleanField(default = True)
 	created       = models.DateTimeField()
 	modified      = models.DateTimeField()
 
+	parent        = models.ForeignKey('self', null = True, default = None)
+
 	objects       = OKOPFManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.full_name)
+		return "{}".format(self.code)
 
 	class Meta:
 		ordering = ['code']
@@ -521,65 +490,50 @@ class OKOPF(models.Model):
 
 class OKPDManager(models.Manager):
 
-	def take(self, oos_id, parent_oos_id = None, code = None, name = None, state = True):
+	def take(self, id, code = None, name = None, parent = None, state = True):
 		try:
-			okpd = self.get(oos_id = oos_id)
+			o = self.get(id = id)
 		except OKPD.DoesNotExist:
-			okpd               = OKPD()
-			okpd.oos_id        = oos_id
-			okpd.parent_oos_id = parent_oos_id
-			okpd.code          = code
-			okpd.name          = name
-			if parent_oos_id:
-				okpd.parent  = self.take(oos_id = parent_oos_id)
-			else:
-				okpd.parent  = None
-			okpd.state       = state
-			okpd.created     = timezone.now()
-			okpd.modified    = timezone.now()
-			okpd.save()
-		return okpd
+			o          = OKPD()
+			o.id       = id
+			o.code     = code
+			o.name     = name
+			o.parent   = parent
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
 
-	def update(self, oos_id, parent_oos_id = None, code = None, name = None, state = True):
+	def update(self, id, code = None, name = None, parent = None, state = True):
 		try:
-			okpd = self.get(oos_id = oos_id)
-			okpd.parent_oos_id = parent_oos_id
-			okpd.code          = code
-			okpd.name          = name
-			if parent_oos_id:
-				okpd.parent  = self.take(oos_id = parent_oos_id)
-			else:
-				okpd.parent  = None
-			okpd.state       = state
-			okpd.modified    = timezone.now()
-			okpd.save()
+			o          = self.get(id = id)
+			o.code     = code
+			o.name     = name
+			o.parent   = parent
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKPD.DoesNotExist:
-			okpd = OKPD()
-			okpd.oos_id        = oos_id
-			okpd.parent_oos_id = parent_oos_id
-			okpd.code          = code
-			okpd.name          = name
-			if parent_oos_id:
-				okpd.parent    = self.take(oos_id = parent_oos_id)
-			else:
-				okpd.parent    = None
-			okpd.state         = state
-			okpd.created       = timezone.now()
-			okpd.modified      = timezone.now()
-			okpd.save()
-		return okpd
+			o = self(
+				id     = id,
+				code   = code,
+				name   = name,
+				parent = parent,
+				state  = state)
+		return o
 
 
 class OKPD(models.Model):
 
-	oos_id        = models.CharField(max_length = 100, unique = True)
-	code          = models.CharField(max_length = 100, null = True, default = None)
+	id            = models.IntegerField(primary_key = True, editable = False)
+	code          = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name          = models.TextField(null = True, default = None)
-	parent_oos_id = models.CharField(max_length = 100, null = True, default = None)
-	parent        = models.ForeignKey('self', null = True, default = None)
 	state         = models.BooleanField(default = True)
 	created       = models.DateTimeField()
 	modified      = models.DateTimeField()
+
+	parent        = models.ForeignKey('self', null = True, default = None)
 
 	objects       = OKPDManager()
 
@@ -592,66 +546,51 @@ class OKPD(models.Model):
 
 class OKTMOManager(models.Manager):
 
-	def take(self, code, parent_code = None, full_name = None, state = True):
+	def take(self, code, name = None, parent = None, state = True):
 		try:
-			oktmo = self.get(code = code)
+			o = self.get(code = code)
 		except OKTMO.DoesNotExist:
-			oktmo             = OKTMO()
-			oktmo.code        = code
-			oktmo.parent_code = parent_code
-			oktmo.full_name   = full_name
-			if parent_code:
-				oktmo.parent  = self.take(parent_code)
-			else:
-				oktmo.parent  = None
-			oktmo.state       = state
-			oktmo.created     = timezone.now()
-			oktmo.modified    = timezone.now()
-			oktmo.save()
-		return oktmo
+			o          = OKTMO()
+			o.code     = code
+			o.name     = name
+			o.parent   = parent
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
 
-	def update(self, code, parent_code = None, full_name = None, state = True):
+	def update(self, code, name = None, parent = None, state = True):
 		try:
-			oktmo             = self.get(code = code)
-			oktmo.parent_code = parent_code
-			oktmo.full_name   = full_name
-			if parent_code:
-				oktmo.parent  = self.take(parent_code)
-			else:
-				oktmo.parent  = None
-			oktmo.state       = state
-			oktmo.modified    = timezone.now()
-			oktmo.save()
+			o          = self.get(code = code)
+			o.name     = name
+			o.parent   = parent
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKTMO.DoesNotExist:
-			oktmo             = OKTMO()
-			oktmo.code        = code
-			oktmo.parent_code = parent_code
-			oktmo.full_name   = full_name
-			if parent_code:
-				oktmo.parent  = self.take(parent_code)
-			else:
-				oktmo.parent  = None
-			oktmo.state       = state
-			oktmo.created     = timezone.now()
-			oktmo.modified    = timezone.now()
-			oktmo.save()
-		return oktmo
+			o = self.take(
+				code   = code,
+				name   = name,
+				parent = parent,
+				state  = state)
+		return o
 
 
 class OKTMO(models.Model):
 
-	code        = models.CharField(max_length = 20, unique = True)
-	full_name   = models.TextField(null = True, default = None)
-	parent_code = models.CharField(max_length = 20, null = True, default = None)
-	parent      = models.ForeignKey('self', null = True, default = None)
-	state       = models.BooleanField(default = True)
-	created     = models.DateTimeField()
-	modified    = models.DateTimeField()
+	code     = models.CharField(max_length = 20, unique = True)
+	name     = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField()
+	modified = models.DateTimeField()
+
+	parent   = models.ForeignKey('self', null = True, default = None)
 
 	objects       = OKTMOManager()
 
 	def __str__(self):
-		return "{} {}".format(self.code, self.full_name)
+		return "{}".format(self.code)
 
 	class Meta:
 		ordering = ['code']
@@ -661,35 +600,32 @@ class OKVEDSectionManager(models.Manager):
 
 	def take(self, name, state = True):
 		try:
-			okved_section = self.get(name = name)
+			o = self.get(name = name)
 		except OKVEDSection.DoesNotExist:
-			okved_section          = OKVEDSection()
-			okved_section.name     = name
-			okved_section.state    = state
-			okved_section.created  = timezone.now()
-			okved_section.modified = timezone.now()
-			okved_section.save()
-		return okved_section
+			o          = OKVEDSection()
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
 
 	def update(self, name, state = True):
 		try:
-			okved_section          = self.get(name = name)
-			okved_section.state    = state
-			okved_section.modified = timezone.now()
-			okved_section.save()
+			o          = self.get(name = name)
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKVEDSection.DoesNotExist:
-			okved_section          = OKVEDSection()
-			okved_section.name     = name
-			okved_section.state    = state
-			okved_section.created  = timezone.now()
-			okved_section.modified = timezone.now()
-			okved_section.save()
+			o = self.take(
+				name  = name,
+				state = state)
 		return okved_section
 
 
 class OKVEDSection(models.Model):
 
-	name     = models.CharField(max_length = 20, unique = True)
+	name     = models.CharField(max_length = 100, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField()
 	modified = models.DateTimeField()
@@ -707,35 +643,32 @@ class OKVEDSubSectionManager(models.Manager):
 
 	def take(self, name, state = True):
 		try:
-			okved_subsection = self.get(name = name)
+			o = self.get(name = name)
 		except OKVEDSubSection.DoesNotExist:
-			okved_subsection          = OKVEDSubSection()
-			okved_subsection.name     = name
-			okved_subsection.state    = state
-			okved_subsection.created  = timezone.now()
-			okved_subsection.modified = timezone.now()
-			okved_subsection.save()
-		return okved_subsection
+			o          = OKVEDSubSection()
+			o.name     = name
+			o.state    = state
+			o.created  = timezone.now()
+			o.modified = timezone.now()
+			o.save()
+		return o
 
 	def update(self, name, state = True):
 		try:
-			okved_subsection          = self.get(name = name)
-			okved_subsection.state    = state
-			okved_subsection.modified = timezone.now()
-			okved_subsection.save()
+			o          = self.get(name = name)
+			o.state    = state
+			o.modified = timezone.now()
+			o.save()
 		except OKVEDSubSection.DoesNotExist:
-			okved_subsection          = OKVEDSubSection()
-			okved_subsection.name     = name
-			okved_subsection.state    = state
-			okved_subsection.created  = timezone.now()
-			okved_subsection.modified = timezone.now()
-			okved_subsection.save()
-		return okved_subsection
+			o = self.take(
+				name  = name,
+				state = state)
+		return o
 
 
 class OKVEDSubSection(models.Model):
 
-	name     = models.CharField(max_length = 20, unique = True)
+	name     = models.CharField(max_length = 100, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField()
 	modified = models.DateTimeField()
@@ -826,16 +759,16 @@ class OKVEDManager(models.Manager):
 
 class OKVED(models.Model):
 
-	oos_id        = models.CharField(max_length = 20, unique = True)
-	parent_oos_id = models.CharField(max_length = 20, null = True, default = None)
-	parent        = models.ForeignKey('self', null = True, default = None)
+	id            = models.IntegerField(primary_key = True, editable = False)
 	code          = models.CharField(max_length = 100, null = True, default = None)
-	section       = models.ForeignKey(OKVEDSection, null = True, default = None)
-	subsection    = models.ForeignKey(OKVEDSubSection, null = True, default = None)
 	name          = models.TextField(null = True, default = None)
 	state         = models.BooleanField(default = True)
 	created       = models.DateTimeField()
 	modified      = models.DateTimeField()
+
+	section       = models.ForeignKey(OKVEDSection, null = True, default = None)
+	subsection    = models.ForeignKey(OKVEDSubSection, null = True, default = None)
+	parent        = models.ForeignKey('self', null = True, default = None)
 
 	objects       = OKVEDManager()
 
@@ -1191,7 +1124,7 @@ class Organisation(models.Model):
 	created           = models.DateTimeField()
 	modified          = models.DateTimeField()
 
-	objects     = OrganisationManager()
+	objects           = OrganisationManager()
 
 	def __str__(self):
 		return "{} {}".format(self.reg_number, self.short_name)

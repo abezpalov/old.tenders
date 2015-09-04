@@ -498,46 +498,33 @@ class Runner:
 		# Парсим
 		tree = etree.parse(xml_data)
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
 
-		# Получаем список
-		for element_list in root:
+		elements = tree.xpath('.//nsiOKPD')
 
-			# Получаем элемент
-			for element in element_list:
 
-				# Инициируем пустой справочник элемента
-				e = {}
+		# TODO
+		for element in elements:
 
-				# Обрабатываем значения полей
-				for value in element:
+			o                  = {}
+			o['oos_id']        = element.xpath('./id')[0].text
+			o['code']          = element.xpath('./code')[0].text
+			try:
+				o['parent_oos_id'] = element.xpath('./parentId')[0].text
+			except IndexError:
+				o['parent_oos_id'] = None
+			o['name']          = element.xpath('./name')[0].text
 
-					# code
-					if value.tag.endswith('id'):
-						e['oos_id'] = value.text
+			if element.xpath('./actual')[0].text == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-					# parent_code
-					elif value.tag.endswith('parentId'):
-						if not value.text:
-							e['parent_oos_id'] = None
-						else:
-							e['parent_oos_id'] = value.text
 
-					# alias
-					elif value.tag.endswith('code'):
-						e['code'] = value.text	
 
-					# name
-					elif value.tag.endswith('name'):
-						e['name'] = value.text
 
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
 
 				# Обновляем информацию в базе
 				try:
@@ -942,6 +929,8 @@ class Runner:
 		# Получаем корневой элемент
 		root = tree.getroot()
 
+		# TODO XPath
+
 		# Получаем список
 		for element_list in root:
 
@@ -1007,6 +996,8 @@ class Runner:
 						else:
 							e['register'] = False
 
+				# TODO Не работает
+
 				# Обрабатываем зависимости
 				try:
 					if e['head_agency']:
@@ -1015,7 +1006,6 @@ class Runner:
 					e['head_agency'] = None
 				except Organisation.DoesNotExist:
 					e['head_agency'] = None
-
 
 				try:
 					if e['ordering_agency']:

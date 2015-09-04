@@ -531,8 +531,6 @@ $("body").delegate("[data-do='select-region']", "click", function(){
 });
 
 
-
-
 // Выделение элемента ОКПД
 $("body").delegate("[data-do='select-okpd']", "click", function(){
 

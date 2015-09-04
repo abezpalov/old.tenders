@@ -66,6 +66,8 @@ urlpatterns = patterns('',
 	url(r'^ajax/get-okei/$',            views.ajaxGetOKEI,           name='ajaxGetOKEI'),
 	url(r'^ajax/search-okeis/$',        views.ajaxSearchOKEIs,       name='ajaxSearchOKEIs'),
 
+	url(r'^essence/organisations/$',    views.organisations,         name='organisations'),
+
 #	url(r'^essence/kogsu/$', views.KOGSUs,   name='KOGSUs'),
 #	url(r'^essence/oktmo/$', views.OKTMOs,   name='OKTMOs'),
 #	url(r'^essence/okopf/$', views.OKOPFs,   name='OKOPFs'),
