@@ -790,6 +790,21 @@ def ajaxSearchOKVEDs(request):
 
 
 # TODO Organisation
+def organisations(request):
+	"Представление: список организаций."
+
+	# Импортируем
+	from tenders.models import Organisation
+
+	# Проверяем права доступа
+	if request.user.has_perm('tenders.add_organisation')\
+	or request.user.has_perm('tenders.change_organisation')\
+	or request.user.has_perm('tenders.delete_organisation'):
+
+		# Получаем список объектов
+		organisations = Organisation.objects.select_related().filter(state = True)[0:100]
+
+	return render(request, 'tenders/organisations.html', locals())
 
 
 def ajaxGetOrganisation(request):
