@@ -382,7 +382,7 @@ class OKEI(models.Model):
 
 class KOSGUManager(models.Manager):
 
-	def take(self, code, parent = None, name = None, parent = None, state = True):
+	def take(self, code, name = None, parent = None, state = True):
 		try:
 			o = self.get(code = code)
 		except KOSGU.DoesNotExist:
@@ -396,7 +396,7 @@ class KOSGUManager(models.Manager):
 			o.save()
 		return kosgu
 
-	def update(self, code, parent = None, name = None, parent = None, state = True):
+	def update(self, code, name = None, parent = None, state = True):
 		try:
 			o             = self.get(code = code)
 			o.name        = name
