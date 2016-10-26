@@ -1,283 +1,206 @@
-import gc
-import datetime
+#import gc
+import tenders.runner
 from tenders.models import *
-from project.models import Log
-from django.utils import timezone
 
 
-class Runner:
+class Runner(tenders.runner.Runner):
 
 
-	name = 'Обновление с сайта государственных закупок России'
+	name  = 'Обновление с сайта государственных закупок России'
 	alias = 'zakupki-gov-ru'
-	urls = {
-		'base':                        'ftp.zakupki.gov.ru',
-		'essences':                    'fcs_nsi',
-		'regions':                     'fcs_regions',
-		'country':                     'nsiOKSM',
-		'currency':                    'nsiCurrency',
-		'okei':                        'nsiOKEI',
-		'kosgu':                       'nsiKOSGU',
-		'okopf':                       'nsiOKOPF',
-		'okpd':                        'nsiOKPD',
-		'oktmo':                       'nsiOKTMO',
-		'okved':                       'nsiOKVED',
-		'budget':                      'nsiBudget',
-		'budget_type':                 'nsiOffBudgetType',
-		'kbk_budget':                  'nsiKBKBudget',
-		'organisation_type':           'nsiOrganizationType',
-		'organisation':                'nsiOrganization',
-		'placing_way':                 'nsiPlacingWay',
-		'plan_position_change_reason': 'nsiPlanPositionChangeReason',
-		'purchase_document_type':      'nsiPurchaseDocumentTypes',
-		'purchase_preference':         'nsiPurchasePreferences',
-		'purchase_reject_reason':      'nsiPurchaseRejectReason',
-		'plangraph':                   'plangraphs',
-		'prev_month':                  'prevMonth',
-		'curr_month':                  'currMonth'}
 
-	essences = [
-		'country',
-		'currency',
-		'okei',
-		'kosgu',
-		'okopf',
-		'okpd',
-		'oktmo',
-		'okved',
-		'budget',
-		'budget_type',
-		'kbk_budget',
-		'organisation_type',
-		'organisation',
-		'placing_way',
-		'plan_position_change_reason']
-
-	max_time = datetime.timedelta(0, 82800, 0)
 
 	def __init__(self):
 
-		# Загрузчик
-		self.updater = Updater.objects.take(
-			alias = self.alias,
-			name  = self.name)
+		super().__init__()
 
-		self.parsers = {
+		self.url = 'ftp.zakupki.gov.ru'
 
-			'country':                     self.parseCountry,
-			'currency':                    self.parseCurrency,
-			'okei':                        self.parseOKEI,
-			'kosgu':                       self.parseKOSGU,
-			'okopf':                       self.parseOKOPF,
-			'okpd':                        self.parseOKPD,
-			'oktmo':                       self.parseOKTMO,
-			'okved':                       self.parseOKVED,
-			'budget':                      self.parseBudget,
-			'budget_type':                 self.parseBudgetType,
-			'kbk_budget':                  self.parseKBKBudget,
-			'organisation_type':           self.parseOrganisationType,
-			'organisation':                self.parseOrganisation,
-			'placing_way':                 self.parsePlacingWay,
-			'plan_position_change_reason': self.parsePlanPositionChangeReason,
+		self.categories = {
+			'essences'                    : 'fcs_nsi',
+			'regions'                     : 'fcs_regions',
 
-			'plangraph':                   self.parsePlanGraph
+			'plangraph'                   : 'plangraphs',
+			# TODO
+
+			'prev_month'                  : 'prevMonth',
+			'curr_month'                  : 'currMonth'
 		}
+
+		self.essences = {
+			'country' : {
+				'category' : 'nsiOKSM',
+				'parser'   : self.parse_country
+			}
+		}
+
+
+#			'currency'                    : 'nsiCurrency',
+#			'okei'                        : 'nsiOKEI',
+#			'kosgu'                       : 'nsiKOSGU',
+#			'okopf'                       : 'nsiOKOPF',
+#			'okpd'                        : 'nsiOKPD',
+#			'oktmo'                       : 'nsiOKTMO',
+#			'okved'                       : 'nsiOKVED',
+#			'budget'                      : 'nsiBudget',
+#			'budget_type'                 : 'nsiOffBudgetType',
+#			'kbk_budget'                  : 'nsiKBKBudget',
+#			'organisation_type'           : 'nsiOrganizationType',
+#			'organisation'                : 'nsiOrganization',
+#			'placing_way'                 : 'nsiPlacingWay',
+#			'plan_position_change_reason' : 'nsiPlanPositionChangeReason',
+#			'purchase_document_type'      : 'nsiPurchaseDocumentTypes',
+#			'purchase_preference'         : 'nsiPurchasePreferences',
+#			'purchase_reject_reason'      : 'nsiPurchaseRejectReason',
+
+
+#			'currency',
+#			'okei',
+#			'kosgu',
+#			'okopf',
+#			'okpd',
+#			'oktmo',
+#			'okved',
+#			'budget',
+#			'budget_type',
+#			'kbk_budget',
+#			'organisation_type',
+#			'organisation',
+#			'placing_way',
+#			'plan_position_change_reason'
+
+#		self.parsers = {
+#			'country':                     ,
+#			'currency':                    self.parse_currency,
+#			'okei':                        self.parse_okei,
+#			'kosgu':                       self.parse_kosgu,
+#			'okopf':                       self.parse_okopf,
+#			'okpd':                        self.parse_okpd,
+#			'oktmo':                       self.parse_oktmo,
+#			'okved':                       self.parse_okved,
+#			'budget':                      self.parse_budget,
+#			'budget_type':                 self.parse_budget_type,
+#			'kbk_budget':                  self.parse_kbk_budget,
+#			'organisation_type':           self.parse_organisation_type,
+#			'organisation':                self.parse_organisation,
+#			'placing_way':                 self.parse_placing_way,
+#			'plan_position_change_reason': self.parse_plan_position_change_reason,
+
+#			'plangraph':                   self.parse_plan_graph
+#		}
 
 
 	def run(self):
 
-		self.start = timezone.now()
-
-		# Проверяем наличие параметров авторизации
-		if not self.updater.login or not self.updater.password:
-			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
-			return False
-
 		# Обновляем справочники
-		for essence in self.essences:
+		for k in self.essences:
 
 			# Проверяем не вышло ли время
-			if timezone.now() - self.start > self.max_time:
-				print("Время вышло {}.".format(timezone.now() - self.start))
+			if self.is_time_up():
 				return True
 
-			self.updateEssence(essence)
+			self.update_essence(self.essences[k])
+
 
 		# Обновляем информацию по регионам
-		self.updateRegions()
+#		self.updateRegions()
 
 		# Получаем спиисок "нужных" регионов
-		regions = Region.objects.filter(state = True)
+#		regions = Region.objects.filter(state = True)
 
-		for region in regions:
+#		for region in regions:
 
-			catalogs = [
-				"{}/{}/{}/{}".format(
-					self.urls['regions'],
-					region.alias,
-					self.urls['plangraph'],
-					self.urls['prev_month']),
-				"{}/{}/{}/{}".format(
-					self.urls['regions'],
-					region.alias,
-					self.urls['plangraph'],
-					self.urls['curr_month'])]
+#			catalogs = [
+#				"{}/{}/{}/{}".format(
+#					self.urls['regions'],
+#					region.alias,
+#					self.urls['plangraph'],
+#					self.urls['prev_month']),
+#				"{}/{}/{}/{}".format(
+#					self.urls['regions'],
+#					region.alias,
+#					self.urls['plangraph'],
+#					self.urls['curr_month'])]
 
-			for catalog in catalogs:
+#			for catalog in catalogs:
 
 				# Обрабатываем планы-графики
-				self.updateEssence(
-					essence = 'plangraph',
-					catalog = catalog,
-					region = region)
+#				self.updateEssence(
+#					essence = 'plangraph',
+#					catalog = catalog,
+#					region = region)
 
 				# TODO Обновляем тендеры регионов
 
-		print("Обработки завершены за {}.".format(timezone.now() - self.start))
+		print("Обработки завершены за {}.".format(timezone.now() - self.start_time))
 		return True
 
 
-	def getFTPCatalog(self, catalog = None):
-		'Возвращает содержимое папки'
-
-		# Импортируем
-		from ftplib import FTP
-
-		# Авторизуемся
-		ftp = FTP(host = self.urls['base'])
-		ftp.login(user = self.updater.login, passwd = self.updater.password)
-
-		# Переходим в нужный каталог
-		if catalog:
-			ftp.cwd(catalog)
-
-		# Получаем содержимое каталога
-		result = ftp.nlst()
-
-		# Закрываем соединение
-		ftp.close()
-
-		# Возвращаем результат
-		return result
-
-
-	def getZipFromFTP(self, file_name, catalog = None):
-		'Скачивает и возвращает файл с FTP-сервера'
-
-		# Импортируем
-		from ftplib import FTP
-		from io import BytesIO
-		from zipfile import ZipFile
-
-		# Инициализируем переменные
-		ftp = FTP(host = self.urls['base'])
-		zip_file = BytesIO(b"")
-
-		# Авторизуемся
-		ftp.login(user = self.updater.login, passwd = self.updater.password)
-
-		# Переходим в нужный каталог
-		if catalog:
-			ftp.cwd(catalog)
-
-		# Скачиваем файл
-		try:
-			ftp.retrbinary("RETR {}".format(file_name), zip_file.write)
-			zip_data  = ZipFile(zip_file)
-		except:
-			return False
-
-		# Возвращаем результат
-		return zip_data
-
-
-	def updateEssence(self, essence, catalog = None, region = None):
+	def update_essence(self, essence):
 		'Получает файлы сущностей для анализа и обработки'
 
 		# Импортируем
-		from io import TextIOWrapper
+#		from io import TextIOWrapper
 
-		# Получаем список файлов
-		if catalog is None:
-			catalog = "{}/{}".format(self.urls['essences'], self.urls[essence])
 
-		zip_names = self.getFTPCatalog(catalog)
+		print(essence)
+		print(self.categories['essences'])
+		print(essence['category'])
+		catalog = "{}/{}".format(self.categories['essences'], essence['category'])
 
-		# Записываем источники в базу
-		for zip_name in zip_names:
-
-			source = Source.objects.take(
-				url = "{}/{}/{}".format(
-					self.urls['base'],
-					catalog,
-					zip_name))
+		zip_names = self.get_ftp_catalog(self.url, catalog)
 
 		# Загружаем архивы
 		for zip_name in zip_names:
 
-			# Проверяем не вышло ли время
-			if timezone.now() - self.start > self.max_time:
-				print("Время вышло {}.".format(timezone.now() - self.start))
+			# Проверяем, не вышло ли время
+			if self.is_time_up():
 				return True
-			else:
-				print("Времени прошло {}.".format(timezone.now() - self.start))
 
-			# Проверяем источник
-			source = Source.objects.take(
-				url = "{}/{}/{}".format(
-					self.urls['base'],
-					catalog,
-					zip_name))
-
-			if source.state:
-				print("Файл уже обработан: {}.".format(zip_name))
+			# Проверяем, не обработан ли файл
+			source = Source.objects.take(url = "{}/{}/{}".format(self.url, catalog, zip_name))
+			if source.is_parsed():
 				continue
 
 			# Скачиваем архив
-			print("Скачиваю файл: {}".format(zip_name))
-			zip_data = self.getZipFromFTP(zip_name, catalog)
+			zip_data = self.get_file_from_ftp(self.url, catalog, zip_name)
 
 			if not zip_data:
-				print("Ошибка: невозможно скачать файл. Перехожу с следующему.")
 				continue
 
-			# Получаем список файлов в архиве
-			xml_names = zip_data.namelist()
-			for xml_name in xml_names:
+			# Проходим по всем файлам в архиве
+			for xml_name in zip_data.namelist():
 
-				# Извлекаем файл из архива
-				try:
-					xml_data = zip_data.open(xml_name)
-				except Exception as error:
-					Log.objects.add(
-						subject     = "Tenders Updater: Zakupki.gov.ru",
-						channel     = "error",
-						title       = "Exception",
-						description = "Не удалось извлечь файл {} из архива {}. {}".format(xml_name, zip_name, error))
-					continue
+				# Извлекаем данные
+				tree = self.get_tree_from_zip(zip_data, xml_name)
+				if tree:
+					tree = self.clear_tags(tree)
+				else:
+					return False
 
-				# Парсим файл
-				parse = self.parsers[essence]
-				parse(xml_data, region)
+				# Обрабатываем файл
+				parse = essence['parser']
+				parse(tree)
 
 			print("Все файлы архива обработаны.")
+
 			source.complite()
 
 		return True
 
 
-	def parseCountry(self, xml_data, region = None):
+	def parse_country(self, tree, region = None):
 		'Парсит страны'
 
-		# Импортируем
-		from lxml import etree
-
-		# Парсим
-		tree = etree.parse(xml_data)
-
-		# Чистим теги
-		for element in tree.xpath('.//*'):
-			element.tag = element.tag.split('}')[1]
+		'''
+		<export xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://zakupki.gov.ru/oos/export/1" xmlns:oos="http://zakupki.gov.ru/oos/types/1">
+		<nsiOKSMList>
+			<nsiOKSM>
+				<oos:countryCode>148</oos:countryCode>
+				<oos:countryFullName>Республика Чад</oos:countryFullName>
+				<oos:actual>true</oos:actual>
+			</nsiOKSM>
+		'''
 
 		elements = tree.xpath('.//nsiOKSM')
 
@@ -1565,3 +1488,12 @@ class Runner:
 		return True
 
 
+
+
+	def clear_tags(self, tree):
+
+		# Чистим теги
+		for element in tree.xpath('.//*'):
+			element.tag = element.tag.split('}')[1]
+
+		return tree

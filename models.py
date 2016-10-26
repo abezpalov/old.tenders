@@ -55,11 +55,20 @@ class SourceManager(models.Manager):
 class Source(models.Model):
 
 	url      = models.CharField(max_length = 2048)
-	state    = models.BooleanField(default = True)
+	state    = models.BooleanField(default = False)
 	created  = models.DateTimeField()
 	modified = models.DateTimeField()
 
 	objects  = SourceManager()
+
+
+	def is_parsed(self):
+
+		if self.state:
+			print("Файл уже обработан: {}.".format(self.url))
+			return True
+		else:
+			return False
 
 	def complite(self):
 		self.state    = True
@@ -68,7 +77,7 @@ class Source(models.Model):
 		return self
 
 	def __str__(self):
-		return "{}".format(self.name)
+		return "{}".format(self.url)
 
 
 class CountryManager(models.Manager):
