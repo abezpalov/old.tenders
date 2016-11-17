@@ -9,7 +9,7 @@ class Runner(tenders.runner.Runner):
 	name  = 'Обновление с сайта государственных закупок России'
 	alias = 'zakupki-gov-ru'
 
-	black_list = ['_logs', 'fcs_undefined', 'auditresult', 'customerreports']
+	black_list = ['_logs', 'fcs_undefined', 'auditresult', 'customerreports', 'regulationrules', 'requestquotation']
 
 
 	def __init__(self):
@@ -21,13 +21,12 @@ class Runner(tenders.runner.Runner):
 		self.categories = {
 			'essences'                    : 'fcs_nsi',
 			'regions'                     : 'fcs_regions',
-
-			'plangraph'                   : 'plangraphs',
-			# TODO
-
-			'prev_month'                  : 'prevMonth',
-			'curr_month'                  : 'currMonth'
 		}
+
+		self.subcategories = [
+			'prevMonth',
+			'currMonth'
+		]
 
 		self.essences = [
 			{'category' : 'nsiOKSM',                           'parser' : self.parse_country},
@@ -45,11 +44,11 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiOffBudgetType',                  'parser' : self.parse_budget_type},
 			{'category' : 'nsiKBKBudget',                      'parser' : self.parse_kbk_budget},
 			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
-
 			{'category' : 'nsiOrganization',                   'parser' : self.parse_organisation},
+			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placing_way},
+			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
+			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_contract_modification_reason},
 
-#			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_},
-#			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_},
 #			{'category' : 'nsiPurchaseDocumentTypes',          'parser' : self.parse_},
 #			{'category' : 'nsiPurchasePreferences',            'parser' : self.parse_},
 #			{'category' : 'nsiPurchaseRejectReason',           'parser' : self.parse_},
@@ -64,7 +63,6 @@ class Runner(tenders.runner.Runner):
 #			{'category' : 'nsiCommission',                     'parser' : self.parse_},
 #			{'category' : 'nsiCommissionRole',                 'parser' : self.parse_},
 #			{'category' : 'nsiContractExecutionDoc',           'parser' : self.parse_},
-#			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_},
 #			{'category' : 'nsiContractOKOPFExtraBudget',       'parser' : self.parse_},
 #			{'category' : 'nsiContractPenaltyReason',          'parser' : self.parse_},
 #			{'category' : 'nsiContractPriceChangeReason',      'parser' : self.parse_},
@@ -85,6 +83,11 @@ class Runner(tenders.runner.Runner):
 
 		]
 
+		self.region_essences = [
+			{'category' : 'plangraphs',       'parser' : self.parse_tenderplan},
+
+		]
+
 	def run(self):
 
 		# Обновляем справочники
@@ -96,48 +99,29 @@ class Runner(tenders.runner.Runner):
 
 			self.update_essence(essence)
 
-		# Получаем список регионов с FTP-сервера
+		# Обновляем данные с регионов
 		for region in self.get_ftp_catalog(self.url, self.categories['regions']):
 
-			try:
-				self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
-				if not region in self.black_list:
+			if (not region in self.black_list) and (not '.'in region):
+				try:
+					self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
 					region = Region.objects.take(
 						alias = region,
 						name = region,
 						full_name = region)
-					print("Обновлён регион: {}.".format(region))
-			except Exception:
-				print('.')
+					print(region)
+	
+				except Exception:
+					continue
 
-		# Получаем спиисок "нужных" регионов
-		regions = Region.objects.filter(state = True)
+				if region.state:
 
-#		for region in regions:
+					for essence in self.region_essences:
+						self.update_region_essence(region, essence)
 
-#			catalogs = [
-#				"{}/{}/{}/{}".format(
-#					self.urls['regions'],
-#					region.alias,
-#					self.urls['plangraph'],
-#					self.urls['prev_month']),
-#				"{}/{}/{}/{}".format(
-#					self.urls['regions'],
-#					region.alias,
-#					self.urls['plangraph'],
-#					self.urls['curr_month'])]
 
-#			for catalog in catalogs:
 
-				# Обрабатываем планы-графики
-#				self.updateEssence(
-#					essence = 'plangraph',
-#					catalog = catalog,
-#					region = region)
-
-				# TODO Обновляем тендеры регионов
-
-		print("Обработки завершены за {}.".format(timezone.now() - self.start_time))
+		print("Завершил за {}.".format(timezone.now() - self.start_time))
 		return True
 
 
@@ -180,9 +164,53 @@ class Runner(tenders.runner.Runner):
 				parse = essence['parser']
 				parse(tree)
 
-			print("Все файлы архива обработаны.")
-
 			source.complite()
+
+		return True
+
+
+	def update_region_essence(self, region, essence):
+		'Получает файлы сущностей для анализа и обработки'
+
+		for subcategory in self.subcategories:
+
+			catalog = "{}/{}/{}/{}".format(self.categories['regions'], region.alias, essence['category'], subcategory)
+
+			zip_names = self.get_ftp_catalog(self.url, catalog)
+
+			# Загружаем архивы
+			for zip_name in zip_names:
+
+				# Проверяем, не вышло ли время
+				if self.is_time_up():
+					return True
+
+				# Проверяем, не обработан ли файл
+				source = Source.objects.take(url = "{}/{}/{}".format(self.url, catalog, zip_name))
+				if source.is_parsed():
+					continue
+
+				# Скачиваем архив
+				zip_data = self.get_file_from_ftp(self.url, catalog, zip_name)
+
+				if not zip_data:
+					continue
+
+				# Проходим по всем файлам в архиве
+				for xml_name in zip_data.namelist():
+
+					# Извлекаем данные
+					tree = self.get_tree_from_zip(zip_data, xml_name)
+					if tree:
+						tree = self.clear_tags(tree)
+					else:
+						return False
+
+					# Обрабатываем файл
+					parse = essence['parser']
+					parse(tree, region)
+
+				source.complite()
 
 		return True
 
@@ -409,7 +437,7 @@ class Runner(tenders.runner.Runner):
 				name   = o['name'],
 				state  = o['state'])
 
-			print("Обновлён элемент ОКПД: {}.".format(okpd))
+			print("ОКПД: {}.".format(okpd))
 
 		return True
 
@@ -447,7 +475,7 @@ class Runner(tenders.runner.Runner):
 				name   = o['name'],
 				state  = o['state'])
 
-			print("Обновлён элемент ОКПД2: {}.".format(okpd2))
+			print("ОКПД2: {}.".format(okpd2))
 
 		return True
 
@@ -485,7 +513,7 @@ class Runner(tenders.runner.Runner):
 				name   = o['name'],
 				state  = o['state'])
 
-			print("Обновлён элемент ОКТМО: {}.".format(oktmo))
+			print("ОКТМО: {}.".format(oktmo))
 
 		return True
 
@@ -547,7 +575,7 @@ class Runner(tenders.runner.Runner):
 				name       = o['name'],
 				state      = o['state'])
 
-			print("Обновлён элемент ОКВЭД: {}.".format(okved))
+			print("ОКВЭД: {}.".format(okved))
 
 		return True
 
@@ -602,7 +630,7 @@ class Runner(tenders.runner.Runner):
 				name       = o['name'],
 				state      = o['state'])
 
-			print("Обновлён элемент ОКВЭД2: {}.".format(okved))
+			print("ОКВЭД2: {}.".format(okved))
 
 		return True
 
@@ -627,7 +655,7 @@ class Runner(tenders.runner.Runner):
 				name       = o['name'],
 				state      = o['state'])
 
-			print("Обновлён элемент Бюджет: {}.".format(budget))
+			print("Бюджет: {}.".format(budget))
 
 		return True
 
@@ -664,7 +692,7 @@ class Runner(tenders.runner.Runner):
 				subsystem_type = subsystem_type,
 				state          = o['state'])
 
-			print("Обновлён элемент Тип бюджета: {}.".format(budget_type))
+			print("Тип бюджета: {}.".format(budget_type))
 
 		return True
 
@@ -712,7 +740,7 @@ class Runner(tenders.runner.Runner):
 				start_date = o['start_date'],
 				end_date   = o['end_date'])
 
-			print("Обновлён элемент Код поступления бюджета: {}.".format(kbk_budget))
+			print("Код поступления бюджета: {}.".format(kbk_budget))
 
 		return True
 
@@ -733,52 +761,51 @@ class Runner(tenders.runner.Runner):
 				name        = o['name'],
 				description = o['description'])
 
-			print(organisation_type)
+			print("Тип организации: {}".format(organisation_type))
 
 		return True
 
 
 
-	# TODO
 	def parse_organisation(self, tree):
 		'Парсит организации.'
 
 		for element in tree.xpath('.//nsiOrganization'):
 
-			o                    = {}
+			o = {}
 
-			o['reg_number']      = self.get_data_from_element(element, './regNumber')
-			o['short_name']      = self.get_data_from_element(element, './shortName')
-			o['full_name']       = self.get_data_from_element(element, './fullName')
-			o['factual_address'] = self.get_data_from_element(element, './factualAddress/addressLine')
-			o['postal_address']  = self.get_data_from_element(element, './postalAddress')
-			o['inn']             = self.get_data_from_element(element, './INN')
-			o['kpp']             = self.get_data_from_element(element, './KPP')
-			o['ogrn']            = self.get_data_from_element(element, './OGRN')
-			o['okpo']            = self.get_data_from_element(element, './OKPO')
+			o['reg_number']      = self.get_text(element, './regNumber')
+			o['short_name']      = self.get_text(element, './shortName')
+			o['full_name']       = self.get_text(element, './fullName')
+			o['factual_address'] = self.get_text(element, './factualAddress/addressLine')
+			o['postal_address']  = self.get_text(element, './postalAddress')
+			o['inn']             = self.get_text(element, './INN')
+			o['kpp']             = self.get_text(element, './KPP')
+			o['ogrn']            = self.get_text(element, './OGRN')
+			o['okpo']            = self.get_text(element, './OKPO')
 
-			email = self.get_data_from_element(element, './email')
+			email = self.get_text(element, './email')
 			if email:
 				email = Email.objects.take(email = email)
 			else:
 				email = None
 
-			phone = self.get_data_from_element(element, './phone')
+			phone = self.get_text(element, './phone')
 			if phone:
 				phone = Phone.objects.take(phone = phone)
 			else:
 				phone = None
 
-			fax = self.get_data_from_element(element, './fax')
+			fax = self.get_text(element, './fax')
 			if fax:
 				fax = Phone.objects.take(phone = fax)
 			else:
 				fax = None
 
 			contact_person = {}
-			contact_person['first_name']  = self.get_data_from_element(element, './contactPerson/firstName')
-			contact_person['middle_name'] = self.get_data_from_element(element, './contactPerson/middleName')
-			contact_person['last_name']   = self.get_data_from_element(element, './contactPerson/lastName')
+			contact_person['first_name']  = self.get_text(element, './contactPerson/firstName')
+			contact_person['middle_name'] = self.get_text(element, './contactPerson/middleName')
+			contact_person['last_name']   = self.get_text(element, './contactPerson/lastName')
 			if contact_person['first_name']:
 				contact_person = Person.objects.take(
 						first_name  = contact_person['first_name'],
@@ -791,8 +818,8 @@ class Runner(tenders.runner.Runner):
 				contact_person = None
 
 			head_agency = {}
-			head_agency['reg_number'] = self.get_data_from_element(element, './headAgency/regNum')
-			head_agency['full_name']  = self.get_data_from_element(element, './headAgency/fullName')
+			head_agency['reg_number'] = self.get_text(element, './headAgency/regNum')
+			head_agency['full_name']  = self.get_text(element, './headAgency/fullName')
 			if head_agency['reg_number']:
 				head_agency = Organisation.objects.take(
 						reg_number = head_agency['reg_number'],
@@ -801,8 +828,8 @@ class Runner(tenders.runner.Runner):
 				head_agency = None
 
 			ordering_agency = {}
-			ordering_agency['reg_number'] = self.get_data_from_element(element, './orderingAgency/regNum')
-			ordering_agency['full_name']  = self.get_data_from_element(element, './orderingAgency/fullName')
+			ordering_agency['reg_number'] = self.get_text(element, './orderingAgency/regNum')
+			ordering_agency['full_name']  = self.get_text(element, './orderingAgency/fullName')
 			if ordering_agency['reg_number']:
 				ordering_agency = Organisation.objects.take(
 						reg_number = ordering_agency['reg_number'],
@@ -811,30 +838,30 @@ class Runner(tenders.runner.Runner):
 				ordering_agency = None
 
 			okopf = {}
-			okopf['code']      = self.get_data_from_element(element, './OKOPF/code')
-			okopf['full_name'] = self.get_data_from_element(element, './OKOPF/fullName')
+			okopf['code']      = self.get_text(element, './OKOPF/code')
+			okopf['full_name'] = self.get_text(element, './OKOPF/fullName')
 			if okopf['code']:
 				okopf = OKOPF.objects.take(code = okopf['code'], full_name = okopf['full_name'])
 			else:
 				okopf = None
 
 			okogu = {}
-			okogu['code'] = self.get_data_from_element(element, './OKOGU/code')
-			okogu['name'] = self.get_data_from_element(element, './OKOGU/name')
+			okogu['code'] = self.get_text(element, './OKOGU/code')
+			okogu['name'] = self.get_text(element, './OKOGU/name')
 			if okogu['code']:
 				okogu = OKOGU.objects.take(code = okogu['code'], name = okogu['name'])
 			else:
 				okogu = None
 
-			organisation_role = self.get_data_from_element(element, './organizationRole')
+			organisation_role = self.get_text(element, './organizationRole')
 			if organisation_role:
 				organisation_role = OrganisationRole.objects.take(code = organisation_role)
 			else:
 				organisation_role = None
 
 			organisation_type = {}
-			organisation_type['code'] = self.get_data_from_element(element, './organizationType/code')
-			organisation_type['name'] = self.get_data_from_element(element, './organizationType/name')
+			organisation_type['code'] = self.get_text(element, './organizationType/code')
+			organisation_type['name'] = self.get_text(element, './organizationType/name')
 			if organisation_type['code']:
 				organisation_type = OrganisationType.objects.take(
 						code = organisation_type['code'],
@@ -842,29 +869,28 @@ class Runner(tenders.runner.Runner):
 			else:
 				organisation_type = None
 
-			oktmo = self.get_data_from_element(element, './OKTMO/code')
+			oktmo = self.get_text(element, './OKTMO/code')
 			if oktmo:
 				oktmo = OKTMO.objects.take(code = oktmo)
 			else:
 				oktmo = None
 
-			# accounts
 			accounts = []
 			for e in element.xpath('./accounts/account'):
 
 				bank = {}
-				bank['bik']     = self.get_data_from_element(e, './bik')
-				bank['name']    = self.get_data_from_element(e, './bankName')
-				bank['address'] = self.get_data_from_element(e, './bankAddress')
+				bank['bik']     = self.get_text(e, './bik')
+				bank['name']    = self.get_text(e, './bankName')
+				bank['address'] = self.get_text(e, './bankAddress')
 				bank = Bank.objects.take(
 					bik     = bank['bik'],
 					name    = bank['name'],
 					address = bank['address'])
 
 				account = {}
-				account['payment_account']  = self.get_data_from_element(e, './paymentAccount')
-				account['corr_account']     = self.get_data_from_element(e, './corrAccount')
-				account['personal_account'] = self.get_data_from_element(e, './personalAccount')
+				account['payment_account']  = self.get_text(e, './paymentAccount')
+				account['corr_account']     = self.get_text(e, './corrAccount')
+				account['personal_account'] = self.get_text(e, './personalAccount')
 				account = Account.objects.take(
 					payment_account  = account['payment_account'],
 					corr_account     = account['corr_account'],
@@ -873,34 +899,32 @@ class Runner(tenders.runner.Runner):
 
 				accounts.append(account)
 
-			# budgets
 			budgets = []
 			for e in element.xpath('./budgets/budget'):
 
 				budget = {}
-				budget['code'] = self.get_data_from_element(e, './code')
-				budget['name'] = self.get_data_from_element(e, './name')
+				budget['code'] = self.get_text(e, './code')
+				budget['name'] = self.get_text(e, './name')
 				budget = Budget.objects.take(
 					code = budget['code'],
 					name = budget['name'])
 
 				budgets.append(budget)
 
-			# okveds
 			okveds = []
-			for okved in self.get_data_from_element(element, './OKVED').split(';'):
+			for okved in self.get_text(element, './OKVED').split(';'):
 				try:
 					okved = OKVED.objects.get(code = okved)
 					okveds.append(okved)
 				except Exception:
 					pass
 
-			if self.get_data_from_element(element, './actual') == 'true':
+			if self.get_text(element, './actual') == 'true':
 				o['state'] = True
 			else:
 				o['state'] = False
 
-			if self.get_data_from_element(element, './register') == 'true':
+			if self.get_text(element, './register') == 'true':
 				o['register'] = True
 			else:
 				o['register'] = False
@@ -916,7 +940,6 @@ class Runner(tenders.runner.Runner):
 				kpp               = o['kpp'],
 				ogrn              = o['ogrn'],
 				okpo              = o['okpo'],
-
 				email             = email,
 				phone             = phone,
 				fax               = fax,
@@ -928,501 +951,359 @@ class Runner(tenders.runner.Runner):
 				organisation_role = organisation_role,
 				organisation_type = organisation_type,
 				oktmo             = oktmo,
-
 				accounts          = accounts,
 				budgets           = budgets,
 				okveds            = okveds)
 
-			print(organisation)
+			print('Организация: {}'.format(organisation))
 
 		return True
 
 
-	def parsePlacingWay(self, xml_data, region = None):
-		'Парсит пути размещения.'
+	def parse_placing_way(self, tree):
 
-		# Импортируем
-		from lxml import etree
+		for element in tree.xpath('.//nsiPlacingWay'):
 
-		# Парсим
-		tree = etree.parse(xml_data)
+			o = {}
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+			o['id']        = self.get_text(element, './placingWayId')
+			o['code']      = self.get_text(element, './code')
+			o['name']      = self.get_text(element, './name')
+			o['type_code'] = self.get_text(element, './type')
 
-		# Получаем список
-		for element_list in root:
+			o['subsystem_type'] = self.get_text(element, './subsystemType')
+			if o['subsystem_type']:
+				subsystem_type = SubsystemType.objects.take(
+						code = o['subsystem_type'])
+			else:
+				subsystem_type = None
 
-			# Получаем элемент
-			for element in element_list:
+			if self.get_text(element, './actual') == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-				# Инициируем пустой справочник элемента
-				e = {}
+			# Обновляем информацию в базе
+			placing_way = PlacingWay.objects.update(
+				id             = o['id'],
+				code           = o['code'],
+				name           = o['name'],
+				type_code      = o['type_code'],
+				subsystem_type = subsystem_type,
+				state          = o['state'])
 
-				# Обрабатываем значения полей
-				for value in element:
-
-					# placing_way_id
-					if value.tag.endswith('placingWayId'):
-						e['placing_way_id'] = value.text
-
-					# code
-					elif value.tag.endswith('code'):
-						e['code'] = value.text
-
-					# name
-					elif value.tag.endswith('name'):
-						e['name'] = value.text
-
-					# type
-					elif value.tag.endswith('type'):
-						e['placing_way_type'] = value.text
-
-					# subsystem_type
-					elif value.tag.endswith('subsystemType'):
-						e['subsystem_type'] = value.text
-
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
-
-				# Обновляем информацию в базе
-				placing_way = PlacingWay.objects.update(
-					placing_way_id   = e['placing_way_id'],
-					code             = e['code'],
-					name             = e['name'],
-					placing_way_type = e['placing_way_type'],
-					subsystem_type   = e['subsystem_type'],
-					state            = e['state'])
-
-				print("Обновлён элемент Путь размещения: {}.".format(placing_way))
+			print(placing_way)
 
 		return True
 
 
-	def parsePlanPositionChangeReason(self, xml_data, region = None):
-		'Парсит пути причины изменения позиций планов закупок.'
+	def parse_plan_position_change_reason(self, tree):
 
-		# Импортируем
-		from lxml import etree
+		for element in tree.xpath('.//nsiPlanPositionChangeReason'):
 
-		# Парсим
-		tree = etree.parse(xml_data)
+			o = {}
 
-		# Получаем корневой элемент
-		root = tree.getroot()
+			o['id']          = self.get_text(element, './id')
+			o['name']        = self.get_text(element, './name')
+			o['description'] = self.get_text(element, './description')
 
-		# Получаем список
-		for element_list in root:
+			if self.get_text(element, './actual') == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
 
-			# Получаем элемент
-			for element in element_list:
+			# Обновляем информацию в базе
+			o = PlanPositionChangeReason.objects.update(
+					id          = o['id'],
+					name        = o['name'],
+					description = o['description'],
+					state       = o['state'])
 
-				# Инициируем пустой справочник элемента
-				e = {}
-
-				# Обрабатываем значения полей
-				for value in element:
-
-					# oos_id
-					if value.tag.endswith('id'):
-						e['oos_id'] = value.text
-
-					# name
-					elif value.tag.endswith('name'):
-						e['name'] = value.text
-
-					# description
-					elif value.tag.endswith('description'):
-						e['description'] = value.text
-
-					# state
-					elif value.tag.endswith('actual'):
-						if value.text == 'true':
-							e['state'] = True
-						else:
-							e['state'] = False
-
-				# Обновляем информацию в базе
-				plan_position_change_reason = PlanPositionChangeReason.objects.update(
-					oos_id      = e['oos_id'],
-					name        = e['name'],
-					description = e['description'],
-					state       = e['state'])
-
-				print("Обновлён элемент Причина изменения позиции плана: {}.".format(plan_position_change_reason))
+			print(o)
 
 		return True
 
 
-	def parsePlanGraph(self, xml_data, region = None):
+	def parse_contract_modification_reason(self, tree):
+
+		for element in tree.xpath('.//nsiContractModificationReason/nsiContractModificationReason'):
+
+			o = {}
+
+			o['code'] = self.get_text(element, './code')
+			o['name'] = self.get_text(element, './name')
+
+			if self.get_text(element, './actual') == 'true':
+				o['state'] = True
+			else:
+				o['state'] = False
+
+			# Обновляем информацию в базе
+			o = ContractModificationReason.objects.update(
+					code        = o['code'],
+					name        = o['name'],
+					state       = o['state'])
+
+			print(o)
+
+		return True
+
+
+	def parse_tenderplan(self, tree, region):
 		'Парсит планы-графики.'
 
-		# Импортируем
-		from lxml import etree
+		# TODO KILL
+		import xml.etree.ElementTree as ET
 
-		# Парсим
-		tree = etree.parse(xml_data)
+		for element in tree.xpath('.//tenderPlanCancel'):
+			self.parse_tenderplan_cancel(element, region)
 
-		# Чистим теги
-		for element in tree.xpath('.//*'):
-			element.tag = element.tag.split('}')[1]
+		for element in tree.xpath('.//tenderPlanUnstructured'):
+			self.parse_tenderplan_unstructured(element, region)
 
-		# Планы-графики
-		pgs = tree.xpath('.//tenderPlan')
+		for element in tree.xpath('.//tenderPlan'):
 
-		for pg in pgs:
-
-			# План-график
-			plan_graph = {}
-
-			plan_graph['oos_id']                     = pg.xpath('./commonInfo/id')[0].text
-			plan_graph['number']                     = pg.xpath('./commonInfo/planNumber')[0].text
-			plan_graph['year']                       = pg.xpath('./commonInfo/year')[0].text
-			plan_graph['version']                    = pg.xpath('./commonInfo/versionNumber')[0].text
-			plan_graph['owner_reg_number']           = pg.xpath('./commonInfo/owner/regNum')[0].text
-			plan_graph['create_date']                = pg.xpath('./commonInfo/createDate')[0].text
-			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text.strip()
-			plan_graph['confirm_date']               = pg.xpath('./commonInfo/confirmDate')[0].text
-			plan_graph['publish_date']               = pg.xpath('./commonInfo/publishDate')[0].text
-			plan_graph['customer_reg_number']        = pg.xpath('./customerInfo/customer/regNum')[0].text
-			plan_graph['oktmo_code']                 = pg.xpath('./customerInfo/OKTMO/code')[0].text
-			plan_graph['contact_person_last_name']   = pg.xpath('./responsibleContactInfo/lastName')[0].text
-			plan_graph['contact_person_first_name']  = pg.xpath('./responsibleContactInfo/firstName')[0].text
-			plan_graph['contact_person_middle_name'] = pg.xpath('./responsibleContactInfo/middleName')[0].text
-			try:
-				plan_graph['contact_person_phone']   = pg.xpath('./responsibleContactInfo/phone')[0].text
-			except IndexError:
-				plan_graph['contact_person_phone']   = None
-			try:
-				plan_graph['contact_person_fax']     = pg.xpath('./responsibleContactInfo/fax')[0].text
-			except IndexError:
-				plan_graph['contact_person_fax']     = None
-			try:
-				plan_graph['contact_person_email']   = pg.xpath('./responsibleContactInfo/email')[0].text
-			except:
-				plan_graph['contact_person_email']   = None
-
-			plan_graph['owner'] = Organisation.objects.take(
-				reg_number = plan_graph['owner_reg_number'])
-
-			plan_graph['customer'] = Organisation.objects.take(
-				reg_number = plan_graph['customer_reg_number'])
+			plan = {}
+			plan['id']          = self.get_text(element, './commonInfo/id')
+			plan['number']      = self.get_text(element, './commonInfo/planNumber')
+			plan['year']        = self.get_text(element, './commonInfo/year')
+			plan['version']     = self.get_text(element, './commonInfo/versionNumber')
+			plan['description'] = self.get_text(element, './commonInfo/description')
+			plan['created']     = self.get_text(element, './commonInfo/createDate')
+			plan['confirmed']   = self.get_text(element, './commonInfo/confirmDate')
+			plan['published']   = self.get_text(element, './commonInfo/publishDate')
+			plan['url']         = self.get_text(element, './printForm/url')
 
 			try:
-				plan_graph['oktmo'] = OKTMO.objects.get(
-					code = plan_graph['oktmo_code'])
-			except OKTMO.DoesNotExist:
-				plan_graph['oktmo'] = None
+				owner = Organisation.objects.get(
+					reg_number = self.get_text(element, './commonInfo/owner/regNum'))
+			except Exception:
+				owner = None
 
+			try:
+				customer = Organisation.objects.get(
+					reg_number = self.get_text(element, './customerInfo/customer/regNum'))
+			except Exception:
+				customer = None
 
-			plan_graph['contact_person'] = ContactPerson.objects.take(
-				last_name   = plan_graph['contact_person_last_name'],
-				first_name  = plan_graph['contact_person_first_name'],
-				middle_name = plan_graph['contact_person_middle_name'],
-				email       = plan_graph['contact_person_email'],
-				phone       = plan_graph['contact_person_phone'],
-				fax         = plan_graph['contact_person_fax'])
+			try:
+				email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
+			except Exception:
+				email = None
 
-			plan_graph = PlanGraph.objects.update(
-				oos_id         = plan_graph['oos_id'],
-				number         = plan_graph['number'],
-				year           = plan_graph['year'],
-				version        = plan_graph['version'],
-				region         = region,
-				owner          = plan_graph['owner'],
-				create_date    = plan_graph['create_date'],
-				description    = plan_graph['description'],
-				confirm_date   = plan_graph['confirm_date'],
-				publish_date   = plan_graph['publish_date'],
-				customer       = plan_graph['customer'],
-				oktmo          = plan_graph['oktmo'],
-				contact_person = plan_graph['contact_person'])
+			try:
+				phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
+			except Exception:
+				phone = None
 
-			msg = "План-график: {}.".format(plan_graph)
-			print(msg)
+			try:
+				fax = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/fax'))
+			except Exception:
+				fax = None
 
-			# Позиции планов-графиков
-			ps = pg.xpath('./providedPurchases/positions/position')
+			contact_person = Person.objects.take(
+				first_name  = self.get_text(element, './responsibleContactInfo/firstName'),
+				middle_name = self.get_text(element, './responsibleContactInfo/middleName'),
+				last_name   = self.get_text(element, './responsibleContactInfo/lastName'),
+				emails      = [email],
+				phones      = [phone],
+				faxes       = [fax])
 
-			for p in ps:
+			plan = Plan.objects.update(
+					id             = plan['id'],
+					number         = plan['number'],
+					year           = plan['year'],
+					version        = plan['version'],
+					description    = plan['description'],
+					url            = plan['url'],
+					created        = plan['created'],
+					confirmed      = plan['confirmed'],
+					published      = plan['published'],
+					region         = region,
+					owner          = owner,
+					customer       = customer,
+					contact_person = contact_person)
+			print(plan)
 
-				# Позиция плана-графика
+			positions = []
+			for pos in element.xpath('.//positions/position'):
+
 				position = {}
-
-				position['number']               = p.xpath('./commonInfo/positionNumber')[0].text
-				try:
-					position['ext_number']       = p.xpath('./commonInfo/extNumber')[0].text
-				except IndexError:
-					position['ext_number']       = None
-
-				# TODO KBKs Бюджетирование по годам?
-
-				position['okveds']                   = p.xpath('./commonInfo/OKVEDs/OKVED/code')
-				position['okpds']                    = p.xpath('./products/product/OKPD/code')
+				position['number']          = self.get_text(pos, './commonInfo/positionNumber')
+				position['name']            = self.get_text(pos, './commonInfo/contractSubjectName')
+				position['purchase_month']  = self.get_int(pos, './purchaseConditions/purchaseGraph/purchasePlacingTerm/month')
+				position['purchase_year']   = self.get_int(pos, './purchaseConditions/purchaseGraph/purchasePlacingTerm/year')
+				position['execution_month'] = self.get_int(pos, './purchaseConditions/purchaseGraph/contractExecutionTerm/month')
+				position['execution_year']  = self.get_int(pos, './purchaseConditions/purchaseGraph/contractExecutionTerm/year')
+				position['max_price']       = self.get_text(pos, './commonInfo/contractMaxPrice')
 
 				try:
-					position['subject_name']     = p.xpath('./commonInfo/contractSubjectName')[0].text.strip()
-				except AttributeError:
-					position['subject_name']     = 'None'
+					currency = Currency.objects.get(code = self.get_text(pos, './commonInfo/contractCurrency/code'))
+				except Exception:
+					currency = None
 
-				position['max_price']                = p.xpath('./commonInfo/contractMaxPrice')[0].text
 				try:
-					position['payments']         = p.xpath('./commonInfo/payments')[0].text
-				except IndexError:
-					position['payments']         = None
-				position['currency_code']            = p.xpath('./commonInfo/contractCurrency/code')[0].text
-				position['placing_way_code']         = p.xpath('./commonInfo/placingWay/code')[0].text
-				try:
-					position['change_reason_id']     = p.xpath('./commonInfo/positionModification/changeReason/id')[0].text
-				except IndexError:
-					position['change_reason_id']     = None
-				try:
-					position['publish_date']         = p.xpath('./commonInfo/positionPublishDate')[0].text
-				except IndexError:
-					position['publish_date']         = plan_graph.publish_date
-				try:
-					position['no_public_discussion'] = p.xpath('./commonInfo/noPublicDiscussion')[0].text
-				except IndexError:
-					position['no_public_discussion'] = False
-				try:
-					position['placing_year']         = p.xpath('./purchaseConditions/purchaseGraph/purchasePlacingTerm/year')[0].text
-				except IndexError:
-					position['placing_year']         = None
-				try:
-					position['placing_month']        = p.xpath('./purchaseConditions/purchaseGraph/purchasePlacingTerm/month')[0].text
-				except IndexError:
-					position['placing_month']        = None
-				try:
-					position['execution_year']       = p.xpath('./purchaseConditions/purchaseGraph/contractExecutionTerm/year')[0].text
-				except IndexError:
-					position['execution_year']       = None
-				try:
-					position['execution_month']      = p.xpath('./purchaseConditions/purchaseGraph/contractExecutionTerm/month')[0].text
-				except IndexError:
-					position['execution_month']      = None
+					placing_way = PlacingWay.objects.get(
+						code = self.get_text(pos, './commonInfo/placingWay/code'))
+				except Exception:
+					placing_way = None
 
-				for n, okved in enumerate(position['okveds']):
+				try:
+					change_reason = PlanPositionChangeReasonManager.objects.get(
+						id = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
+				except Exception:
+					change_reason = None
+
+				okveds2 = []
+				for okv2 in pos.xpath('.//OKVEDs/OKVED2'):
 					try:
-						position['okveds'][n] = OKVED.objects.get(
-							code = okved.text)
-					except OKVED.DoesNotExist:
-						position['okveds'][n] = None
+						okved2 = OKVED2.objects.get(code = self.get_text(okv2, './code'))
+						okveds2.append(okved2)
+					except Exception:
+						pass
 
-				for n, okpd in enumerate(position['okpds']):
-					try:
-						position['okpds'][n] = OKPD.objects.get(
-							code = okpd.text)
-					except OKPD.DoesNotExist:
-						position['okpds'][n] = None
+				position = PlanPosition.objects.update(
+					plan            = plan,
+					number          = position['number'],
+					name            = position['name'],
+					purchase_month  = position['purchase_month'],
+					purchase_year   = position['purchase_year'],
+					execution_month = position['execution_month'],
+					execution_year  = position['execution_year'],
+					max_price       = position['max_price'],
+					currency        = currency,
+					placing_way     = placing_way,
+					change_reason   = change_reason,
+					okveds2         = okveds2)
 
-				try:
-					position['currency'] = Currency.objects.get(
-						code = position['currency_code'])
-				except Currency.DoesNotExist:
-					position['currency'] = None
+				print('\t{}'.format(position))
 
-				position['placing_way'] = PlacingWay.objects.take(
-					code = position['placing_way_code'])
+				position.products.clear()
 
-				try:
-					position['change_reason'] = PlanPositionChangeReason.objects.get(
-						oos_id = position['change_reason_id'])
-				except PlanPositionChangeReason.DoesNotExist:
-					position['change_reason'] = None
-
-				if position['no_public_discussion'] == 'true':
-					position['public_discussion'] = False
-				else:
-					position['public_discussion'] = True
-
-				position = PlanGraphPosition.objects.update(
-					plan_graph        = plan_graph,
-					number            = position['number'],
-					ext_number        = position['ext_number'],
-					okveds            = position['okveds'],
-					okpds             = position['okpds'],
-					subject_name      = position['subject_name'],
-					max_price         = position['max_price'],
-					payments          = position['payments'],
-					currency          = position['currency'],
-					placing_way       = position['placing_way'],
-					change_reason     = position['change_reason'],
-					publish_date      = position['publish_date'],
-					public_discussion = position['public_discussion'],
-					placing_year      = position['placing_year'],
-					placing_month     = position['placing_month'],
-					execution_year    = position['execution_year'],
-					execution_month   = position['execution_month'],
-					state             = True)
-
-				print(".", end = "")
-
-				# Продукты
-				prs = p.xpath('./products/product')
-
-				for number, pr in enumerate(prs):
-
-					# Продукт
-					product = {}
-
-					product['okpd_code']                 = pr.xpath('./OKPD/code')[0].text
-					product['name']                      = pr.xpath('./name')[0].text
-					product['min_requirement']           = pr.xpath('./minRequirement')[0].text
-					try:
-						product['okei_code']             = pr.xpath('./OKEI/code')[0].text
-					except IndexError:
-						product['okei_code']             = None
-					try:
-						product['max_sum']               = pr.xpath('./sumMax')[0].text
-					except IndexError:
-						product['max_sum']               = None
-					try:
-						product['price']                 = pr.xpath('./price')[0].text
-					except IndexError:
-						product['price']                 = None
-					product['quantity_undefined']        = pr.xpath('./quantityUndefined')[0].text
-					try:
-						product['quantity']              = pr.xpath('./quantity')[0].text
-					except IndexError:
-						product['quantity']              = None
-					try:
-						product['quantity_current_year'] = pr.xpath('./quantityCurrentYear')[0].text
-					except IndexError:
-						product['quantity_current_year'] = None
+				for prod in pos.xpath('.//products/product'):
 
 					try:
-						product['okpd'] = OKPD.objects.get(
-							code = product['okpd_code'])
-					except OKPD.DoesNotExist:
-						product['okpd'] = None
+						okpd2 = OKPD2.objects.get(code = self.get_text(prod, './OKPD2/code'))
+					except Exception:
+						okpd2 = None
+
+					product = Product.objects.take(okpd2 = okpd2, name = self.get_text(prod, './name'))
 
 					try:
-						product['okei'] = OKEI.objects.get(
-							code = product['okei_code'])
-					except OKEI.DoesNotExist:
-						product['okei'] = None
+						okei = OKPD2.objects.get(code = self.get_text(prod, './OKEI/code'))
+					except Exception:
+						okei = None
 
-					product = PlanGraphPositionProduct.objects.update(
-						position              = position,
-						number                = number,
-						okpd                  = product['okpd'],
-						name                  = product['name'],
-						min_requirement       = product['min_requirement'],
-						okei                  = product['okei'],
-						max_sum               = product['max_sum'],
-						price                 = product['price'],
-						quantity_undefined    = product['quantity_undefined'],
-						quantity              = product['quantity'],
-						quantity_current_year = product['quantity_current_year'],
-						state                 = True)
+					e = PlanPositionToProduct()
+					e.plan_position = position
+					e.product       = product
+					e.requirement   = self.get_text(prod, './minRequirement')
+					e.quantity      = self.get_text(prod, './quantity')
+					e.price         = self.get_text(prod, './price')
+					e.total         = self.get_text(prod, './sumMax')
+					e.okei          = okei
+					e.save()
 
-					print(".", end = "")
+					print('\t\t{}'.format(e))
 
-			print("\n")
 
-		# Отмена планов-графиков
-		pgs = tree.xpath('.//tenderPlanCancel')
+	def parse_tenderplan_cancel(self, element, region):
 
-		for pg in pgs:
+		plan = {}
+		plan['id']          = self.get_text(element, './id')
+		plan['number']      = self.get_text(element, './planNumber')
+		plan['year']        = self.get_text(element, './year')
+		plan['version']     = self.get_text(element, './versionNumber')
+		plan['description'] = self.get_text(element, './description')
+		plan['created']     = self.get_text(element, './cancelDate')
+		plan['url']         = self.get_text(element, './printForm/url')
 
-			# План-график
-			plan_graph = {}
+		try:
+			customer = Organisation.objects.get(
+				reg_number = self.get_text(element, './customerInfo/regNum'))
+		except Exception:
+			customer = None
 
-			plan_graph['oos_id'] = pg.xpath('./id')[0].text
-			plan_graph['number'] = pg.xpath('./planNumber')[0].text
-
-			plan_graph = PlanGraph.objects.cancel(
-				oos_id = plan_graph['oos_id'],
-				number = plan_graph['number'])
-
-			msg = "Отменен план-график."
-			print(msg)
-
-		# Планы-графики (неструктурированные)
-		pgs = tree.xpath('.//tenderPlanUnstructured')
-
-		for pg in pgs:
-
-			# План-график
-			plan_graph = {}
-
-			plan_graph['oos_id']                     = pg.xpath('./commonInfo/id')[0].text
-			plan_graph['number']                     = pg.xpath('./commonInfo/planNumber')[0].text
-			plan_graph['year']                       = pg.xpath('./commonInfo/year')[0].text
-			plan_graph['version']                    = pg.xpath('./commonInfo/versionNumber')[0].text
-			plan_graph['owner_reg_number']           = pg.xpath('./commonInfo/owner/regNum')[0].text
-			plan_graph['create_date']                = pg.xpath('./commonInfo/createDate')[0].text
-			plan_graph['description']                = pg.xpath('./commonInfo/description')[0].text.strip()
-			plan_graph['confirm_date']               = pg.xpath('./commonInfo/confirmDate')[0].text
-			plan_graph['publish_date']               = pg.xpath('./commonInfo/publishDate')[0].text
-			plan_graph['customer_reg_number']        = pg.xpath('./customerInfo/customer/regNum')[0].text
-			plan_graph['oktmo_code']                 = pg.xpath('./customerInfo/OKTMO/code')[0].text
-			plan_graph['contact_person_last_name']   = pg.xpath('./responsibleContactInfo/lastName')[0].text
-			plan_graph['contact_person_first_name']  = pg.xpath('./responsibleContactInfo/firstName')[0].text
-			plan_graph['contact_person_middle_name'] = pg.xpath('./responsibleContactInfo/middleName')[0].text
-			try:
-				plan_graph['contact_person_phone']   = pg.xpath('./responsibleContactInfo/phone')[0].text
-			except IndexError:
-				plan_graph['contact_person_phone']   = None
-			try:
-				plan_graph['contact_person_fax']     = pg.xpath('./responsibleContactInfo/fax')[0].text
-			except IndexError:
-				plan_graph['contact_person_fax']     = None
-			try:
-				plan_graph['contact_person_email']   = pg.xpath('./responsibleContactInfo/email')[0].text
-			except:
-				plan_graph['contact_person_email']   = None
-
-			plan_graph['owner'] = Organisation.objects.take(
-				reg_number = plan_graph['owner_reg_number'])
-
-			plan_graph['customer'] = Organisation.objects.take(
-				reg_number = plan_graph['customer_reg_number'])
-
-			try:
-				plan_graph['oktmo'] = OKTMO.objects.get(
-					code = plan_graph['oktmo_code'])
-			except OKTMO.DoesNotExist:
-				plan_graph['oktmo'] = None
-
-			plan_graph['contact_person'] = ContactPerson.objects.take(
-				last_name   = plan_graph['contact_person_last_name'],
-				first_name  = plan_graph['contact_person_first_name'],
-				middle_name = plan_graph['contact_person_middle_name'],
-				email       = plan_graph['contact_person_email'],
-				phone       = plan_graph['contact_person_phone'],
-				fax         = plan_graph['contact_person_fax'])
-
-			plan_graph = PlanGraph.objects.update(
-				oos_id         = plan_graph['oos_id'],
-				number         = plan_graph['number'],
-				year           = plan_graph['year'],
-				version        = plan_graph['version'],
+		plan = Plan.objects.update(
+				id             = plan['id'],
+				number         = plan['number'],
+				year           = plan['year'],
+				version        = plan['version'],
+				description    = plan['description'],
+				url            = plan['url'],
+				created        = plan['created'],
 				region         = region,
-				owner          = plan_graph['owner'],
-				create_date    = plan_graph['create_date'],
-				description    = plan_graph['description'],
-				confirm_date   = plan_graph['confirm_date'],
-				publish_date   = plan_graph['publish_date'],
-				customer       = plan_graph['customer'],
-				oktmo          = plan_graph['oktmo'],
-				contact_person = plan_graph['contact_person'])
+				customer       = customer,
+				state          = False)
 
-			msg = "План-график (неструктурированный): {}.\n".format(plan_graph)
-			print(msg)
-
-		# Чистим мусор
-		del tree
-		gc.collect()
-
-		return True
+		Plan.objects.filter(number = plan.number).update(state = False)
+		print('Отменён: {}.'.format(plan.number))
 
 
+	def parse_tenderplan_unstructured(self, element, region):
 
+		plan = {}
+		plan['id']          = self.get_text(element, './commonInfo/id')
+		plan['number']      = self.get_text(element, './commonInfo/planNumber')
+		plan['year']        = self.get_text(element, './commonInfo/year')
+		plan['version']     = self.get_text(element, './commonInfo/versionNumber')
+		plan['description'] = self.get_text(element, './commonInfo/description')
+		plan['created']     = self.get_text(element, './commonInfo/createDate')
+		plan['confirmed']   = self.get_text(element, './commonInfo/confirmDate')
+		plan['published']   = self.get_text(element, './commonInfo/publishDate')
+		plan['url']         = self.get_text(element, './printForm/url')
+
+		try:
+			owner = Organisation.objects.get(
+				reg_number = self.get_text(element, './commonInfo/owner/regNum'))
+		except Exception:
+			owner = None
+
+		try:
+			customer = Organisation.objects.get(
+				reg_number = self.get_text(element, './customerInfo/customer/regNum'))
+		except Exception:
+			customer = None
+
+		try:
+			email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
+		except Exception:
+			email = None
+
+		try:
+			phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
+		except Exception:
+			phone = None
+
+		try:
+			fax = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/fax'))
+		except Exception:
+			fax = None
+
+		contact_person = Person.objects.take(
+			first_name  = self.get_text(element, './responsibleContactInfo/firstName'),
+			middle_name = self.get_text(element, './responsibleContactInfo/middleName'),
+			last_name   = self.get_text(element, './responsibleContactInfo/lastName'),
+			emails      = [email],
+			phones      = [phone],
+			faxes       = [fax])
+
+		plan = Plan.objects.update(
+			id             = plan['id'],
+			number         = plan['number'],
+			year           = plan['year'],
+			version        = plan['version'],
+			description    = plan['description'],
+			url            = plan['url'],
+			created        = plan['created'],
+			confirmed      = plan['confirmed'],
+			published      = plan['published'],
+			region         = region,
+			owner          = owner,
+			customer       = customer,
+			contact_person = contact_person)
+
+		print(plan)
 
 
 
@@ -1436,11 +1317,21 @@ class Runner(tenders.runner.Runner):
 
 
 
-	def get_data_from_element(self, element, query):
+	def get_text(self, element, query):
 
 		try:
-			result = element.xpath(query)[0].text
+			result = element.xpath(query)[0].text.strip()
 		except Exception:
 			result = ''
+
+		return result
+
+
+	def get_int(self, element, query):
+
+		try:
+			result = int(element.xpath(query)[0].text.strip())
+		except Exception:
+			result = None
 
 		return result
