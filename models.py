@@ -1114,6 +1114,7 @@ class KBKBudgetManager(models.Manager):
 
 class KBKBudget(models.Model):
 
+	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code       = models.CharField(max_length = 50, unique = True)
 	start_date = models.DateTimeField(null = True, default = None)
 	end_date   = models.DateTimeField(null = True, default = None)
@@ -1166,10 +1167,44 @@ class OKOGU(models.Model):
 
 
 
+class AddressManager(models.Manager):
+
+
+	def take(self, address, state = True):
+		if not address:
+			return None
+		try:
+			o = self.get(address = address)
+		except Address.DoesNotExist:
+			o         = Address()
+			o.address = address
+			o.state   = state
+			o.save()
+		return o
+
+
+
+class Address(models.Model):
+
+	address  = models.TextField(unique = True)
+	state    = models.BooleanField(default = True)
+
+	objects  = AddressManager()
+
+	def __str__(self):
+		return "{}".format(self.address)
+
+	class Meta:
+		ordering = ['address']
+
+
+
 class EmailManager(models.Manager):
 
 
 	def take(self, email, state = True):
+		if not email:
+			return None
 		try:
 			o = self.get(email = email)
 		except Email.DoesNotExist:
@@ -1201,6 +1236,8 @@ class Email(models.Model):
 class PhoneManager(models.Manager):
 
 	def take(self, phone, state = True):
+		if not phone:
+			return None
 		try:
 			o = self.get(phone = phone)
 		except Phone.DoesNotExist:
@@ -1541,12 +1578,12 @@ class OrganisationManager(models.Manager):
 
 			o.short_name        = kwargs.get('short_name', None)
 			o.full_name         = kwargs.get('full_name', None)
-			o.factual_address   = kwargs.get('factual_address', None)
-			o.postal_address    = kwargs.get('postal_address', None)
 			o.inn               = kwargs.get('inn', None)
 			o.kpp               = kwargs.get('kpp', None)
 			o.ogrn              = kwargs.get('ogrn', None)
 			o.okpo              = kwargs.get('okpo', None)
+			o.factual_address   = kwargs.get('factual_address', None)
+			o.postal_address    = kwargs.get('postal_address', None)
 			o.email             = kwargs.get('email', None)
 			o.phone             = kwargs.get('phone', None)
 			o.fax               = kwargs.get('fax', None)
@@ -1608,13 +1645,13 @@ class OrganisationManager(models.Manager):
 
 			o.short_name        = kwargs.get('short_name', None)
 			o.full_name         = kwargs.get('full_name', None)
-			o.factual_address   = kwargs.get('factual_address', None)
-			o.postal_address    = kwargs.get('postal_address', None)
 			o.inn               = kwargs.get('inn', None)
 			o.kpp               = kwargs.get('kpp', None)
 			o.ogrn              = kwargs.get('ogrn', None)
 			o.okpo              = kwargs.get('okpo', None)
 
+			o.factual_address   = kwargs.get('factual_address', None)
+			o.postal_address    = kwargs.get('postal_address', None)
 			o.email             = kwargs.get('email', None)
 			o.phone             = kwargs.get('phone', None)
 			o.fax               = kwargs.get('fax', None)
@@ -1676,16 +1713,18 @@ class Organisation(models.Model):
 	name              = models.TextField(null = True, default = None)
 	short_name        = models.TextField(null = True, default = None)
 	full_name         = models.TextField(null = True, default = None)
-	factual_address   = models.TextField(null = True, default = None)
-	postal_address    = models.TextField(null = True, default = None)
+
 	inn               = models.CharField(max_length = 20, null = True, default = None)
 	kpp               = models.CharField(max_length = 20, null = True, default = None)
 	ogrn              = models.CharField(max_length = 20, null = True, default = None)
 	okpo              = models.CharField(max_length = 20, null = True, default = None)
 
+	factual_address   = models.ForeignKey(Address,          related_name = 'organisation_factual_address', null = True, default = None)
+	postal_address    = models.ForeignKey(Address,          related_name = 'organisation_postal_address',  null = True, default = None)
 	email             = models.ForeignKey(Email,            related_name = 'organisation_email',           null = True, default = None)
 	phone             = models.ForeignKey(Phone,            related_name = 'organisation_phone',           null = True, default = None)
 	fax               = models.ForeignKey(Phone,            related_name = 'organisation_fax',             null = True, default = None)
+
 	contact_person    = models.ForeignKey(Person,           related_name = 'organisation_contact_person',  null = True, default = None)
 	head_agency       = models.ForeignKey('self',           related_name = 'organisation_head_agency',     null = True, default = None)
 	ordering_agency   = models.ForeignKey('self',           related_name = 'organisation_ordering_agency', null = True, default = None)
@@ -1896,6 +1935,50 @@ class ContractModificationReason(models.Model):
 
 
 
+
+
+
+
+class KVRManager(models.Manager):
+
+
+	def take(self, code, **kwargs):
+		try:
+			o = self.get(code = code)
+		except Exception:
+			o       = KVR()
+			o.code  = code
+			o.name  = kwargs.get('name', None)
+			o.state = kwargs.get('state', True)
+			o.save()
+		return o
+
+
+	def update(self, code, **kwargs):
+		o          = self.take(code, **kwargs)
+		o.name     = kwargs.get('name', None)
+		o.state    = kwargs.get('state', True)
+		o.save()
+		return o
+
+
+
+class KVR(models.Model):
+
+	code        = models.TextField(unique = True)
+	name        = models.TextField(null = True, default = None)
+	state       = models.BooleanField(default = True)
+
+	objects     = KVRManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
+
+
+
 class PlanManager(models.Manager):
 
 
@@ -1981,20 +2064,23 @@ class Plan(models.Model):
 
 class ProductManager(models.Manager):
 
-	def take(self, okpd2, name):
+	def take(self, okpd, okpd2, name):
 		try:
-			o = self.get(okpd2 = okpd2, name = name)
+			o = self.get(okpd = okpd, okpd2 = okpd2, name = name)
 		except Exception:
 			o = Product()
+			o.okpd  = okpd
 			o.okpd2 = okpd2
 			o.name  = name
 			o.save()
+		return o
 
 
 
 class Product(models.Model):
 
 	id    = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	okpd  = models.ForeignKey(OKPD,  null = True, default = None)
 	okpd2 = models.ForeignKey(OKPD2, null = True, default = None)
 	name  = models.TextField(null = True, default = None)
 
@@ -2005,7 +2091,7 @@ class Product(models.Model):
 
 	class Meta:
 		ordering = ['name']
-		unique_together = ('okpd2', 'name')
+		unique_together = ('okpd', 'okpd2', 'name')
 
 
 
@@ -2045,6 +2131,17 @@ class PlanPositionManager(models.Manager):
 		o.change_reason   = kwargs.get('change_reason', None)
 		o.save()
 
+		o.okveds.clear()
+		for okved in kwargs.get('okveds', []):
+			if okved:
+				try:
+					o.okveds.get(okved = okved)
+				except Exception:
+					e = PlanPositionToOKVED()
+					e.plan_position = o
+					e.okved = okved
+					e.save()
+
 		o.okveds2.clear()
 		for okved2 in kwargs.get('okveds2', []):
 			if okved2:
@@ -2076,6 +2173,7 @@ class PlanPosition(models.Model):
 	placing_way   = models.ForeignKey(PlacingWay,               null = True, default = None)
 	change_reason = models.ForeignKey(PlanPositionChangeReason, null = True, default = None)
 
+	okveds   = models.ManyToManyField(OKVED,   through = 'PlanPositionToOKVED',   through_fields = ('plan_position', 'okved'))
 	okveds2  = models.ManyToManyField(OKVED2,  through = 'PlanPositionToOKVED2',  through_fields = ('plan_position', 'okved2'))
 	products = models.ManyToManyField(Product, through = 'PlanPositionToProduct', through_fields = ('plan_position', 'product'))
 
@@ -2086,6 +2184,16 @@ class PlanPosition(models.Model):
 
 	def add_product(self, product, **kwargs):
 		pass
+
+
+class PlanPositionToOKVED(models.Model):
+
+	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	plan_position = models.ForeignKey(PlanPosition, on_delete = models.CASCADE)
+	okved         = models.ForeignKey(OKVED, on_delete = models.CASCADE)
+
+	class Meta:
+		db_table = 'tenders_planposition_to_okved'
 
 
 
