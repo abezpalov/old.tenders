@@ -54,7 +54,8 @@ class SourceManager(models.Manager):
 
 class Source(models.Model):
 
-	url      = models.CharField(max_length = 2048)
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	url      = models.CharField(max_length = 2048, unique = True)
 	state    = models.BooleanField(default = False)
 	created  = models.DateTimeField(default = timezone.now)
 	modified = models.DateTimeField(default = timezone.now)
@@ -92,8 +93,8 @@ class RegionManager(models.Manager):
 		except Region.DoesNotExist:
 			o = Region()
 			o.alias     = alias[:100]
-			o.name      = name[:100]
-			o.full_name = full_name[:100]
+			o.name      = name
+			o.full_name = full_name
 			o.save()
 		return o
 
@@ -101,6 +102,7 @@ class RegionManager(models.Manager):
 
 class Region(models.Model):
 
+	id        = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 	alias     = models.CharField(max_length = 100, unique = True)
@@ -161,6 +163,7 @@ class CountryManager(models.Manager):
 
 class Country(models.Model):
 
+	id        = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code      = models.CharField(max_length = 10, unique = True)
 	full_name = models.TextField(null = True, default = None)
 	name      = models.TextField(null = True, default = None)
@@ -213,6 +216,7 @@ class CurrencyManager(models.Manager):
 
 class Currency(models.Model):
 
+	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code         = models.CharField(max_length = 10, unique = True)
 	digital_code = models.CharField(max_length = 10, unique = True)
 	name         = models.TextField(null = True, default = None)
@@ -263,6 +267,7 @@ class OKEISectionManager(models.Manager):
 
 class OKEISection(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -312,6 +317,7 @@ class OKEIGroupManager(models.Manager):
 
 class OKEIGroup(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -330,6 +336,8 @@ class OKEIGroup(models.Model):
 class OKEIManager(models.Manager):
 
 	def take(self, code, full_name = None, section = None, group = None, local_name = None, international_name = None, local_symbol = None, international_symbol = None, state = True):
+		if not code:
+			return None
 		try:
 			o = self.get(code = code)
 		except OKEI.DoesNotExist:
@@ -349,6 +357,8 @@ class OKEIManager(models.Manager):
 		return o
 
 	def update(self, code, full_name = None, section = None, group = None, local_name = None, international_name = None, local_symbol = None, international_symbol = None, state = True):
+		if not code:
+			return None
 		try:
 			o                      = self.get(code = code)
 			o.full_name            = full_name
@@ -377,8 +387,8 @@ class OKEIManager(models.Manager):
 
 
 class OKEI(models.Model):
-	'Единицы измерения'
 
+	id                   = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code                 = models.CharField(max_length = 10, unique = True)
 	full_name            = models.TextField(null = True, default = None)
 	local_name           = models.TextField(null = True, default = None)
@@ -437,8 +447,8 @@ class KOSGUManager(models.Manager):
 
 
 class KOSGU(models.Model):
-	'Операции сектора государственного управления'
 
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code        = models.CharField(max_length = 10, unique = True)
 	name        = models.TextField(null = True, default = None)
 	state       = models.BooleanField(default = True)
@@ -460,6 +470,8 @@ class KOSGU(models.Model):
 class OKOPFManager(models.Manager):
 
 	def take(self, code, full_name = None, singular_name = None, parent = None, state = True):
+		if not code:
+			return None
 		try:
 			o = self.get(code = code)
 		except OKOPF.DoesNotExist:
@@ -473,6 +485,8 @@ class OKOPFManager(models.Manager):
 		return o
 
 	def update(self, code, full_name = None, singular_name = None, parent = None, state = True):
+		if not code:
+			return None
 		try:
 			o               = self.get(code = code)
 			o.full_name     = full_name
@@ -494,6 +508,7 @@ class OKOPFManager(models.Manager):
 
 class OKOPF(models.Model):
 
+	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code          = models.CharField(max_length = 10, unique = True)
 	full_name     = models.TextField(null = True, default = None)
 	singular_name = models.TextField(null = True, default = None)
@@ -665,6 +680,7 @@ class OKTMOManager(models.Manager):
 
 class OKTMO(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -673,10 +689,10 @@ class OKTMO(models.Model):
 
 	parent   = models.ForeignKey('self', null = True, default = None)
 
-	objects       = OKTMOManager()
+	objects = OKTMOManager()
 
 	def __str__(self):
-		return "{}".format(self.code)
+		return "{} {}".format(self.code, self.name)
 
 	class Meta:
 		ordering = ['code']
@@ -712,6 +728,7 @@ class OKVEDSectionManager(models.Manager):
 
 class OKVEDSection(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	name     = models.CharField(max_length = 100, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
@@ -757,6 +774,7 @@ class OKVEDSubSectionManager(models.Manager):
 
 class OKVEDSubSection(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	name     = models.CharField(max_length = 100, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
@@ -865,6 +883,7 @@ class OKVED2SectionManager(models.Manager):
 
 class OKVED2Section(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	name     = models.CharField(max_length = 100, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
@@ -923,6 +942,7 @@ class OKVED2Manager(models.Manager):
 
 class OKVED2(models.Model):
 
+	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code          = models.CharField(max_length = 100, null = True, default = None, unique = True)
 	oos_id        = models.CharField(max_length = 10, null = True, default = None)
 	name          = models.TextField(null = True, default = None)
@@ -948,6 +968,8 @@ class BudgetManager(models.Manager):
 
 
 	def take(self, code, name = None, state = True):
+		if not code:
+			return None
 		try:
 			o = self.get(code = code)
 		except Budget.DoesNotExist:
@@ -960,6 +982,8 @@ class BudgetManager(models.Manager):
 
 
 	def update(self, code, name = None, state = True):
+		if not code:
+			return None
 		try:
 			o          = self.get(code = code)
 			o.name     = name
@@ -977,6 +1001,7 @@ class BudgetManager(models.Manager):
 
 class Budget(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -996,6 +1021,10 @@ class Budget(models.Model):
 class SubsystemTypeManager(models.Manager):
 
 	def take(self, code, name = None, state = True):
+
+		if not code:
+			return None
+
 		try:
 			o = self.get(code = code)
 		except SubsystemType.DoesNotExist:
@@ -1010,6 +1039,7 @@ class SubsystemTypeManager(models.Manager):
 
 class SubsystemType(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -1059,6 +1089,7 @@ class BudgetTypeManager(models.Manager):
 
 class BudgetType(models.Model):
 
+	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code           = models.CharField(max_length = 20, unique = True)
 	name           = models.TextField(null = True, default = None)
 	state          = models.BooleanField(default = True)
@@ -1080,6 +1111,8 @@ class BudgetType(models.Model):
 class KBKBudgetManager(models.Manager):
 
 	def take(self, code, budget = None, start_date = None, end_date = None, state = True):
+		if not code:
+			return None
 		try:
 			o = self.get(code = code)
 		except KBKBudget.DoesNotExist:
@@ -1093,6 +1126,8 @@ class KBKBudgetManager(models.Manager):
 		return o
 
 	def update(self, code, budget = None, start_date = None, end_date = None, state = True):
+		if not code:
+			return None
 		try:
 			o            = self.get(code = code)
 			o.budget     = budget
@@ -1137,6 +1172,8 @@ class KBKBudget(models.Model):
 class OKOGUManager(models.Manager):
 
 	def take(self, code, name = None, state = True):
+		if not code:
+			return None
 		try:
 			o = self.get(code = code)
 		except OKOGU.DoesNotExist:
@@ -1151,6 +1188,7 @@ class OKOGUManager(models.Manager):
 
 class OKOGU(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -1164,6 +1202,43 @@ class OKOGU(models.Model):
 
 	class Meta:
 		ordering = ['code']
+
+
+
+class AttachmentManager(models.Manager):
+
+
+	def take(self, url, **kwargs):
+
+		if not url:
+			return None
+
+		try:
+			o = self.get(url = url)
+		except Attachment.DoesNotExist:
+			o = Attachment()
+			o.url         = url
+			o.name        = kwargs.get('name', None)
+			o.size        = kwargs.get('size', None)
+			o.description = kwargs.get('description', None)
+			o.save()
+
+		return o
+
+
+
+class Attachment(models.Model):
+
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	url         = models.CharField(max_length = 512, unique = True)
+	name        = models.TextField(null = True, default = None)
+	size        = models.TextField(null = True, default = None)
+	description = models.TextField(null = True, default = None)
+
+	objects = AttachmentManager()
+
+	def __str__(self):
+		return "Attachment: {}".format(self.url)
 
 
 
@@ -1186,6 +1261,7 @@ class AddressManager(models.Manager):
 
 class Address(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	address  = models.TextField(unique = True)
 	state    = models.BooleanField(default = True)
 
@@ -1200,7 +1276,6 @@ class Address(models.Model):
 
 
 class EmailManager(models.Manager):
-
 
 	def take(self, email, state = True):
 		if not email:
@@ -1218,6 +1293,7 @@ class EmailManager(models.Manager):
 
 class Email(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	email    = models.CharField(max_length = 256, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
@@ -1251,6 +1327,7 @@ class PhoneManager(models.Manager):
 
 class Phone(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	phone    = models.CharField(max_length = 128, unique = True)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
@@ -1349,9 +1426,10 @@ class PersonManager(models.Manager):
 
 class Person(models.Model):
 
-	first_name  = models.CharField(max_length = 128)
-	middle_name = models.CharField(max_length = 128)
-	last_name   = models.CharField(max_length = 128)
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	first_name  = models.CharField(max_length = 128, db_index = True)
+	middle_name = models.CharField(max_length = 128, db_index = True)
+	last_name   = models.CharField(max_length = 128, db_index = True)
 	position    = models.CharField(max_length = 128, null = True, default = None)
 	description = models.TextField(null = True, default = None)
 
@@ -1424,9 +1502,10 @@ class BankManager(models.Manager):
 
 class Bank(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	bik      = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
-	address  = models.TextField(null = True, default = None)
+	address  = models.ForeignKey(Address, related_name = 'bank_address', null = True, default = None)
 	state    = models.BooleanField(default = True)
 	created  = models.DateTimeField(default = timezone.now)
 	modified = models.DateTimeField(default = timezone.now)
@@ -1438,8 +1517,6 @@ class Bank(models.Model):
 
 	class Meta:
 		ordering = ['bik']
-
-
 
 
 
@@ -1463,9 +1540,10 @@ class AccountManager(models.Manager):
 
 class Account(models.Model):
 
-	payment_account  = models.CharField(max_length = 32, null = True, default = None)
-	corr_account     = models.CharField(max_length = 32, null = True, default = None)
-	personal_account = models.CharField(max_length = 32, null = True, default = None)
+	id               = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	payment_account  = models.CharField(max_length = 32, null = True, default = None, db_index = True)
+	corr_account     = models.CharField(max_length = 32, null = True, default = None, db_index = True)
+	personal_account = models.CharField(max_length = 32, null = True, default = None, db_index = True)
 	bank             = models.ForeignKey(Bank, null = True, default = None)
 	state            = models.BooleanField(default = True)
 	created          = models.DateTimeField(default = timezone.now)
@@ -1498,6 +1576,7 @@ class OrganisationRoleManager(models.Manager):
 
 class OrganisationRole(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True)
@@ -1545,6 +1624,7 @@ class OrganisationTypeManager(models.Manager):
 
 class OrganisationType(models.Model):
 
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code        = models.CharField(max_length = 20, unique = True)
 	name        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
@@ -1565,6 +1645,10 @@ class OrganisationManager(models.Manager):
 
 
 	def take(self, reg_number, **kwargs):
+
+		if not reg_number:
+			return None
+
 		try:
 			o = self.get(reg_number = reg_number)
 		except Organisation.DoesNotExist:
@@ -1600,115 +1684,52 @@ class OrganisationManager(models.Manager):
 
 			o.save()
 
-			for account in kwargs.get('accounts', []):
-				if account:
-					try:
-						o.accounts.get(account = account)
-					except Exception:
-						e = OrganisationToAccount()
-						e.organisation = o
-						e.account      = account
-						e.save()
-
-			for budget in kwargs.get('budgets', []):
-				if budget:
-					try:
-						o.budgets.get(budget = budget)
-					except Exception:
-						e = OrganisationToBudget()
-						e.organisation = o
-						e.budget       = budget
-						e.save()
-
-			for okved in kwargs.get('okveds', []):
-				if okved:
-					try:
-						o.okveds.get(okved = okved)
-					except Exception:
-						e = OrganisationToOKVED()
-						e.organisation = o
-						e.okved        = okved
-						e.save()
-
 		return o
 
 
 	def update(self, reg_number, **kwargs):
 
-		try:
-			o = self.get(reg_number = reg_number)
+		if not reg_number:
+			return None
 
-			if kwargs.get('name', None):
-				o.name = kwargs.get('name', None)
-			else:
-				o.name = kwargs.get('full_name', None)
+		o = self.take(reg_number, **kwargs)
 
-			o.short_name        = kwargs.get('short_name', None)
-			o.full_name         = kwargs.get('full_name', None)
-			o.inn               = kwargs.get('inn', None)
-			o.kpp               = kwargs.get('kpp', None)
-			o.ogrn              = kwargs.get('ogrn', None)
-			o.okpo              = kwargs.get('okpo', None)
+		if kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+		else:
+			o.name = kwargs.get('full_name', None)
 
-			o.factual_address   = kwargs.get('factual_address', None)
-			o.postal_address    = kwargs.get('postal_address', None)
-			o.email             = kwargs.get('email', None)
-			o.phone             = kwargs.get('phone', None)
-			o.fax               = kwargs.get('fax', None)
-			o.contact_person    = kwargs.get('contact_person', None)
-			o.head_agency       = kwargs.get('head_agency', None)
-			o.ordering_agency   = kwargs.get('ordering_agency', None)
-			o.okopf             = kwargs.get('okopf', None)
-			o.okogu             = kwargs.get('okogu', None)
-			o.organisation_role = kwargs.get('organisation_role', None)
-			o.organisation_type = kwargs.get('organisation_type', None)
-			o.oktmo             = kwargs.get('oktmo', None)
-			o.state             = kwargs.get('state', True)
-			o.register          = kwargs.get('register', True)
+		o.short_name        = kwargs.get('short_name', None)
+		o.full_name         = kwargs.get('full_name', None)
+		o.inn               = kwargs.get('inn', None)
+		o.kpp               = kwargs.get('kpp', None)
+		o.ogrn              = kwargs.get('ogrn', None)
+		o.okpo              = kwargs.get('okpo', None)
+		o.factual_address   = kwargs.get('factual_address', None)
+		o.postal_address    = kwargs.get('postal_address', None)
+		o.email             = kwargs.get('email', None)
+		o.phone             = kwargs.get('phone', None)
+		o.fax               = kwargs.get('fax', None)
+		o.contact_person    = kwargs.get('contact_person', None)
+		o.head_agency       = kwargs.get('head_agency', None)
+		o.ordering_agency   = kwargs.get('ordering_agency', None)
+		o.okopf             = kwargs.get('okopf', None)
+		o.okogu             = kwargs.get('okogu', None)
+		o.organisation_role = kwargs.get('organisation_role', None)
+		o.organisation_type = kwargs.get('organisation_type', None)
+		o.oktmo             = kwargs.get('oktmo', None)
+		o.state             = kwargs.get('state', True)
+		o.register          = kwargs.get('register', True)
 
-			o.save()
+		o.save()
 
-			o.accounts.clear()
-			for account in kwargs.get('accounts', []):
-				if account:
-					try:
-						o.accounts.get(account = account)
-					except Exception:
-						e = OrganisationToAccount()
-						e.organisation = o
-						e.account      = account
-						e.save()
-
-			o.budgets.clear()
-			for budget in kwargs.get('budgets', []):
-				if budget:
-					try:
-						o.budgets.get(budget = budget)
-					except Exception:
-						e = OrganisationToBudget()
-						e.organisation = o
-						e.budget       = budget
-						e.save()
-
-			o.okveds.clear()
-			for okved in kwargs.get('okveds', []):
-				if okved:
-					try:
-						o.okveds.get(okved = okved)
-					except Exception:
-						e = OrganisationToOKVED()
-						e.organisation = o
-						e.okved        = okved
-						e.save()
-
-		except Organisation.DoesNotExist:
-			o = self.take(reg_number, **kwargs)
 		return o
 
 
 
 class Organisation(models.Model):
 
+	id                = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	reg_number        = models.CharField(max_length = 20, unique = True)
 	name              = models.TextField(null = True, default = None)
 	short_name        = models.TextField(null = True, default = None)
@@ -1843,6 +1864,46 @@ class PlacingWay(models.Model):
 		ordering = ['code']
 
 
+
+class ETPManager(models.Manager):
+
+
+	def take(self, code, **kwargs):
+		if not code:
+			return None
+		try:
+			o = self.get(code = code)
+		except Exception:
+			o = ETP()
+			o.code  = code
+			o.name  = kwargs.get('name', None)
+			o.url   = kwargs.get('url', None)
+			o.state = kwargs.get('state', True)
+			o.save()
+		return o
+
+
+
+class ETP(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	code     = models.TextField(null = True, default = None, db_index = True)
+	name     = models.TextField(null = True, default = None, db_index = True)
+	url      = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True)
+	created  = models.DateTimeField(default = timezone.now)
+	modified = models.DateTimeField(default = timezone.now)
+
+	objects = ETPManager()
+
+	def __str__(self):
+		return "{} ({})".format(self.name, self.url)
+
+	class Meta:
+		ordering = ['name']
+
+
+
 class PlanPositionChangeReasonManager(models.Manager):
 
 
@@ -1919,6 +1980,7 @@ class ContractModificationReasonManager(models.Manager):
 
 class ContractModificationReason(models.Model):
 
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code        = models.TextField(unique = True)
 	name        = models.TextField(null = True, default = None)
 	state       = models.BooleanField(default = True)
@@ -1932,10 +1994,6 @@ class ContractModificationReason(models.Model):
 
 	class Meta:
 		ordering = ['id']
-
-
-
-
 
 
 
@@ -1965,6 +2023,7 @@ class KVRManager(models.Manager):
 
 class KVR(models.Model):
 
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	code        = models.TextField(unique = True)
 	name        = models.TextField(null = True, default = None)
 	state       = models.BooleanField(default = True)
@@ -2034,10 +2093,10 @@ class PlanManager(models.Manager):
 
 class Plan(models.Model):
 
-	id             = models.IntegerField(primary_key = True, editable = False)
-	number         = models.CharField(max_length = 20)
-	year           = models.IntegerField(null = True, default = None)
-	version        = models.IntegerField(null = True, default = None)
+	id             = models.BigIntegerField(primary_key = True, editable = False)
+	number         = models.CharField(max_length = 20, db_index = True)
+	year           = models.IntegerField(null = True, default = None, db_index = True)
+	version        = models.IntegerField(null = True, default = None, db_index = True)
 	description    = models.TextField(null = True, default = None)
 	url            = models.TextField(null = True, default = None)
 
@@ -2080,9 +2139,9 @@ class ProductManager(models.Manager):
 class Product(models.Model):
 
 	id    = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	okpd  = models.ForeignKey(OKPD,  null = True, default = None)
-	okpd2 = models.ForeignKey(OKPD2, null = True, default = None)
-	name  = models.TextField(null = True, default = None)
+	okpd  = models.ForeignKey(OKPD,  null = True, default = None, db_index = True)
+	okpd2 = models.ForeignKey(OKPD2, null = True, default = None, db_index = True)
+	name  = models.TextField(null = True, default = None, db_index = True)
 
 	objects = ProductManager()
 
@@ -2161,13 +2220,13 @@ class PlanPosition(models.Model):
 
 	id              = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	plan            = models.ForeignKey(Plan)
-	number          = models.CharField(max_length = 50)
+	number          = models.CharField(max_length = 50, db_index = True)
 	name            = models.TextField(null = True, default = None)
-	purchase_month  = models.IntegerField(null = True, default = None)
-	purchase_year   = models.IntegerField(null = True, default = None)
-	execution_month = models.IntegerField(null = True, default = None)
-	execution_year  = models.IntegerField(null = True, default = None)
-	max_price       = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	purchase_month  = models.IntegerField(null = True, default = None, db_index = True)
+	purchase_year   = models.IntegerField(null = True, default = None, db_index = True)
+	execution_month = models.IntegerField(null = True, default = None, db_index = True)
+	execution_year  = models.IntegerField(null = True, default = None, db_index = True)
+	max_price       = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None, db_index = True)
 
 	currency      = models.ForeignKey(Currency,                 null = True, default = None)
 	placing_way   = models.ForeignKey(PlacingWay,               null = True, default = None)
@@ -2227,193 +2286,268 @@ class PlanPositionToProduct(models.Model):
 
 
 
+class PurchaseManager(models.Manager):
+
+	def take(self, number, **kwargs):
+
+		if not number:
+			return None
+
+		try:
+			o = self.get(number = number)
+		except Exception:
+			o = Purchase()
+			o.number                 = number
+			o.name                   = kwargs.get('name', None)
+			o.url                    = kwargs.get('url', None)
+			o.published              = kwargs.get('published', timezone.now())
+			o.region                 = kwargs.get('region', None)
+			o.responsible            = kwargs.get('responsible', None)
+			o.specialised            = kwargs.get('specialised', None)
+			o.contact_person         = kwargs.get('contact_person', None)
+			o.placing_way            = kwargs.get('placing_way', None)
+			o.grant_start_time       = kwargs.get('grant_start_time', None)
+			o.grant_end_time         = kwargs.get('grant_end_time', None)
+			o.collecting_start_time  = kwargs.get('collecting_start_time', None)
+			o.collecting_end_time    = kwargs.get('collecting_end_time', None)
+			o.opening_time           = kwargs.get('opening_time', None)
+			o.prequalification_time  = kwargs.get('prequalification_time', None)
+			o.scoring_time           = kwargs.get('scoring_time', None)
+			o.grant_place            = kwargs.get('grant_place', None)
+			o.collecting_place       = kwargs.get('collecting_place', None)
+			o.opening_place          = kwargs.get('opening_place', None)
+			o.prequalification_place = kwargs.get('prequalification_place', None)
+			o.scoring_place          = kwargs.get('scoring_place', None)
+			o.etp                    = kwargs.get('etp', None)
+
+			o.save()
+
+		return o
+
+	def update(self, number, **kwargs):
+
+		if not number:
+			return None
+
+		o = self.take(number, **kwargs)
+		o.name                   = kwargs.get('name', None)
+		o.url                    = kwargs.get('url', None)
+		o.published              = kwargs.get('published', None)
+		o.region                 = kwargs.get('region', None)
+		o.responsible            = kwargs.get('responsible', None)
+		o.specialised            = kwargs.get('specialised', None)
+		o.contact_person         = kwargs.get('contact_person', None)
+		o.placing_way            = kwargs.get('placing_way', None)
+		o.grant_start_time       = kwargs.get('grant_start_time', None)
+		o.grant_end_time         = kwargs.get('grant_end_time', None)
+		o.collecting_start_time  = kwargs.get('collecting_start_time', None)
+		o.collecting_end_time    = kwargs.get('collecting_end_time', None)
+		o.opening_time           = kwargs.get('opening_time', None)
+		o.prequalification_time  = kwargs.get('prequalification_time', None)
+		o.scoring_time           = kwargs.get('scoring_time', None)
+		o.grant_place            = kwargs.get('grant_place', None)
+		o.collecting_place       = kwargs.get('collecting_place', None)
+		o.opening_place          = kwargs.get('opening_place', None)
+		o.prequalification_place = kwargs.get('prequalification_place', None)
+		o.scoring_place          = kwargs.get('scoring_place', None)
+		o.etp                    = kwargs.get('etp', None)
+		o.modified               = timezone.now()
+
+		o.save()
+
+		return o
 
 
-#class PlanGraphPositionProductManager(models.Manager):
 
-#	def take(self, position, number, okpd = None, name = None,
-#			min_requirement = None, okei = None, max_sum = None, price = None,
-#			quantity_undefined = None, quantity = None,
-#			quantity_current_year = None, state = True):
-#		try:
-#			o = self.get(position = position, number = number)
-#		except PlanGraphPositionProduct.DoesNotExist:
-#			o                       = PlanGraphPositionProduct()
-#			o.position              = position
-#			o.number                = number
-#			o.okpd                  = okpd
-#			o.name                  = name
-#			o.min_requirement       = min_requirement
-#			o.okei                  = okei
-#			o.max_sum               = max_sum
-#			o.price                 = price
-#			o.quantity_undefined    = quantity_undefined
-#			o.quantity              = quantity
-#			o.quantity_current_year = quantity_current_year
-#			o.state                 = state
-#			o.created               = timezone.now()
-#			o.modified              = timezone.now()
-#			o.save()
-#		return o
+class Purchase(models.Model):
 
-#	def update(self, position, number, okpd = None, name = None,
-#			min_requirement = None, okei = None, max_sum = None, price = None,
-#			quantity_undefined = None, quantity = None,
-#			quantity_current_year = None, state = True):
-#		try:
-#			o = self.get(position = position, number = number)
-#			o.okpd                  = okpd
-#			o.name                  = name
-#			o.min_requirement       = min_requirement
-#			o.okei                  = okei
-#			o.max_sum               = max_sum
-#			o.price                 = price
-#			o.quantity_undefined    = quantity_undefined
-#			o.quantity              = quantity
-#			o.quantity_current_year = quantity_current_year
-#			o.state                 = state
-#			o.state             = state
-#			o.modified          = timezone.now()
-#			o.save()
-#		except PlanGraphPositionProduct.DoesNotExist:
-#			o = self.take(
-#				position              = position,
-#				number                = number,
-#				okpd                  = okpd,
-#				name                  = name,
-#				min_requirement       = min_requirement,
-#				okei                  = okei,
-#				max_sum               = max_sum,
-#				price                 = price,
-#				quantity_undefined    = quantity_undefined,
-#				quantity              = quantity,
-#				quantity_current_year = quantity_current_year,
-#				state                 = state)
-#		return o
+	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	number         = models.CharField(max_length = 50, unique = True)
+	name           = models.TextField(null = True, default = None)
+	url            = models.TextField(null = True, default = None)
+	published      = models.DateTimeField(default = timezone.now)
+
+	region         = models.ForeignKey(Region,       related_name = 'purchase_region',         null = True, default = None)
+	responsible    = models.ForeignKey(Organisation, related_name = 'purchase_responsible',    null = True, default = None)
+	specialised    = models.ForeignKey(Organisation, related_name = 'purchase_specialised',    null = True, default = None)
+	contact_person = models.ForeignKey(Person,       related_name = 'purchase_contact_person', null = True, default = None)
+	placing_way    = models.ForeignKey(PlacingWay,   related_name = 'purchase_placing_way',    null = True, default = None)
+
+	grant_start_time      = models.DateTimeField(null = True, default = None)
+	grant_end_time        = models.DateTimeField(null = True, default = None)
+	collecting_start_time = models.DateTimeField(null = True, default = None)
+	collecting_end_time   = models.DateTimeField(null = True, default = None)
+	opening_time          = models.DateTimeField(null = True, default = None)
+	prequalification_time = models.DateTimeField(null = True, default = None)
+	scoring_time          = models.DateTimeField(null = True, default = None)
+
+	grant_place            = models.ForeignKey(Address, related_name = 'purchase_grant_place',            null = True, default = None)
+	collecting_place       = models.ForeignKey(Address, related_name = 'purchase_collecting_place',       null = True, default = None)
+	opening_place          = models.ForeignKey(Address, related_name = 'purchase_opening_place',          null = True, default = None)
+	prequalification_place = models.ForeignKey(Address, related_name = 'purchase_prequalification_place', null = True, default = None)
+	scoring_place          = models.ForeignKey(Address, related_name = 'purchase_scoring_place',          null = True, default = None)
+	etp                    = models.ForeignKey(ETP,     related_name = 'purchase_etp',                    null = True, default = None)
+
+	attachments = models.ManyToManyField(Attachment, through = 'PurchaseToAttachment', through_fields = ('purchase', 'attachment'))
+
+	state          = models.BooleanField(default = True)
+	created        = models.DateTimeField(default = timezone.now)
+	modified       = models.DateTimeField(default = timezone.now)
+
+	objects        = PurchaseManager()
+
+	def cancel(self):
+		self.state    = False
+		self.modified = timezone.now()
+		self.save()
+
+	def __str__(self):
+		return "Закупка: {} {} ".format(self.region, self.number)
+
+	class Meta:
+		ordering = ['number']
 
 
-#class PlanGraphPositionProduct(models.Model):
 
-#	position              = models.ForeignKey(PlanGraphPosition)
-#	number                = models.IntegerField()
-#	okpd                  = models.ForeignKey(OKPD, null = True, default = None)
-#	name                  = models.TextField(null = True, default = None)
-#	min_requipment        = models.TextField(null = True, default = None)
-#	okei                  = models.ForeignKey(OKEI, null = True, default = None)
-#	max_sum               = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
-#	price                 = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
-#	quantity_undefined    = models.BooleanField(default = True)
-#	quantity              = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
-#	quantity_current_year = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
-#	state                 = models.BooleanField(default = True)
-#	created               = models.DateTimeField()
-#	modified              = models.DateTimeField()
+class PurchaseToAttachment(models.Model):
 
-#	objects               = PlanGraphPositionProductManager()
+	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	purchase   = models.ForeignKey(Purchase, on_delete = models.CASCADE)
+	attachment = models.ForeignKey(Attachment, on_delete = models.CASCADE)
 
-#	def __str__(self):
-#		return "{}".format(self.name)
-
-#	def _get_max_sum_str(self):
-
-#		try:
-#			max_sum  = self.max_sum
-#			currency = self.position.currency
-#		except: return '-'
-
-#		if max_sum:
-#			max_sum = '{:,}'.format(round(max_sum, 2))
-#			max_sum = max_sum.replace(',', '\u00a0')
-#			max_sum = max_sum.replace('.', ',')
-#			max_sum = '{}\u00a0{}'.format(max_sum, currency.code)
-#			return max_sum
-#		else:
-#			return '-'
-
-#	max_sum_str = property(_get_max_sum_str)
-
-#	def _get_price_str(self):
-
-#		try:
-#			price    = self.price
-#			currency = self.position.currency
-#		except: return '-'
-
-#		if price:
-#			price = '{:,}'.format(round(price, 2))
-#			price = price.replace(',', '\u00a0')
-#			price = price.replace('.', ',')
-#			price = '{}\u00a0{}'.format(price, currency.code)
-#			return price
-#		else:
-#			return '-'
-
-#	price_str = property(_get_price_str)
-
-#	def _get_quantity_str(self):
-
-#		try:
-#			quantity = self.quantity
-#			unit     = self.okei
-#		except: return '-'
-
-#		if quantity:
-#			quantity = '{:,}'.format(round(quantity, 2))
-#			quantity = quantity.replace(',', '\u00a0')
-#			quantity = quantity.replace('.', ',')
-#			quantity = '{}\u00a0{}'.format(quantity, unit.local_symbol)
-#			return quantity
-#		else:
-#			return '-'
-
-#	quantity_str = property(_get_quantity_str)
-
-#	class Meta:
-#		ordering = ['number']
-#		unique_together = ("position", "number")
+	class Meta:
+		db_table = 'tenders_purchase_to_attachment'
 
 
-#class Word(models.Model):
 
-#	word     = models.CharField(max_length = 100, unique = True)
-#	created  = models.DateTimeField()
-#	modified = models.DateTimeField()
+class NotificationManager(models.Manager):
 
-#	def __str__(self):
-#		return "{}".format(self.word)
+	def take(self, id, **kwargs):
+		if not id:
+			return None
+		try:
+			o = self.get(id = id)
+		except Exception:
+			o = Notification()
+			o.id       = id
+			o.url      = kwargs.get('url', None)
+			o.purchase = kwargs.get('purchase', None)
+			o.save()
+		return o
 
-#	class Meta:
-#		ordering = ['word']
 
 
-#class QueryFilter(models.Model):
+class Notification(models.Model):
 
-#	name         = models.CharField(max_length = 100)
+	id       = models.BigIntegerField(primary_key = True, editable = False)
+	url      = models.TextField(null = True, default = None)
+	purchase = models.ForeignKey(Purchase, related_name = 'notification_purchase', null = True, default = None)
+	created  = models.DateTimeField(default = timezone.now)
+	modified = models.DateTimeField(default = timezone.now)
 
-#	regions      = models.ManyToManyField(Region,       db_table = 'tenders_queryfilter_to_region',   related_name = 'queryfilter_region')
-#	customers    = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_customer', related_name = 'queryfilter_customer')
-#	owners       = models.ManyToManyField(Organisation, db_table = 'tenders_queryfilter_to_owner',    related_name = 'queryfilter_owner')
-#	okveds       = models.ManyToManyField(OKVED,        db_table = 'tenders_queryfilter_to_okved',    related_name = 'queryfilter_okved')
-#	okpds        = models.ManyToManyField(OKPD,         db_table = 'tenders_queryfilter_to_okpd',     related_name = 'queryfilter_okpd')
-#	words        = models.ManyToManyField(Word,         db_table = 'tenders_queryfilter_to_word',     related_name = 'queryfilter_word')
+	objects = NotificationManager()
 
-#	regions_in   = models.BooleanField(default=True)
-#	customers_in = models.BooleanField(default=True)
-#	owners_in    = models.BooleanField(default=True)
-#	okveds_in    = models.BooleanField(default=True)
-#	okpds_in     = models.BooleanField(default=True)
-#	words_in     = models.BooleanField(default=True)
+	def __str__(self):
+		return "Уведомление: {}".format(self.id)
 
-#	state        = models.BooleanField(default=True)
-#	public       = models.BooleanField(default=False)
+	class Meta:
+		ordering = ['id']
 
-#	created      = models.DateTimeField()
-#	created_by   = models.CharField(max_length=100, null=True, default=None)
-#	modified     = models.DateTimeField()
-#	modified_by  = models.CharField(max_length=100, null=True, default=None)
 
-#	def __str__(self):
-#		return "{}".format(self.name)
 
-#	class Meta:
-#		ordering = ['name']
+class LotManager(models.Manager):
+
+	def take(self, purchase, number = None, **kwargs):
+
+		if not purchase:
+			return None
+
+		try:
+			o = self.get(purchase = purchase, number = number)
+		except Exception:
+			o = Lot()
+			o.name           = kwargs.get('name', None)
+			o.finance_source = kwargs.get('finance_source', None)
+			o.max_price      = kwargs.get('max_price', None)
+			o.currency       = kwargs.get('currency', None)
+
+			o.save()
+
+		return o
+
+	def update(self, purchase, number = None, **kwargs):
+
+		if not purchase:
+			return None
+
+		o = self.take(purchase, number = None, **kwargs)
+
+		o.name           = kwargs.get('name', None)
+		o.finance_source = kwargs.get('finance_source', None)
+		o.max_price      = kwargs.get('max_price', None)
+		o.currency       = kwargs.get('currency', None)
+
+		o.save()
+
+		return o
+
+
+
+class Lot(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	purchase = models.ForeignKey(Purchase, related_name = 'lot_purchase', null = True, default = None)
+	number   = models.IntegerField(null = True, default = None)
+
+	name           = models.TextField(null = True, default = None)
+	finance_source = models.TextField(null = True, default = None)
+	max_price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None, db_index = True)
+
+	currency       = models.ForeignKey(Currency, related_name = 'lot_currency', null = True, default = None)
+
+	products  = models.ManyToManyField(Product,      through = 'LotToProduct',  through_fields = ('lot', 'product'))
+	customers = models.ManyToManyField(Organisation, through = 'LotToCustomer', through_fields = ('lot', 'customer'))
+
+	objects = LotManager()
+
+	def __str__(self):
+		return "Lot: {}".format(self.id)
+
+
+
+class LotToProduct(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	lot      = models.ForeignKey(Lot,     on_delete = models.CASCADE)
+	product  = models.ForeignKey(Product, on_delete = models.CASCADE)
+
+	quantity = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	okei     = models.ForeignKey(OKEI, null = True, default = None)
+	price    = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	total    = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	currency = models.ForeignKey(Currency, null = True, default = None)
+
+	class Meta:
+		db_table = 'tenders_lot_to_product'
+
+
+
+class LotToCustomer(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	lot      = models.ForeignKey(Lot, on_delete = models.CASCADE)
+	customer = models.ForeignKey(Organisation, on_delete = models.CASCADE)
+
+	class Meta:
+		db_table = 'tenders_lot_to_customer'
+
+
+
+
+
+
+
+
+
+
+
