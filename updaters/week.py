@@ -6,7 +6,8 @@ class Runner(tenders.updaters.zakupki.Runner):
 	subcategories = [
 #		None,
 #		'prevMonth',
-#		'currMonth']
+#		'currMonth'
+	]
 
 	def __init__(self):
 
