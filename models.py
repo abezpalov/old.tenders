@@ -17,7 +17,7 @@ class UpdaterManager(models.Manager):
 
 		except Updater.DoesNotExist:
 			o = Updater()
-			o.alias = alias[:100]
+			o.alias = alias[:50]
 			o.name  = kwargs.get('name', None)
 			o.save()
 
@@ -30,7 +30,7 @@ class Updater(models.Model):
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	name     = models.TextField(null = True, default = None)
-	alias    = models.TextField(unique = True)
+	alias    = models.CharField(max_length = 50, unique = True)
 	login    = models.TextField(null = True, default = None)
 	password = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -118,7 +118,7 @@ class RegionManager(models.Manager):
 
 		except Region.DoesNotExist:
 			o = Region()
-			o.alias     = alias[:100]
+			o.alias     = alias[:50]
 			o.name      = kwargs.get('name',      None)
 			o.full_name = kwargs.get('full_name', None)
 			o.save()
@@ -131,7 +131,7 @@ class Region(models.Model):
 
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	alias     = models.CharField(max_length = 100, unique = True)
+	alias     = models.CharField(max_length = 50, unique = True)
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 	state     = models.BooleanField(default = False, db_index = True)
@@ -161,7 +161,7 @@ class CountryManager(models.Manager):
 
 		except Country.DoesNotExist:
 			o = Country()
-			o.code      = code[:100]
+			o.code      = code[:10]
 			o.full_name = kwargs.get('full_name', None)
 			o.state     = kwargs.get('state', True)
 			if kwargs.get('name', None):
@@ -178,7 +178,7 @@ class CountryManager(models.Manager):
 		if not code:
 			return None
 
-		o = self.take(code = code, **kwargs)
+		o = self.take(code, **kwargs)
 
 		o.full_name = kwargs.get('full_name', None)
 		o.state     = kwargs.get('state',     True)
@@ -229,7 +229,7 @@ class CurrencyManager(models.Manager):
 
 		except Currency.DoesNotExist:
 			o = Currency()
-			o.code         = code
+			o.code         = code[:10]
 			o.digital_code = kwargs.get('digital_code', None)
 			o.name         = kwargs.get('name',         None)
 			o.state        = kwargs.get('state',        True)
@@ -506,53 +506,53 @@ class KOSGU(models.Model):
 
 
 
-#class OKOPFManager(models.Manager):
+class OKOPFManager(models.Manager):
 
 
-#	def take(self, code, **kwargs):
-#		if not code:
-#			return None
-#		try:
-#			o = self.get(code = code)
-#		except OKOPF.DoesNotExist:
-#			o = OKOPF()
-#			o.code          = code[:10]
-#			o.full_name     = kwargs.get('full_name',     None)
-#			o.singular_name = kwargs.get('singular_name', None)
-#			o.parent        = kwargs.get('parent',        None)
-#			o.state         = kwargs.get('state',         True)
-#			o.save()
-#		return o
+	def take(self, code, **kwargs):
+		if not code:
+			return None
+		try:
+			o = self.get(code = code)
+		except OKOPF.DoesNotExist:
+			o = OKOPF()
+			o.code          = code[:10]
+			o.full_name     = kwargs.get('full_name',     None)
+			o.singular_name = kwargs.get('singular_name', None)
+			o.parent        = kwargs.get('parent',        None)
+			o.state         = kwargs.get('state',         True)
+			o.save()
+		return o
 
 
-#	def update(self, code, **kwargs):
-#		if not code:
-#			return None
-#		o = self.take(code, **kwargs)
-#		o.full_name     = kwargs.get('full_name',     None)
-#		o.singular_name = kwargs.get('singular_name', None)
-#		o.parent        = kwargs.get('parent',        None)
-#		o.state         = kwargs.get('state',         True)
-#		o.save()
-#		return o
+	def update(self, code, **kwargs):
+		if not code:
+			return None
+		o = self.take(code, **kwargs)
+		o.full_name     = kwargs.get('full_name',     None)
+		o.singular_name = kwargs.get('singular_name', None)
+		o.parent        = kwargs.get('parent',        None)
+		o.state         = kwargs.get('state',         True)
+		o.save()
+		return o
 
 
 
-#class OKOPF(models.Model):
+class OKOPF(models.Model):
 
-#	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	parent        = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
-#	code          = models.CharField(max_length = 10, unique = True)
-#	full_name     = models.TextField(null = True, default = None)
-#	singular_name = models.TextField(null = True, default = None)
-#	state         = models.BooleanField(default = True, db_index = True)
-#	objects       = OKOPFManager()
+	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	parent        = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	code          = models.CharField(max_length = 10, unique = True)
+	full_name     = models.TextField(null = True, default = None)
+	singular_name = models.TextField(null = True, default = None)
+	state         = models.BooleanField(default = True, db_index = True)
+	objects       = OKOPFManager()
 
-#	def __str__(self):
-#		return "{} {}".format(self.code, self.full_name)
+	def __str__(self):
+		return "{} {}".format(self.code, self.full_name)
 
-#	class Meta:
-#		ordering = ['code']
+	class Meta:
+		ordering = ['code']
 
 
 
@@ -573,7 +573,8 @@ class OKPDManager(models.Manager):
 		except OKPD.DoesNotExist:
 			o = OKPD()
 			o.id     = id
-			o.code   = code
+			if code:
+				o.code = code[:50]
 			o.name   = kwargs.get('name',   None)
 			o.parent = kwargs.get('parent', None)
 			o.state  = kwargs.get('state',  True)
@@ -588,7 +589,7 @@ class OKPDManager(models.Manager):
 			return None
 
 		o = self.take(id, code, **kwargs)
-		o.code     = code
+		o.code     = code[:50]
 		o.name     = kwargs.get('name',   None)
 		o.parent   = kwargs.get('parent', None)
 		o.state    = kwargs.get('state',  True)
@@ -634,7 +635,7 @@ class OKPD2Manager(models.Manager):
 		except OKPD2.DoesNotExist:
 			o = OKPD2()
 			o.id       = id
-			o.code     = code
+			o.code     = code[:50]
 			o.name     = kwargs.get('name',   None)
 			o.parent   = kwargs.get('parent', None)
 			o.state    = kwargs.get('state',  True)
@@ -649,7 +650,7 @@ class OKPD2Manager(models.Manager):
 			return None
 
 		o = self.take(id, code, **kwargs)
-		o.code   = code
+		o.code   = code[:50]
 		o.name   = kwargs.get('name',   None)
 		o.parent = kwargs.get('parent', None)
 		o.state  = kwargs.get('state',  True)
@@ -691,7 +692,7 @@ class OKTMOManager(models.Manager):
 
 		except OKTMO.DoesNotExist:
 			o = OKTMO()
-			o.code   = code
+			o.code   = code[:20]
 			o.name   = kwargs.get('name',   None)
 			o.parent = kwargs.get('parent', None)
 			o.state  = kwargs.get('state',  True)
@@ -849,7 +850,8 @@ class OKVEDManager(models.Manager):
 		except OKVED.DoesNotExist:
 			o = OKVED()
 			o.id         = id
-			o.code       = code
+			if code:
+				o.code = code[:100]
 			o.section    = kwargs.get('section',    None)
 			o.subsection = kwargs.get('subsection', None)
 			o.parent     = kwargs.get('parent',     None)
@@ -865,7 +867,7 @@ class OKVEDManager(models.Manager):
 			return None
 
 		o = self.take(id, code, **kwargs)
-		o.code       = code
+		o.code       = code[:100]
 		o.section    = kwargs.get('section',    None)
 		o.subsection = kwargs.get('subsection', None)
 		o.parent     = kwargs.get('parent',     None)
@@ -967,7 +969,7 @@ class OKVED2Manager(models.Manager):
 		except OKVED2.DoesNotExist:
 			o = OKVED2()
 			o.id      = id
-			o.code    = code
+			o.code    = code[:100]
 			o.section = kwargs.get('section', None)
 			o.parent  = kwargs.get('parent',  None)
 			o.name    = kwargs.get('name',    None)
@@ -1030,7 +1032,7 @@ class BudgetManager(models.Manager):
 
 		except Budget.DoesNotExist:
 			o = Budget()
-			o.code     = code
+			o.code     = code[:20]
 			o.name     = kwargs.get('name',  None)
 			o.state    = kwargs.get('state', False)
 			o.save()
@@ -1086,7 +1088,7 @@ class SubsystemTypeManager(models.Manager):
 
 		except SubsystemType.DoesNotExist:
 			o = SubsystemType()
-			o.code     = code
+			o.code     = code[:20]
 			o.name     = kwargs.get('name',  None)
 			o.state    = kwargs.get('state', True)
 			o.save()
@@ -1234,7 +1236,7 @@ class OKOGUManager(models.Manager):
 
 		except OKOGU.DoesNotExist:
 			o          = OKOGU()
-			o.code     = code
+			o.code     = code[:20]
 			o.name     = kwargs.get('name', None)
 			o.state    = kwargs.get('state', True)
 			o.save()
@@ -1288,7 +1290,7 @@ class Attachment(models.Model):
 
 	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	url         = models.CharField(max_length = 512, unique = True)
+	url         = models.TextField(unique = True)
 	name        = models.TextField(null = True, default = None)
 	size        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
@@ -1399,7 +1401,7 @@ class Phone(models.Model):
 
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	phone = models.CharField(max_length = 128, unique = True)
+	phone = models.TextField(unique = True)
 	state = models.BooleanField(default = True, db_index = True)
 
 	objects = PhoneManager()
@@ -1623,86 +1625,86 @@ class PersonToFax(models.Model):
 
 
 
-#class OrganisationRoleManager(models.Manager):
+class OrganisationRoleManager(models.Manager):
 
-#	def take(self, code, **kwargs):
+	def take(self, code, **kwargs):
 
-#		if not code:
-#			return None
+		if not code:
+			return None
 
-#		try:
-#			o = self.get(code = code)
+		try:
+			o = self.get(code = code)
 
-#		except OrganisationRole.DoesNotExist:
-#			o = OrganisationRole()
-#			o.code  = code[:20]
-#			o.name  = kwargs.get('name', None)
-#			o.state = kwargs.get('state', True)
-#			o.save()
+		except OrganisationRole.DoesNotExist:
+			o = OrganisationRole()
+			o.code  = code[:20]
+			o.name  = kwargs.get('name', None)
+			o.state = kwargs.get('state', True)
+			o.save()
 
-#		return o
-
-
-
-#class OrganisationRole(models.Model):
-
-#	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	code     = models.CharField(max_length = 20, unique = True)
-#	name     = models.TextField(null = True, default = None)
-#	state    = models.BooleanField(default = True, db_index = True)
-
-#	objects  = OrganisationRoleManager()
-
-#	def __str__(self):
-#		return "{}".format(self.code)
-
-#	class Meta:
-#		ordering = ['code']
+		return o
 
 
 
-#class OrganisationTypeManager(models.Manager):
+class OrganisationRole(models.Model):
 
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	code     = models.CharField(max_length = 20, unique = True)
+	name     = models.TextField(null = True, default = None)
+	state    = models.BooleanField(default = True, db_index = True)
 
-#	def take(self, code, **kwargs):
-#		if not code:
-#			return None
-#		try:
-#			o = self.get(code = code)
-#		except OrganisationType.DoesNotExist:
-#			o = OrganisationType()
-#			o.code        = code
-#			o.name        = kwargs.get('name', None)
-#			o.description = kwargs.get('description', None)
-#			o.save()
-#		return o
+	objects  = OrganisationRoleManager()
 
+	def __str__(self):
+		return "{}".format(self.code)
 
-#	def update(self, code, **kwargs):
-#		if not code:
-#			return None
-#		o = self.take(code = code)
-#		o.name        = kwargs.get('name', None)
-#		o.description = kwargs.get('description', None)
-#		o.save()
-#		return o
+	class Meta:
+		ordering = ['code']
 
 
 
-#class OrganisationType(models.Model):
+class OrganisationTypeManager(models.Manager):
 
-#	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	code        = models.CharField(max_length = 20, unique = True)
-#	name        = models.TextField(null = True, default = None)
-#	description = models.TextField(null = True, default = None)
 
-#	objects     = OrganisationTypeManager()
+	def take(self, code, **kwargs):
+		if not code:
+			return None
+		try:
+			o = self.get(code = code)
+		except OrganisationType.DoesNotExist:
+			o = OrganisationType()
+			o.code        = code
+			o.name        = kwargs.get('name', None)
+			o.description = kwargs.get('description', None)
+			o.save()
+		return o
 
-#	def __str__(self):
-#		return "{} {}".format(self.code, self.name)
 
-#	class Meta:
-#		ordering = ['code']
+	def update(self, code, **kwargs):
+		if not code:
+			return None
+		o = self.take(code = code)
+		o.name        = kwargs.get('name', None)
+		o.description = kwargs.get('description', None)
+		o.save()
+		return o
+
+
+
+class OrganisationType(models.Model):
+
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	code        = models.CharField(max_length = 20, unique = True)
+	name        = models.TextField(null = True, default = None)
+	description = models.TextField(null = True, default = None)
+
+	objects     = OrganisationTypeManager()
+
+	def __str__(self):
+		return "{} {}".format(self.code, self.name)
+
+	class Meta:
+		ordering = ['code']
 
 
 
@@ -1734,10 +1736,10 @@ class OrganisationManager(models.Manager):
 			o.contact_person    = kwargs.get('contact_person',    None)
 			o.head_agency       = kwargs.get('head_agency',       None)
 			o.ordering_agency   = kwargs.get('ordering_agency',   None)
-#			o.okopf             = kwargs.get('okopf',             None)
-#			o.okogu             = kwargs.get('okogu',             None)
-#			o.organisation_role = kwargs.get('organisation_role', None)
-#			o.organisation_type = kwargs.get('organisation_type', None)
+			o.okopf             = kwargs.get('okopf',             None)
+			o.okogu             = kwargs.get('okogu',             None)
+			o.organisation_role = kwargs.get('organisation_role', None)
+			o.organisation_type = kwargs.get('organisation_type', None)
 			o.oktmo             = kwargs.get('oktmo',             None)
 			o.state             = kwargs.get('state',             True)
 			o.register          = kwargs.get('register',          True)
@@ -1772,10 +1774,10 @@ class OrganisationManager(models.Manager):
 		o.contact_person    = kwargs.get('contact_person',    None)
 		o.head_agency       = kwargs.get('head_agency',       None)
 		o.ordering_agency   = kwargs.get('ordering_agency',   None)
-#		o.okopf             = kwargs.get('okopf',             None)
-#		o.okogu             = kwargs.get('okogu',             None)
-#		o.organisation_role = kwargs.get('organisation_role', None)
-#		o.organisation_type = kwargs.get('organisation_type', None)
+		o.okopf             = kwargs.get('okopf',             None)
+		o.okogu             = kwargs.get('okogu',             None)
+		o.organisation_role = kwargs.get('organisation_role', None)
+		o.organisation_type = kwargs.get('organisation_type', None)
 		o.oktmo             = kwargs.get('oktmo',             None)
 		o.state             = kwargs.get('state',             True)
 		o.register          = kwargs.get('register',          True)
@@ -1802,10 +1804,10 @@ class Organisation(models.Model):
 	contact_person    = models.ForeignKey(Person,           on_delete = models.CASCADE, related_name = 'organisation_contact_person',  null = True, default = None)
 	head_agency       = models.ForeignKey('self',           on_delete = models.CASCADE, related_name = 'organisation_head_agency',     null = True, default = None)
 	ordering_agency   = models.ForeignKey('self',           on_delete = models.CASCADE, related_name = 'organisation_ordering_agency', null = True, default = None)
-#	okopf             = models.ForeignKey(OKOPF,            on_delete = models.CASCADE, related_name = 'organisation_okopf',           null = True, default = None)
-#	okogu             = models.ForeignKey(OKOGU,            on_delete = models.CASCADE, related_name = 'organisation_okogu',           null = True, default = None)
-#	organisation_role = models.ForeignKey(OrganisationRole, on_delete = models.CASCADE, related_name = 'organisation_role',            null = True, default = None)
-#	organisation_type = models.ForeignKey(OrganisationType, on_delete = models.CASCADE, related_name = 'organisation_type',            null = True, default = None)
+	okopf             = models.ForeignKey(OKOPF,            on_delete = models.CASCADE, related_name = 'organisation_okopf',           null = True, default = None)
+	okogu             = models.ForeignKey(OKOGU,            on_delete = models.CASCADE, related_name = 'organisation_okogu',           null = True, default = None)
+	organisation_role = models.ForeignKey(OrganisationRole, on_delete = models.CASCADE, related_name = 'organisation_role',            null = True, default = None)
+	organisation_type = models.ForeignKey(OrganisationType, on_delete = models.CASCADE, related_name = 'organisation_type',            null = True, default = None)
 	oktmo             = models.ForeignKey(OKTMO,            on_delete = models.CASCADE, related_name = 'organisation_oktmo',           null = True, default = None)
 
 	reg_number        = models.CharField(max_length = 20, unique = True)

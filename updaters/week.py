@@ -22,8 +22,8 @@ class Runner(tenders.updaters.zakupki.Runner):
 			{'category' : 'nsiCurrency',                       'parser' : self.parse_currency},
 			{'category' : 'nsiContractCurrencyCBRF',           'parser' : self.parse_currency},
 			{'category' : 'nsiOKEI',                           'parser' : self.parse_okei},
-#			{'category' : 'nsiKOSGU',                          'parser' : self.parse_kosgu},
-#			{'category' : 'nsiOKOPF',                          'parser' : self.parse_okopf},
+			{'category' : 'nsiKOSGU',                          'parser' : self.parse_kosgu},
+			{'category' : 'nsiOKOPF',                          'parser' : self.parse_okopf},
 			{'category' : 'nsiOKPD',                           'parser' : self.parse_okpd},
 			{'category' : 'nsiOKPD2',                          'parser' : self.parse_okpd2},
 			{'category' : 'nsiOKTMO',                          'parser' : self.parse_oktmo},
@@ -32,7 +32,7 @@ class Runner(tenders.updaters.zakupki.Runner):
 			{'category' : 'nsiBudget',                         'parser' : self.parse_budget},
 			{'category' : 'nsiOffBudgetType',                  'parser' : self.parse_budget_type},
 #			{'category' : 'nsiKBKBudget',                      'parser' : self.parse_kbk_budget},
-#			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
+			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
 			{'category' : 'nsiOrganization',                   'parser' : self.parse_organisation},
 			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placing_way},
 			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
@@ -116,6 +116,6 @@ class Runner(tenders.updaters.zakupki.Runner):
 					parse = essence['parser']
 					parse(tree, region)
 
-#				source.complite()
+				source.complite()
 
 		return True

@@ -31,8 +31,8 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiCurrency',                       'parser' : self.parse_currency},
 			{'category' : 'nsiContractCurrencyCBRF',           'parser' : self.parse_currency},
 			{'category' : 'nsiOKEI',                           'parser' : self.parse_okei},
-#			{'category' : 'nsiKOSGU',                          'parser' : self.parse_kosgu},
-#			{'category' : 'nsiOKOPF',                          'parser' : self.parse_okopf},
+			{'category' : 'nsiKOSGU',                          'parser' : self.parse_kosgu},
+			{'category' : 'nsiOKOPF',                          'parser' : self.parse_okopf},
 			{'category' : 'nsiOKPD',                           'parser' : self.parse_okpd},
 			{'category' : 'nsiOKPD2',                          'parser' : self.parse_okpd2},
 			{'category' : 'nsiOKTMO',                          'parser' : self.parse_oktmo},
@@ -41,7 +41,7 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiBudget',                         'parser' : self.parse_budget},
 			{'category' : 'nsiOffBudgetType',                  'parser' : self.parse_budget_type},
 #			{'category' : 'nsiKBKBudget',                      'parser' : self.parse_kbk_budget},
-#			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
+			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
 			{'category' : 'nsiOrganization',                   'parser' : self.parse_organisation},
 			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placing_way},
 			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
@@ -286,34 +286,38 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
-#	def parse_kosgu(self, tree):
-#		'Парсит классификатор операций сектора государственного управления.'
-#		for element in tree.xpath('.//nsiKOSGU'):
-#			o['parent_code'] = self.get_text(element, './parentCode')
-#			if o['parent_code'] == '000' or not o['parent_code']:
-#				o['parent_code'] = None
-#			parent = KOSGU.objects.take(code = o['parent_code'])
-#			kosgu = KOSGU.objects.update(
-#				code   = self.get_text(element, './code'),
-#				parent = parent,
-#				name   = self.get_text(element, './name'),
-#				state  = self.get_bool(element, './actual'))
-#			print("КОСГУ: {}.".format(kosgu))
-#		return True
+	def parse_kosgu(self, tree):
+		'Парсит классификатор операций сектора государственного управления.'
+		for element in tree.xpath('.//nsiKOSGU'):
+
+			code = self.get_text(element, './parentCode')
+			if code == '000' or not code:
+				code = None
+			parent = KOSGU.objects.take(code = code)
+
+			kosgu = KOSGU.objects.update(
+				code   = self.get_text(element, './code'),
+				parent = parent,
+				name   = self.get_text(element, './name'),
+				state  = self.get_bool(element, './actual'))
+
+			print("КОСГУ: {}.".format(kosgu))
+
+		return True
 
 
-#	def parse_okopf(self, tree):
-#		'Парсит ОКОПФ.'
-#		for element in tree.xpath('.//nsiOKOPF'):
-#			parent = OKOPF.objects.take(code = self.get_text(element, './parentCode'))
-#			okopf = OKOPF.objects.update(
-#				code          = self.get_text(element, './code'),
-#				full_name     = self.get_text(element, './fullName'),
-#				singular_name = self.get_text(element, './singularName'),
-#				parent        = parent,
-#				state         = self.get_bool(element, './actual'))
-#			print("ОКОПФ: {}.".format(okopf))
-#		return True
+	def parse_okopf(self, tree):
+		'Парсит ОКОПФ.'
+		for element in tree.xpath('.//nsiOKOPF'):
+			parent = OKOPF.objects.take(code = self.get_text(element, './parentCode'))
+			okopf = OKOPF.objects.update(
+				code          = self.get_text(element, './code'),
+				full_name     = self.get_text(element, './fullName'),
+				singular_name = self.get_text(element, './singularName'),
+				parent        = parent,
+				state         = self.get_bool(element, './actual'))
+			print("ОКОПФ: {}.".format(okopf))
+		return True
 
 
 	def parse_okpd(self, tree):
@@ -466,15 +470,15 @@ class Runner(tenders.runner.Runner):
 #		return True
 
 
-#	def parse_organisation_type(self, tree):
-#		'Парсит типы организаций.'
-#		for element in tree.xpath('.//nsiOrganizationType'):
-#			organisation_type = OrganisationType.objects.update(
-#				code        = self.get_text(element, './code'),
-#				name        = self.get_text(element, './name'),
-#				description = self.get_text(element, './description'))
-#			print("Тип организации: {}".format(organisation_type))
-#		return True
+	def parse_organisation_type(self, tree):
+		'Парсит типы организаций.'
+		for element in tree.xpath('.//nsiOrganizationType'):
+			organisation_type = OrganisationType.objects.update(
+				code        = self.get_text(element, './code'),
+				name        = self.get_text(element, './name'),
+				description = self.get_text(element, './description'))
+			print("Тип организации: {}".format(organisation_type))
+		return True
 
 
 
@@ -506,20 +510,20 @@ class Runner(tenders.runner.Runner):
 				reg_number = self.get_text(element, './orderingAgency/regNum'),
 				full_name  = self.get_text(element, './orderingAgency/fullName'))
 
-#			okopf = OKOPF.objects.take(
-#				code      = self.get_text(element, './OKOPF/code'),
-#				full_name = self.get_text(element, './OKOPF/fullName'))
+			okopf = OKOPF.objects.take(
+				code      = self.get_text(element, './OKOPF/code'),
+				full_name = self.get_text(element, './OKOPF/fullName'))
 
-#			okogu = OKOGU.objects.take(
-#				code = self.get_text(element, './OKOGU/code'),
-#				name = self.get_text(element, './OKOGU/name'))
+			okogu = OKOGU.objects.take(
+				code = self.get_text(element, './OKOGU/code'),
+				name = self.get_text(element, './OKOGU/name'))
 
-#			organisation_role = OrganisationRole.objects.take(
-#				code = self.get_text(element, './organizationRole'))
+			organisation_role = OrganisationRole.objects.take(
+				code = self.get_text(element, './organizationRole'))
 
-#			organisation_type = OrganisationType.objects.take(
-#				code = self.get_text(element, './organizationType/code'),
-#				name = self.get_text(element, './organizationType/name'))
+			organisation_type = OrganisationType.objects.take(
+				code = self.get_text(element, './organizationType/code'),
+				name = self.get_text(element, './organizationType/name'))
 
 			oktmo = OKTMO.objects.take(
 				code = self.get_text(element, './OKTMO/code'))
@@ -540,10 +544,10 @@ class Runner(tenders.runner.Runner):
 				contact_person    = contact_person,
 				head_agency       = head_agency,
 				ordering_agency   = ordering_agency,
-#				okopf             = okopf,
-#				okogu             = okogu,
-#				organisation_role = organisation_role,
-#				organisation_type = organisation_type,
+				okopf             = okopf,
+				okogu             = okogu,
+				organisation_role = organisation_role,
+				organisation_type = organisation_type,
 				oktmo             = oktmo,
 				state             = self.get_bool(element, './actual'),
 				register          = self.get_bool(element, './register'))
@@ -1051,7 +1055,8 @@ class Runner(tenders.runner.Runner):
 
 			currency = Currency.objects.take(code = self.get_text(l, './currency/code'))
 
-			# TODO ??
+
+		# TODO ??
 			#plan_number     = self.get_text(l, './customerRequirements/tenderPlanInfo/planNumber')
 			#position_number = self.get_text(l, './customerRequirements/tenderPlanInfo/positionNumber')
 			if self.get_int(l, './lotNumber'):
