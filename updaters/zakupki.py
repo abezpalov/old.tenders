@@ -325,10 +325,10 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiOKPD'):
 
-			parent = OKPD.objects.take(id = self.get_text(element, './parentId'))
+			parent = OKPD.objects.take(oos_id = self.get_text(element, './parentId'))
 
 			okpd = OKPD.objects.update(
-				id     = self.get_text(element, './id'),
+				oos_id = self.get_text(element, './id'),
 				parent = parent,
 				code   = self.get_text(element, './code'),
 				name   = self.get_text(element, './name'),
@@ -344,10 +344,10 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiOKPD2'):
 
-			parent = OKPD2.objects.take(id = self.get_text(element, './parentId'))
+			parent = OKPD2.objects.take(oos_id = self.get_text(element, './parentId'))
 
 			okpd2 = OKPD2.objects.update(
-				id     = self.get_text(element, './id'),
+				oos_id = self.get_text(element, './id'),
 				parent = parent,
 				code   = self.get_text(element, './code'),
 				name   = self.get_text(element, './name'),
@@ -384,10 +384,10 @@ class Runner(tenders.runner.Runner):
 
 			section    = OKVEDSection.objects.take(name = self.get_text(element, './section'))
 			subsection = OKVEDSubSection.objects.take(name = self.get_text(element, './subsection'))
-			parent     = OKVED.objects.take(id = self.get_text(element, './parentId'))
+			parent     = OKVED.objects.take(oos_id = self.get_text(element, './parentId'))
 
 			okved = OKVED.objects.update(
-				id         = self.get_text(element, './id'),
+				oos_id     = self.get_text(element, './id'),
 				section    = section,
 				subsection = subsection,
 				parent     = parent,
@@ -410,7 +410,7 @@ class Runner(tenders.runner.Runner):
 
 			okved = OKVED2.objects.update(
 				code       = self.get_text(element, './code'),
-				id         = self.get_text(element, './id'),
+				oos_id     = self.get_text(element, './id'),
 				section    = section,
 				parent     = parent,
 				name       = self.get_text(element, './name'),
@@ -503,11 +503,11 @@ class Runner(tenders.runner.Runner):
 				faxes       = [fax])
 
 			head_agency = Organisation.objects.take(
-				reg_number = self.get_text(element, './headAgency/regNum'),
+				oos_number = self.get_text(element, './headAgency/regNum'),
 				full_name  = self.get_text(element, './headAgency/fullName'))
 
 			ordering_agency = Organisation.objects.take(
-				reg_number = self.get_text(element, './orderingAgency/regNum'),
+				oos_number = self.get_text(element, './orderingAgency/regNum'),
 				full_name  = self.get_text(element, './orderingAgency/fullName'))
 
 			okopf = OKOPF.objects.take(
@@ -529,7 +529,7 @@ class Runner(tenders.runner.Runner):
 				code = self.get_text(element, './OKTMO/code'))
 
 			organisation = Organisation.objects.update(
-				reg_number        = self.get_text(element, './regNumber'),
+				oos_number        = self.get_text(element, './regNumber'),
 				short_name        = self.get_text(element, './shortName'),
 				full_name         = self.get_text(element, './fullName'),
 				inn               = self.get_text(element, './INN'),
@@ -675,7 +675,7 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlanCancel'):
 
-			customer = Organisation.objects.get(reg_number = self.get_text(element, './customerInfo/regNum'))
+			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/regNum'))
 
 			plan = Plan.objects.update(
 				id             = self.get_text(element, './id'),
@@ -696,8 +696,8 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlanUnstructured'):
 
-			owner    = Organisation.objects.get(reg_number = self.get_text(element, './commonInfo/owner/regNum'))
-			customer = Organisation.objects.get(reg_number = self.get_text(element, './customerInfo/customer/regNum'))
+			owner    = Organisation.objects.get(oos_number = self.get_text(element, './commonInfo/owner/regNum'))
+			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/customer/regNum'))
 
 			email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
 			phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
@@ -731,8 +731,8 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlan'):
 
-			owner    = Organisation.objects.take(reg_number = self.get_text(element, './commonInfo/owner/regNum'))
-			customer = Organisation.objects.get(reg_number = self.get_text(element, './customerInfo/customer/regNum'))
+			owner    = Organisation.objects.take(oos_number = self.get_text(element, './commonInfo/owner/regNum'))
+			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/customer/regNum'))
 
 			email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
 			phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
@@ -900,7 +900,7 @@ class Runner(tenders.runner.Runner):
 
 	def parse_notification_sign(self, element, region):
 
-		customer = Organisation.objects.take(reg_number = self.get_text(element, './customer/regNum'))
+		customer = Organisation.objects.take(oos_number = self.get_text(element, './customer/regNum'))
 		print('Customer: {}.'.format(customer))
 
 		currency = Currency.objects.take(code = self.get_text(element, './currency/code'))
@@ -931,7 +931,7 @@ class Runner(tenders.runner.Runner):
 
 	def parse_notification_prolongation(self, element, region):
 
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'))
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
 #		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
 #		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
@@ -955,7 +955,7 @@ class Runner(tenders.runner.Runner):
 
 	def parse_notification_cancel(self, element, region):
 
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'))
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
 		notification = Notification.objects.take(
 			id       = self.get_int(element, './id'),
@@ -969,8 +969,8 @@ class Runner(tenders.runner.Runner):
 
 	def parse_notification_get_universal(self, element, region):
 
-		responsible = Organisation.objects.take(reg_number = self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
-		specialised = Organisation.objects.take(reg_number = self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
+		responsible = Organisation.objects.take(oos_number = self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
+		specialised = Organisation.objects.take(oos_number = self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
 
 		# TODO TEST
 		import xml.etree.ElementTree as ET
@@ -1108,7 +1108,7 @@ class Runner(tenders.runner.Runner):
 				for c in l.xpath('./customerRequirements/customerRequirement/customer'):
 
 					customer = Organisation.objects.take(
-						reg_number = self.get_text(c, './regNum'))
+						oos_number = self.get_text(c, './regNum'))
 
 					link = LotToCustomer()
 					link.lot      = lot

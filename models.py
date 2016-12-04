@@ -542,10 +542,12 @@ class OKOPF(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	parent        = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+
 	code          = models.CharField(max_length = 10, unique = True)
 	full_name     = models.TextField(null = True, default = None)
 	singular_name = models.TextField(null = True, default = None)
 	state         = models.BooleanField(default = True, db_index = True)
+
 	objects       = OKOPFManager()
 
 	def __str__(self):
@@ -559,20 +561,20 @@ class OKOPF(models.Model):
 class OKPDManager(models.Manager):
 
 
-	def take(self, id = None, code = None, **kwargs):
+	def take(self, oos_id = None, code = None, **kwargs):
 
-		if not id and not code:
+		if not oos_id and not code:
 			return None
 
 		try:
-			if id:
-				o = self.get(id = id)
+			if oos_id:
+				o = self.get(oos_id = oos_id)
 			else:
 				o = self.get(code = code)
 
 		except OKPD.DoesNotExist:
 			o = OKPD()
-			o.id     = id
+			o.oos_id = oos_id
 			if code:
 				o.code = code[:50]
 			o.name   = kwargs.get('name',   None)
@@ -583,12 +585,12 @@ class OKPDManager(models.Manager):
 		return o
 
 
-	def update(self, id, code = None, **kwargs):
+	def update(self, oos_id, code = None, **kwargs):
 
 		if not code:
 			return None
 
-		o = self.take(id, code, **kwargs)
+		o = self.take(oos_id, code, **kwargs)
 		o.code     = code[:50]
 		o.name     = kwargs.get('name',   None)
 		o.parent   = kwargs.get('parent', None)
@@ -601,9 +603,10 @@ class OKPDManager(models.Manager):
 
 class OKPD(models.Model):
 
-	id       = models.IntegerField(primary_key = True, editable = False)
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	parent   = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
 
+	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -621,20 +624,20 @@ class OKPD(models.Model):
 class OKPD2Manager(models.Manager):
 
 
-	def take(self, id, code = None, **kwargs):
+	def take(self, oos_id, code = None, **kwargs):
 
-		if not id and not code:
+		if not oos_id and not code:
 			return None
 
 		try:
-			if id:
-				o = self.get(id = id)
+			if oos_id:
+				o = self.get(oos_id = oos_id)
 			else:
 				o = self.get(code = code)
 
 		except OKPD2.DoesNotExist:
 			o = OKPD2()
-			o.id       = id
+			o.oos_id       = oos_id
 			o.code     = code[:50]
 			o.name     = kwargs.get('name',   None)
 			o.parent   = kwargs.get('parent', None)
@@ -644,12 +647,12 @@ class OKPD2Manager(models.Manager):
 		return o
 
 
-	def update(self, id, code, **kwargs):
+	def update(self, oos_id, code, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
-		o = self.take(id, code, **kwargs)
+		o = self.take(oos_id, code, **kwargs)
 		o.code   = code[:50]
 		o.name   = kwargs.get('name',   None)
 		o.parent = kwargs.get('parent', None)
@@ -662,9 +665,10 @@ class OKPD2Manager(models.Manager):
 
 class OKPD2(models.Model):
 
-	id       = models.IntegerField(primary_key = True, editable = False)
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	parent   = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
 
+	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -820,6 +824,7 @@ class OKVEDSubSectionManager(models.Manager):
 class OKVEDSubSection(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
 	name     = models.TextField(unique = True)
 	state    = models.BooleanField(default = True, db_index = True)
 
@@ -835,21 +840,21 @@ class OKVEDSubSection(models.Model):
 
 class OKVEDManager(models.Manager):
 
-	def take(self, id = None, code = None, **kwargs):
+	def take(self, oos_id = None, code = None, **kwargs):
 
 
-		if not id and not code:
+		if not oos_id and not code:
 			return None
 
 		try:
-			if id:
-				o = self.get(id = id)
+			if oos_id:
+				o = self.get(oos_id = oos_id)
 			else:
 				o = self.get(code = code)
 
 		except OKVED.DoesNotExist:
 			o = OKVED()
-			o.id         = id
+			o.oos_id = oos_id
 			if code:
 				o.code = code[:100]
 			o.section    = kwargs.get('section',    None)
@@ -861,12 +866,12 @@ class OKVEDManager(models.Manager):
 
 		return o
 
-	def update(self, id, code = None, **kwargs):
+	def update(self, oos_id, code = None, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
-		o = self.take(id, code, **kwargs)
+		o = self.take(oos_id, code, **kwargs)
 		o.code       = code[:100]
 		o.section    = kwargs.get('section',    None)
 		o.subsection = kwargs.get('subsection', None)
@@ -881,16 +886,17 @@ class OKVEDManager(models.Manager):
 
 class OKVED(models.Model):
 
-	id            = models.IntegerField(primary_key = True, editable = False)
-	section       = models.ForeignKey(OKVEDSection,    on_delete = models.CASCADE, null = True, default = None)
-	subsection    = models.ForeignKey(OKVEDSubSection, on_delete = models.CASCADE, null = True, default = None)
-	parent        = models.ForeignKey('self',          on_delete = models.CASCADE, null = True, default = None)
+	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	section    = models.ForeignKey(OKVEDSection,    on_delete = models.CASCADE, null = True, default = None)
+	subsection = models.ForeignKey(OKVEDSubSection, on_delete = models.CASCADE, null = True, default = None)
+	parent     = models.ForeignKey('self',          on_delete = models.CASCADE, null = True, default = None)
 
-	code          = models.CharField(max_length = 100, null = True, default = None, db_index = True)
-	name          = models.TextField(null = True, default = None)
-	state         = models.BooleanField(default = True, db_index = True)
+	oos_id     = models.IntegerField(null = True, default = None)
+	code       = models.CharField(max_length = 100, null = True, default = None, db_index = True)
+	name       = models.TextField(null = True, default = None)
+	state      = models.BooleanField(default = True, db_index = True)
 
-	objects       = OKVEDManager()
+	objects = OKVEDManager()
 
 	def __str__(self):
 		return "{} {}".format(self.code, self.name)
@@ -936,6 +942,7 @@ class OKVED2SectionManager(models.Manager):
 class OKVED2Section(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
 	name     = models.TextField(unique = True)
 	state    = models.BooleanField(default = True, db_index = True)
 
@@ -955,20 +962,20 @@ class OKVED2Section(models.Model):
 class OKVED2Manager(models.Manager):
 
 
-	def take(self, code, id = None, **kwargs):
+	def take(self, code, oos_id = None, **kwargs):
 
-		if not code and not id:
+		if not code and not oos_id:
 			return None
 
 		try:
 			if code:
 				o = self.get(code = code)
 			else:
-				o = self.get(id = id)
+				o = self.get(oos_id = oos_id)
 
 		except OKVED2.DoesNotExist:
 			o = OKVED2()
-			o.id      = id
+			o.oos_id  = oos_id
 			o.code    = code[:100]
 			o.section = kwargs.get('section', None)
 			o.parent  = kwargs.get('parent',  None)
@@ -980,13 +987,13 @@ class OKVED2Manager(models.Manager):
 		return o
 
 
-	def update(self, code, id, **kwargs):
+	def update(self, code, oos_id, **kwargs):
 
-		if not code or not id:
+		if not code or not oos_id:
 			return None
 
-		o = self.take(code, id, **kwargs)
-		o.id         = id
+		o = self.take(code, oos_id, **kwargs)
+		o.oos_id         = oos_id
 		o.section    = kwargs.get('section', None)
 		o.parent     = kwargs.get('parent',  None)
 		o.name       = kwargs.get('name',    None)
@@ -1000,10 +1007,11 @@ class OKVED2Manager(models.Manager):
 
 class OKVED2(models.Model):
 
-	id      = models.BigIntegerField(primary_key = True, editable = False)
+	id      = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	section = models.ForeignKey(OKVED2Section, on_delete = models.CASCADE, null = True, default = None)
 	parent  = models.ForeignKey('self',        on_delete = models.CASCADE, null = True, default = None)
 
+	oos_id  = models.BigIntegerField(null = True, default = None)
 	code    = models.CharField(max_length = 100, null = True, default = None, unique = True)
 	name    = models.TextField(null = True, default = None)
 	comment = models.TextField(null = True, default = None)
@@ -1649,6 +1657,7 @@ class OrganisationRoleManager(models.Manager):
 class OrganisationRole(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -1694,6 +1703,7 @@ class OrganisationTypeManager(models.Manager):
 class OrganisationType(models.Model):
 
 	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
 	code        = models.CharField(max_length = 20, unique = True)
 	name        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
@@ -1711,17 +1721,17 @@ class OrganisationType(models.Model):
 class OrganisationManager(models.Manager):
 
 
-	def take(self, reg_number, **kwargs):
+	def take(self, oos_number, **kwargs):
 
-		if not reg_number:
+		if not oos_number:
 			return None
 
 		try:
-			o = self.get(reg_number = reg_number)
+			o = self.get(oos_number = oos_number)
 
 		except Organisation.DoesNotExist:
 			o = Organisation()
-			o.reg_number        = reg_number
+			o.oos_number        = oos_number
 			o.short_name        = kwargs.get('short_name',        None)
 			o.full_name         = kwargs.get('full_name',         None)
 			o.inn               = kwargs.get('inn',               None)
@@ -1754,12 +1764,12 @@ class OrganisationManager(models.Manager):
 		return o
 
 
-	def update(self, reg_number, **kwargs):
+	def update(self, oos_number, **kwargs):
 
-		if not reg_number:
+		if not oos_number:
 			return None
 
-		o = self.take(reg_number, **kwargs)
+		o = self.take(oos_number, **kwargs)
 		o.short_name        = kwargs.get('short_name',        None)
 		o.full_name         = kwargs.get('full_name',         None)
 		o.inn               = kwargs.get('inn',               None)
@@ -1810,7 +1820,7 @@ class Organisation(models.Model):
 	organisation_type = models.ForeignKey(OrganisationType, on_delete = models.CASCADE, related_name = 'organisation_type',            null = True, default = None)
 	oktmo             = models.ForeignKey(OKTMO,            on_delete = models.CASCADE, related_name = 'organisation_oktmo',           null = True, default = None)
 
-	reg_number        = models.CharField(max_length = 20, unique = True)
+	oos_number        = models.CharField(max_length = 20, null = True, default = None, db_index = True)
 	name              = models.TextField(null = True, default = None, db_index = True)
 	short_name        = models.TextField(null = True, default = None)
 	full_name         = models.TextField(null = True, default = None)
@@ -1831,7 +1841,7 @@ class Organisation(models.Model):
 		return "{}".format(self.name)
 
 	class Meta:
-		ordering = ['reg_number']
+		ordering = ['oos_number']
 
 
 
@@ -1871,17 +1881,17 @@ class OrganisationToOKVED(models.Model):
 class PlacingWayManager(models.Manager):
 
 
-	def take(self, id, **kwargs):
+	def take(self, oos_id, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
 		try:
-			o = self.get(id = id)
+			o = self.get(oos_id = oos_id)
 
 		except Exception:
 			o = PlacingWay()
-			o.id              = id
+			o.oos_id          = oos_id
 			o.code            = kwargs.get('code', None)
 			o.name            = kwargs.get('name', None)
 			o.type_code       = kwargs.get('type_code', None)
@@ -1892,12 +1902,12 @@ class PlacingWayManager(models.Manager):
 		return o
 
 
-	def update(self, id, **kwargs):
+	def update(self, oos_id, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
-		o = self.take(id, **kwargs)
+		o = self.take(oos_id, **kwargs)
 		o.code           = kwargs.get('code', None)
 		o.name           = kwargs.get('name', None)
 		o.type_code      = kwargs.get('type_code', None)
@@ -1911,15 +1921,16 @@ class PlacingWayManager(models.Manager):
 
 class PlacingWay(models.Model):
 
-	id              = models.IntegerField(primary_key = True, editable = False)
-	subsystem_type  = models.ForeignKey(SubsystemType, on_delete = models.CASCADE, null = True, default = None)
+	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	subsystem_type = models.ForeignKey(SubsystemType, on_delete = models.CASCADE, null = True, default = None)
 
-	code            = models.TextField(null = True, default = None)
-	name            = models.TextField(null = True, default = None)
-	type_code       = models.CharField(max_length = 20, null = True, default = None)
-	state           = models.BooleanField(default = True, db_index = True)
+	oos_id         = models.IntegerField(null = True, default = None, db_index = True)
+	code           = models.TextField(null = True, default = None)
+	name           = models.TextField(null = True, default = None)
+	type_code      = models.CharField(max_length = 20, null = True, default = None)
+	state          = models.BooleanField(default = True, db_index = True)
 
-	objects         = PlacingWayManager()
+	objects = PlacingWayManager()
 
 	def __str__(self):
 		return "{} {}".format(self.code, self.name)
@@ -1974,17 +1985,17 @@ class ETP(models.Model):
 class PlanPositionChangeReasonManager(models.Manager):
 
 
-	def take(self, id, **kwargs):
+	def take(self, oos_id, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
 		try:
-			o = self.get(id = id)
+			o = self.get(oos_id = oos_id)
 
 		except Exception:
 			o = PlanPositionChangeReason()
-			o.id          = id
+			o.oos_id      = oos_id
 			o.name        = kwargs.get('name',        None)
 			o.description = kwargs.get('description', None)
 			o.state       = kwargs.get('state',       True)
@@ -1993,12 +2004,12 @@ class PlanPositionChangeReasonManager(models.Manager):
 		return o
 
 
-	def update(self, id, **kwargs):
+	def update(self, oos_id, **kwargs):
 
-		if not id:
+		if not oos_id:
 			return None
 
-		o = self.take(id, **kwargs)
+		o = self.take(oos_id, **kwargs)
 		o.name        = kwargs.get('name',        None)
 		o.description = kwargs.get('description', None)
 		o.state       = kwargs.get('state',       True)
@@ -2010,8 +2021,9 @@ class PlanPositionChangeReasonManager(models.Manager):
 
 class PlanPositionChangeReason(models.Model):
 
-	id          = models.IntegerField(primary_key = True, editable = False)
+	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
+	oos_id      = models.IntegerField(null = True, default = None, db_index = True)
 	name        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
 	state       = models.BooleanField(default = True, db_index = True)
@@ -2022,7 +2034,7 @@ class PlanPositionChangeReason(models.Model):
 		return "{} {}".format(self.id, self.name)
 
 	class Meta:
-		ordering = ['id']
+		ordering = ['oos_id']
 
 
 
@@ -2135,17 +2147,17 @@ class KVR(models.Model):
 class PlanManager(models.Manager):
 
 
-	def take(self, id, **kwargs):
+	def take(self, oss_id, **kwargs):
 
-		if not id:
+		if not oss_id:
 			return None
 
 		try:
-			o = self.get(id = id)
+			o = self.get(oss_id = oss_id)
 
 		except Exception:
 			o = Plan()
-			o.id             = id
+			o.oss_id             = oss_id
 			o.number         = kwargs.get('number',         None)
 			o.year           = kwargs.get('year',           None)
 			o.version        = kwargs.get('version',        None)
@@ -2166,12 +2178,12 @@ class PlanManager(models.Manager):
 		return o
 
 
-	def update(self, id, **kwargs):
+	def update(self, oss_id, **kwargs):
 
-		if not id:
+		if not oss_id:
 			return None
 
-		o = self.take(id, **kwargs)
+		o = self.take(oss_id, **kwargs)
 		o.number         = kwargs.get('number',         None)
 		o.year           = kwargs.get('year',           None)
 		o.version        = kwargs.get('version',        None)
@@ -2195,7 +2207,9 @@ class PlanManager(models.Manager):
 
 class Plan(models.Model):
 
-	id             = models.BigIntegerField(primary_key = True, editable = False)
+	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
+	oss_id         = models.BigIntegerField(null = True, default = None, db_index = True)
 	region         = models.ForeignKey(Region,       on_delete = models.CASCADE, related_name = 'tenderplan_region',         null = True, default = None)
 	owner          = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'tenderplan_owner',          null = True, default = None)
 	customer       = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'tenderplan_customer',       null = True, default = None)
@@ -2516,17 +2530,17 @@ class PurchaseToAttachment(models.Model):
 
 class NotificationManager(models.Manager):
 
-	def take(self, id, **kwargs):
+	def take(self, oss_id, **kwargs):
 
-		if not id:
+		if not oss_id:
 			return None
 
 		try:
-			o = self.get(id = id)
+			o = self.get(oss_id = oss_id)
 
 		except Exception:
 			o = Notification()
-			o.id       = id
+			o.oss_id   = oss_id
 			o.url      = kwargs.get('url', None)
 			o.purchase = kwargs.get('purchase', None)
 			o.save()
@@ -2537,7 +2551,9 @@ class NotificationManager(models.Manager):
 
 class Notification(models.Model):
 
-	id       = models.BigIntegerField(primary_key = True, editable = False)
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
+	oss_id   = models.BigIntegerField(null = True, default = None, db_index = True)
 	purchase = models.ForeignKey(Purchase, on_delete = models.CASCADE, null = True, default = None)
 
 	url      = models.TextField(null = True, default = None)
@@ -2546,12 +2562,12 @@ class Notification(models.Model):
 
 
 	def __str__(self):
-		return "Уведомление: {}".format(self.id)
+		return "Уведомление: {}".format(self.oss_id)
 
 
 
 	class Meta:
-		ordering = ['id']
+		ordering = ['oss_id']
 
 
 
@@ -2642,3 +2658,21 @@ class LotToCustomer(models.Model):
 
 	class Meta:
 		db_table = 'tenders_lot_to_customer'
+
+
+
+class Contract(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	purchase = models.ForeignKey(Purchase, null = True, default = None, on_delete = models.CASCADE)
+	currency = models.ForeignKey(Currency, null = True, default = None, on_delete = models.CASCADE)
+	customer = models.ForeignKey(Organisation, null = True, default = None, on_delete = models.CASCADE)
+
+	number         = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	finance_source = models.TextField(null = True, default = None)
+	max_price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+
+
+
+
+
