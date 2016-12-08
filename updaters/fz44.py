@@ -5,8 +5,8 @@ from tenders.models import *
 class Runner(tenders.runner.Runner):
 
 
-	name  = 'Обновление с сайта государственных закупок России'
-	alias = 'zakupki'
+	name  = 'Zakupki.gov.ru FZ44'
+	alias = 'fz44'
 
 	black_list = ['_logs', 'fcs_undefined', 'auditresult', 'customerreports', 'regulationrules', 'requestquotation', 'dygeja_Resp']
 
@@ -40,13 +40,11 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiOKVED2',                         'parser' : self.parse_okved2},
 			{'category' : 'nsiBudget',                         'parser' : self.parse_budget},
 			{'category' : 'nsiOffBudgetType',                  'parser' : self.parse_budget_type},
-#			{'category' : 'nsiKBKBudget',                      'parser' : self.parse_kbk_budget},
 			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
 			{'category' : 'nsiOrganization',                   'parser' : self.parse_organisation},
 			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placing_way},
 			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
 			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_contract_modification_reason},
-			{'category' : 'nsiKVR',                            'parser' : self.parse_kvr},
 
 #			{'category' : 'nsiPurchaseDocumentTypes',          'parser' : self.parse_},
 #			{'category' : 'nsiPurchasePreferences',            'parser' : self.parse_},
@@ -455,21 +453,6 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
-
-#	def parse_kbk_budget(self, tree):
-#		'Парсит код поступления бюджета.'
-#		for element in tree.xpath('.//nsiKBKBudget'):
-#			budget = Budget.objects.take(code = self.get_text(element, './budget'))
-#			kbk_budget = KBKBudget.objects.update(
-#				code       = self.get_text(element, './kbk'),
-#				budget     = budget,
-#				state      = self.get_bool(element, './actual'),
-#				start_date = self.get_datetime(element, './start_date'),
-#				end_date   = self.get_datetime(element, './end_date'))
-#			print("Код поступления бюджета: {}.".format(kbk_budget))
-#		return True
-
-
 	def parse_organisation_type(self, tree):
 		'Парсит типы организаций.'
 		for element in tree.xpath('.//nsiOrganizationType'):
@@ -498,9 +481,9 @@ class Runner(tenders.runner.Runner):
 				first_name  = self.get_text(element, './contactPerson/firstName'),
 				middle_name = self.get_text(element, './contactPerson/middleName'),
 				last_name   = self.get_text(element, './contactPerson/lastName'),
-				emails      = [email],
-				phones      = [phone],
-				faxes       = [fax])
+				email       = email,
+				phone       = phone,
+				fax         = fax)
 
 			head_agency = Organisation.objects.take(
 				oos_number = self.get_text(element, './headAgency/regNum'),
@@ -552,53 +535,6 @@ class Runner(tenders.runner.Runner):
 				state             = self.get_bool(element, './actual'),
 				register          = self.get_bool(element, './register'))
 
-			if organisation:
-
-#				organisation.accounts.clear()
-#				for e in element.xpath('./accounts/account'):
-
-#					address = Address.objects.take(
-#						address = self.get_text(e, './bankAddress'))
-
-#					bank = Bank.objects.take(
-#						bik     = self.get_text(e, './bik'),
-#						name    = self.get_text(e, './bankName'),
-#						address = address)
-
-#					account = Account.objects.take(
-#						payment_account  = self.get_text(e, './paymentAccount'),
-#						corr_account     = self.get_text(e, './corrAccount'),
-#						personal_account = self.get_text(e, './personalAccount'),
-#						bank             = bank)
-
-#					link = OrganisationToAccount()
-#					link.organisation = organisation
-#					link.account      = account
-#					link.save()
-
-				organisation.budgets.clear()
-				for e in element.xpath('./budgets/budget'):
-
-					budget = Budget.objects.take(
-						code = self.get_text(e, './code'),
-						name = self.get_text(e, './name'))
-
-					link = OrganisationToBudget()
-					link.organisation = organisation
-					link.budget       = budget
-					link.save()
-
-				organisation.okveds.clear()
-				for okved in self.get_text(element, './OKVED').split(';'):
-					try:
-						okved = OKVED.objects.get(code = okved)
-						link  = OrganisationToOKVED()
-						link.organisation = organisation
-						link.okved        = okved
-						link.save()
-					except Exception:
-						pass
-
 			print('Организация: {}'.format(organisation))
 
 		return True
@@ -633,20 +569,6 @@ class Runner(tenders.runner.Runner):
 					name        = self.get_text(element, './name'),
 					description = self.get_text(element, './description'),
 					state       = self.get_bool(element, './actual'))
-
-			print(o)
-
-		return True
-
-
-	def parse_kvr(self, tree):
-
-		for element in tree.xpath('.//nsiKVR'):
-
-			o = KVR.objects.update(
-				code        = self.get_text(element, './code'),
-				name        = self.get_text(element, './name'),
-				state       = self.get_bool(element, './actual'))
 
 			print(o)
 
@@ -707,9 +629,9 @@ class Runner(tenders.runner.Runner):
 				first_name  = self.get_text(element, './responsibleContactInfo/firstName'),
 				middle_name = self.get_text(element, './responsibleContactInfo/middleName'),
 				last_name   = self.get_text(element, './responsibleContactInfo/lastName'),
-				emails      = [email],
-				phones      = [phone],
-				faxes       = [fax])
+				email       = email,
+				phone       = phone,
+				fax         = fax)
 
 			plan = Plan.objects.update(
 				id             = self.get_text(element, './commonInfo/id'),
@@ -742,9 +664,9 @@ class Runner(tenders.runner.Runner):
 				first_name  = self.get_text(element, './responsibleContactInfo/firstName'),
 				middle_name = self.get_text(element, './responsibleContactInfo/middleName'),
 				last_name   = self.get_text(element, './responsibleContactInfo/lastName'),
-				emails      = [email],
-				phones      = [phone],
-				faxes       = [fax])
+				email       = email,
+				phone       = phone,
+				fax         = fax)
 
 			plan = Plan.objects.update(
 					id             = self.get_text(element, './commonInfo/id'),
@@ -770,21 +692,6 @@ class Runner(tenders.runner.Runner):
 
 				change_reason = PlanPositionChangeReasonManager.objects.take(
 					id = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
-
-				# TODO kvrs
-#				<amountKVRsYears>
-#					<KVR>
-#						<code>244</code>
-#						<yearsList>
-#							<year>2016</year>
-#							<yearAmount>458226.20</yearAmount>
-#						</yearsList>
-#						<yearsList>
-#							<year>2017</year>
-#							<yearAmount>537438.50</yearAmount>
-#						</yearsList>
-#				for k in pos.xpath('.//amountKVRsYears/KVR'):
-
 
 				position = PlanPosition.objects.update(
 					plan            = plan,
@@ -888,10 +795,6 @@ class Runner(tenders.runner.Runner):
 
 
 
-
-
-
-
 		if not ok:
 			print(ET.tostring(tree.getroot(), encoding = 'unicode'))
 			exit()
@@ -900,24 +803,34 @@ class Runner(tenders.runner.Runner):
 
 	def parse_notification_sign(self, element, region):
 
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './foundation/order/purchaseNumber'))
+		print('purchase_number: {}'.format(self.get_text(element, './foundation/order/purchaseNumber')))
+		print('Purchase: {}'.format(purchase))
+
 		customer = Organisation.objects.take(oos_number = self.get_text(element, './customer/regNum'))
 		print('Customer: {}.'.format(customer))
 
 		currency = Currency.objects.take(code = self.get_text(element, './currency/code'))
 		print('Currency: {}'.format(currency))
 
-		contract = {}
-		contract['price'] = self.get_text(element, './price')
-		contract['price_rub'] = self.get_text(element, './priceRUR')
-		contract['number'] = self.get_text(element, './number')
-		contract['sign_date'] = self.get_text(element, './signDate')
+		contract = Contract.objects.take(
+			purchase   = purchase,
+			customer   = customer,
+			number     = self.get_text(element, './number'),
+			currency   = currency,
+			price      = self.get_text(element, './price'),
+			price_rub  = self.get_text(element, './priceRUR'),
+			sign_date  = self.get_text(element, './signDate'))
+
+
+		print('purchase: {}'.format(purchase))
+		print('customer: {}'.format(customer))
+		print('number: {}'.format(self.get_text(element, './number')))
 		print('Contract: {}'.format(contract))
 
-		purchase = Purchase.objects.take(number = self.get_text(element, './order/purchaseNumber'))
-		print('Purchase {}:'.format(purchase))
-
 		protocol = {}
-		protocol['number'] = Purchase.objects.take(number = self.get_text(element, './order/foundationProtocolNumber'))
+#		protocol['number'] = Purchase.objects.take(number = self.get_text(element, './order/foundationProtocolNumber'))
 		
 
 
@@ -942,7 +855,8 @@ class Runner(tenders.runner.Runner):
 #		purchase.prequalification_time  = self.get_datetime(element, './'),
 #		purchase.scoring_time           = self.get_datetime(element, './'),
 		purchase.save()
-		print(purchase)
+
+		print('Закупка {} - prolongated'.format(purchase))
 
 		notification = Notification.objects.take(
 			id       = self.get_int(element, './id'),
@@ -958,11 +872,11 @@ class Runner(tenders.runner.Runner):
 		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
 		notification = Notification.objects.take(
-			id       = self.get_int(element, './id'),
+			oos_id   = self.get_int(element, './id'),
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 		purchase.cancel()
-		print(purchase)
+		print('Закупка {} - cancel'.format(purchase))
 
 		return True
 
@@ -985,8 +899,8 @@ class Runner(tenders.runner.Runner):
 			first_name  = self.get_text(element, './purchaseResponsible/responsibleInfo/contactPerson/firstName'),
 			middle_name = self.get_text(element, './purchaseResponsible/responsibleInfo/contactPerson/middleName'),
 			last_name   = self.get_text(element, './purchaseResponsible/responsibleInfo/contactPerson/lastName'),
-			emails      = [email],
-			phones      = [phone])
+			email       = email,
+			phon        = phone)
 
 		try:
 			placing_way = PlacingWay.objects.get(
@@ -1029,10 +943,10 @@ class Runner(tenders.runner.Runner):
 			prequalification_place = prequalification_place,
 			scoring_place          = scoring_place,
 			etp                    = etp)
-		print(purchase)
+		print('Закупка {} - added'.format(purchase))
 
 		notification = Notification.objects.take(
-			id       = self.get_int(element, './id'),
+			oos_id   = self.get_int(element, './id'),
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 
@@ -1136,6 +1050,7 @@ class Runner(tenders.runner.Runner):
 			result = ''
 
 		return result
+
 
 	def get_bool(self, element, query):
 

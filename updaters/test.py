@@ -1,4 +1,4 @@
-import tenders.updaters.zakupki
+import tenders.updaters.fz44
 from tenders.models import *
 
 class Runner(tenders.updaters.zakupki.Runner):

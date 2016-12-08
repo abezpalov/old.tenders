@@ -429,8 +429,8 @@ class OKEIManager(models.Manager):
 class OKEI(models.Model):
 
 	id                   = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	section              = models.ForeignKey(OKEISection, on_delete = models.CASCADE, null = True, default = None)
-	group                = models.ForeignKey(OKEIGroup,   on_delete = models.CASCADE, null = True, default = None)
+	section              = models.ForeignKey(OKEISection, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	group                = models.ForeignKey(OKEIGroup,   related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code                 = models.CharField(max_length = 10, unique = True)
 	full_name            = models.TextField(null = True, default = None)
@@ -490,7 +490,7 @@ class KOSGUManager(models.Manager):
 class KOSGU(models.Model):
 
 	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	parent      = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	parent      = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code        = models.CharField(max_length = 10, unique = True)
 	name        = models.TextField(null = True, default = None)
@@ -541,7 +541,7 @@ class OKOPFManager(models.Manager):
 class OKOPF(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	parent        = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	parent        = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code          = models.CharField(max_length = 10, unique = True)
 	full_name     = models.TextField(null = True, default = None)
@@ -604,7 +604,7 @@ class OKPDManager(models.Manager):
 class OKPD(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	parent   = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	parent   = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
@@ -666,7 +666,7 @@ class OKPD2Manager(models.Manager):
 class OKPD2(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	parent   = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	parent   = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
@@ -723,7 +723,7 @@ class OKTMOManager(models.Manager):
 class OKTMO(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	parent   = models.ForeignKey('self', on_delete = models.CASCADE, null = True, default = None)
+	parent   = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
@@ -887,9 +887,9 @@ class OKVEDManager(models.Manager):
 class OKVED(models.Model):
 
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	section    = models.ForeignKey(OKVEDSection,    on_delete = models.CASCADE, null = True, default = None)
-	subsection = models.ForeignKey(OKVEDSubSection, on_delete = models.CASCADE, null = True, default = None)
-	parent     = models.ForeignKey('self',          on_delete = models.CASCADE, null = True, default = None)
+	section    = models.ForeignKey(OKVEDSection,    related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	subsection = models.ForeignKey(OKVEDSubSection, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	parent     = models.ForeignKey('self',          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_id     = models.IntegerField(null = True, default = None)
 	code       = models.CharField(max_length = 100, null = True, default = None, db_index = True)
@@ -1008,8 +1008,8 @@ class OKVED2Manager(models.Manager):
 class OKVED2(models.Model):
 
 	id      = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	section = models.ForeignKey(OKVED2Section, on_delete = models.CASCADE, null = True, default = None)
-	parent  = models.ForeignKey('self',        on_delete = models.CASCADE, null = True, default = None)
+	section = models.ForeignKey(OKVED2Section, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	parent  = models.ForeignKey('self',        related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_id  = models.BigIntegerField(null = True, default = None)
 	code    = models.CharField(max_length = 100, null = True, default = None, unique = True)
@@ -1165,7 +1165,7 @@ class BudgetTypeManager(models.Manager):
 class BudgetType(models.Model):
 
 	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	subsystem_type = models.ForeignKey(SubsystemType, on_delete = models.CASCADE, null = True, default = None)
+	subsystem_type = models.ForeignKey(SubsystemType, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code           = models.CharField(max_length = 20, unique = True)
 	name           = models.TextField(null = True, default = None)
@@ -1216,7 +1216,7 @@ class BudgetType(models.Model):
 #class KBKBudget(models.Model):
 
 #	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	budget     = models.ForeignKey(Budget, on_delete = models.CASCADE, null = True, default = None)
+#	budget     = models.ForeignKey(Budget, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 #	code       = models.CharField(max_length = 50, unique = True)
 #	start_date = models.DateTimeField(null = True, default = None)
 #	end_date   = models.DateTimeField(null = True, default = None)
@@ -1422,136 +1422,8 @@ class Phone(models.Model):
 
 
 
-class PersonManager(models.Manager):
 
 
-	def take(self, first_name, middle_name, last_name, **kwargs):
-
-		os = self.filter(first_name = first_name, middle_name = middle_name, last_name = last_name)
-
-		for o in os:
-
-			for email in o.emails.all():
-				if email in kwargs.get('emails', []):
-					return o
-
-			for phone in o.phones.all():
-				if phone in kwargs.get('phones', []):
-					return o
-
-			for fax in o.faxes.all():
-				if fax in kwargs.get('faxes', []):
-					return o
-
-		o = Person()
-
-		o.first_name  = first_name
-		o.middle_name = middle_name
-		o.last_name   = last_name
-		o.state       = kwargs.get('state', True)
-		o.save()
-
-		for email in kwargs.get('emails', []):
-
-			if email:
-
-				try:
-					o.emails.get(email = email)
-
-				except Exception:
-					e = PersonToEmail()
-					e.person = o
-					e.email  = email
-					e.save()
-
-		for phone in kwargs.get('phones', []):
-
-			if phone:
-
-				try:
-					o.phones.get(phone = phone)
-
-				except Exception:
-					e = PersonToPhone()
-					e.person = o
-					e.phone  = phone
-					e.save()
-
-		for fax in kwargs.get('faxes', []):
-
-			if fax:
-
-				try:
-					o.faxes.get(fax = fax)
-
-				except Exception:
-					e = PersonToFax()
-					e.person = o
-					e.fax    = fax
-					e.save()
-
-		return o
-
-
-
-class Person(models.Model):
-
-	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-
-	first_name  = models.TextField(null = True, default = None, db_index = True)
-	middle_name = models.TextField(null = True, default = None, db_index = True)
-	last_name   = models.TextField(null = True, default = None, db_index = True)
-	position    = models.TextField(null = True, default = None)
-	description = models.TextField(null = True, default = None)
-	state       = models.BooleanField(default = True, db_index = True)
-
-	emails      = models.ManyToManyField(Email, related_name = 'person_email', through = 'PersonToEmail', through_fields = ('person', 'email'))
-	phones      = models.ManyToManyField(Phone, related_name = 'person_phone', through = 'PersonToPhone', through_fields = ('person', 'phone'))
-	faxes       = models.ManyToManyField(Phone, related_name = 'person_fax',   through = 'PersonToFax',   through_fields = ('person', 'fax'))
-
-	objects = PersonManager()
-
-
-	def __str__(self):
-		return "{} {} {}".format(self.first_name, self.middle_name, self.last_name)
-
-
-
-	class Meta:
-		ordering = ['first_name', 'middle_name', 'last_name']
-
-
-
-class PersonToEmail(models.Model):
-
-	id     = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	person = models.ForeignKey(Person, on_delete = models.CASCADE)
-	email  = models.ForeignKey(Email,  on_delete = models.CASCADE)
-
-	class Meta:
-		db_table = 'tenders_person_to_email'
-
-
-
-class PersonToPhone(models.Model):
-
-	id     = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	person = models.ForeignKey(Person, on_delete = models.CASCADE)
-	phone  = models.ForeignKey(Phone,  on_delete = models.CASCADE)
-
-	class Meta:
-		db_table = 'tenders_person_to_phone'
-
-
-
-class PersonToFax(models.Model):
-
-	id     = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	person = models.ForeignKey(Person, on_delete = models.CASCADE)
-	fax    = models.ForeignKey(Phone,  on_delete = models.CASCADE)
-
-	class Meta:
-		db_table = 'tenders_person_to_fax'
 
 
 
@@ -1576,7 +1448,7 @@ class PersonToFax(models.Model):
 #class Bank(models.Model):
 
 #	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	address  = models.ForeignKey(Address, on_delete = models.CASCADE, null = True, default = None)
+#	address  = models.ForeignKey(Address, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 #	bik      = models.CharField(max_length = 10, unique = True)
 #	name     = models.TextField(null = True, default = None)
 #	state    = models.BooleanField(default = True, db_index = True)
@@ -1617,7 +1489,7 @@ class PersonToFax(models.Model):
 #class Account(models.Model):
 
 #	id               = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	bank             = models.ForeignKey(Bank, on_delete = models.CASCADE, null = True, default = None)
+#	bank             = models.ForeignKey(Bank, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 #	payment_account  = models.CharField(max_length = 32, null = True, default = None, db_index = True)
 #	corr_account     = models.CharField(max_length = 32, null = True, default = None, db_index = True)
 #	personal_account = models.CharField(max_length = 32, null = True, default = None, db_index = True)
@@ -1718,6 +1590,56 @@ class OrganisationType(models.Model):
 
 
 
+class PersonManager(models.Manager):
+
+
+	def take(self, first_name, middle_name, last_name, email, **kwargs):
+
+		try:
+			o = self.get(first_name = first_name, middle_name = middle_name, last_name = last_name, email = email)
+		except Exception:
+			o = Person()
+			o.first_name   = first_name
+			o.middle_name  = middle_name
+			o.last_name    = last_name
+			o.email        = email
+			o.phone        = kwargs.get('phone', None)
+			o.fax          = kwargs.get('fax',   None)
+			o.state        = kwargs.get('state', True)
+			o.save()
+
+		return o
+
+
+
+class Person(models.Model):
+
+	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	email        = models.ForeignKey(Email,        related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	phone        = models.ForeignKey(Phone,        related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	fax          = models.ForeignKey(Phone,        related_name='+', on_delete = models.CASCADE, null = True, default = None)
+
+	first_name  = models.TextField(null = True, default = None, db_index = True)
+	middle_name = models.TextField(null = True, default = None, db_index = True)
+	last_name   = models.TextField(null = True, default = None, db_index = True)
+	position    = models.TextField(null = True, default = None)
+	description = models.TextField(null = True, default = None)
+	state       = models.BooleanField(default = True, db_index = True)
+
+	objects = PersonManager()
+
+
+	def __str__(self):
+		return "{} {} {}".format(self.first_name, self.middle_name, self.last_name)
+
+
+
+	class Meta:
+		ordering = ['first_name', 'middle_name', 'last_name']
+
+
+
+
 class OrganisationManager(models.Manager):
 
 
@@ -1806,19 +1728,19 @@ class OrganisationManager(models.Manager):
 class Organisation(models.Model):
 
 	id                = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	factual_address   = models.ForeignKey(Address,          on_delete = models.CASCADE, related_name = 'organisation_factual_address', null = True, default = None)
-	postal_address    = models.ForeignKey(Address,          on_delete = models.CASCADE, related_name = 'organisation_postal_address',  null = True, default = None)
-	email             = models.ForeignKey(Email,            on_delete = models.CASCADE, related_name = 'organisation_email',           null = True, default = None)
-	phone             = models.ForeignKey(Phone,            on_delete = models.CASCADE, related_name = 'organisation_phone',           null = True, default = None)
-	fax               = models.ForeignKey(Phone,            on_delete = models.CASCADE, related_name = 'organisation_fax',             null = True, default = None)
-	contact_person    = models.ForeignKey(Person,           on_delete = models.CASCADE, related_name = 'organisation_contact_person',  null = True, default = None)
-	head_agency       = models.ForeignKey('self',           on_delete = models.CASCADE, related_name = 'organisation_head_agency',     null = True, default = None)
-	ordering_agency   = models.ForeignKey('self',           on_delete = models.CASCADE, related_name = 'organisation_ordering_agency', null = True, default = None)
-	okopf             = models.ForeignKey(OKOPF,            on_delete = models.CASCADE, related_name = 'organisation_okopf',           null = True, default = None)
-	okogu             = models.ForeignKey(OKOGU,            on_delete = models.CASCADE, related_name = 'organisation_okogu',           null = True, default = None)
-	organisation_role = models.ForeignKey(OrganisationRole, on_delete = models.CASCADE, related_name = 'organisation_role',            null = True, default = None)
-	organisation_type = models.ForeignKey(OrganisationType, on_delete = models.CASCADE, related_name = 'organisation_type',            null = True, default = None)
-	oktmo             = models.ForeignKey(OKTMO,            on_delete = models.CASCADE, related_name = 'organisation_oktmo',           null = True, default = None)
+	factual_address   = models.ForeignKey(Address,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	postal_address    = models.ForeignKey(Address,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	email             = models.ForeignKey(Email,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	phone             = models.ForeignKey(Phone,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	fax               = models.ForeignKey(Phone,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	contact_person    = models.ForeignKey(Person,           related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	head_agency       = models.ForeignKey('self',           related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	ordering_agency   = models.ForeignKey('self',           related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	okopf             = models.ForeignKey(OKOPF,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	okogu             = models.ForeignKey(OKOGU,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	organisation_role = models.ForeignKey(OrganisationRole, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	organisation_type = models.ForeignKey(OrganisationType, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	oktmo             = models.ForeignKey(OKTMO,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_number        = models.CharField(max_length = 20, null = True, default = None, db_index = True)
 	name              = models.TextField(null = True, default = None, db_index = True)
@@ -1832,8 +1754,8 @@ class Organisation(models.Model):
 	register          = models.BooleanField(default = True, db_index = True)
 
 #	accounts          = models.ManyToManyField(Account, through = 'OrganisationToAccount', through_fields = ('organisation', 'account'))
-	budgets           = models.ManyToManyField(Budget,  through = 'OrganisationToBudget',  through_fields = ('organisation', 'budget'))
-	okveds            = models.ManyToManyField(OKVED,   through = 'OrganisationToOKVED',   through_fields = ('organisation', 'okved'))
+#	budgets           = models.ManyToManyField(Budget,  through = 'OrganisationToBudget',  through_fields = ('organisation', 'budget'))
+#	okveds            = models.ManyToManyField(OKVED,   through = 'OrganisationToOKVED',   through_fields = ('organisation', 'okved'))
 
 	objects           = OrganisationManager()
 
@@ -1843,38 +1765,6 @@ class Organisation(models.Model):
 	class Meta:
 		ordering = ['oos_number']
 
-
-
-#class OrganisationToAccount(models.Model):
-
-#	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-#	organisation = models.ForeignKey(Organisation, on_delete = models.CASCADE)
-#	account      = models.ForeignKey(Account,      on_delete = models.CASCADE)
-
-#	class Meta:
-#		db_table = 'tenders_organisation_to_account'
-
-
-
-class OrganisationToBudget(models.Model):
-
-	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	organisation = models.ForeignKey(Organisation, on_delete = models.CASCADE)
-	budget       = models.ForeignKey(Budget,       on_delete = models.CASCADE)
-
-	class Meta:
-		db_table = 'tenders_organisation_to_budget'
-
-
-
-class OrganisationToOKVED(models.Model):
-
-	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	organisation = models.ForeignKey(Organisation, on_delete = models.CASCADE)
-	okved        = models.ForeignKey(OKVED,        on_delete = models.CASCADE)
-
-	class Meta:
-		db_table = 'tenders_organisation_to_okved'
 
 
 
@@ -1922,7 +1812,7 @@ class PlacingWayManager(models.Manager):
 class PlacingWay(models.Model):
 
 	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	subsystem_type = models.ForeignKey(SubsystemType, on_delete = models.CASCADE, null = True, default = None)
+	subsystem_type = models.ForeignKey(SubsystemType, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	oos_id         = models.IntegerField(null = True, default = None, db_index = True)
 	code           = models.TextField(null = True, default = None)
@@ -2091,73 +1981,64 @@ class ContractModificationReason(models.Model):
 
 
 
-class KVRManager(models.Manager):
+#class KVRManager(models.Manager):
 
+#	def take(self, code, **kwargs):
+#		if not code:
+#			return None
+#		try:
+#			o = self.get(code = code)
+#		except Exception:
+#			o = KVR()
+#			o.code  = code
+#			o.name  = kwargs.get('name',  None)
+#			o.state = kwargs.get('state', True)
+#			o.save()
+#		return o
 
-	def take(self, code, **kwargs):
-
-		if not code:
-			return None
-
-		try:
-			o = self.get(code = code)
-
-		except Exception:
-			o = KVR()
-			o.code  = code
-			o.name  = kwargs.get('name',  None)
-			o.state = kwargs.get('state', True)
-			o.save()
-
-		return o
-
-
-	def update(self, code, **kwargs):
-
-		if not code:
-			return None
-
-		o = self.take(code, **kwargs)
-		o.name  = kwargs.get('name', None)
-		o.state = kwargs.get('state', True)
-		o.save()
-
-		return o
+#	def update(self, code, **kwargs):
+#		if not code:
+#			return None
+#		o = self.take(code, **kwargs)
+#		o.name  = kwargs.get('name', None)
+#		o.state = kwargs.get('state', True)
+#		o.save()
+#		return o
 
 
 
-class KVR(models.Model):
+#class KVR(models.Model):
 
-	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+#	id          = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	code        = models.TextField(unique = True)
-	name        = models.TextField(null = True, default = None)
-	state       = models.BooleanField(default = True, db_index = True)
+#	code        = models.TextField(unique = True)
+#	name        = models.TextField(null = True, default = None)
+#	state       = models.BooleanField(default = True, db_index = True)
 
-	objects     = KVRManager()
+#	objects     = KVRManager()
 
-	def __str__(self):
-		return "{} {}".format(self.code, self.name)
+#	def __str__(self):
+#		return "{} {}".format(self.code, self.name)
 
-	class Meta:
-		ordering = ['code']
+#	class Meta:
+#		ordering = ['code']
 
 
 
 class PlanManager(models.Manager):
 
 
-	def take(self, oss_id, **kwargs):
+	def take(self, oos_id, **kwargs):
 
-		if not oss_id:
+		if not oos_id:
 			return None
 
 		try:
-			o = self.get(oss_id = oss_id)
+			o = self.get(oos_id = oos_id)
 
 		except Exception:
 			o = Plan()
-			o.oss_id             = oss_id
+			o.oos_id         = oos_id
 			o.number         = kwargs.get('number',         None)
 			o.year           = kwargs.get('year',           None)
 			o.version        = kwargs.get('version',        None)
@@ -2178,12 +2059,12 @@ class PlanManager(models.Manager):
 		return o
 
 
-	def update(self, oss_id, **kwargs):
+	def update(self, oos_id, **kwargs):
 
-		if not oss_id:
+		if not oos_id:
 			return None
 
-		o = self.take(oss_id, **kwargs)
+		o = self.take(oos_id, **kwargs)
 		o.number         = kwargs.get('number',         None)
 		o.year           = kwargs.get('year',           None)
 		o.version        = kwargs.get('version',        None)
@@ -2209,11 +2090,11 @@ class Plan(models.Model):
 
 	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	oss_id         = models.BigIntegerField(null = True, default = None, db_index = True)
-	region         = models.ForeignKey(Region,       on_delete = models.CASCADE, related_name = 'tenderplan_region',         null = True, default = None)
-	owner          = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'tenderplan_owner',          null = True, default = None)
-	customer       = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'tenderplan_customer',       null = True, default = None)
-	contact_person = models.ForeignKey(Person,       on_delete = models.CASCADE, related_name = 'tenderplan_contact_person', null = True, default = None)
+	oos_id         = models.BigIntegerField(null = True, default = None, db_index = True)
+	region         = models.ForeignKey(Region,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	owner          = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	customer       = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	contact_person = models.ForeignKey(Person,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	number         = models.CharField(max_length = 20, db_index = True)
 	year           = models.IntegerField(null = True, default = None, db_index = True)
@@ -2262,8 +2143,8 @@ class ProductManager(models.Manager):
 class Product(models.Model):
 
 	id    = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	okpd  = models.ForeignKey(OKPD,  on_delete = models.CASCADE, null = True, default = None)
-	okpd2 = models.ForeignKey(OKPD2, on_delete = models.CASCADE, null = True, default = None)
+	okpd  = models.ForeignKey(OKPD,  related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	okpd2 = models.ForeignKey(OKPD2, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	name  = models.TextField(null = True, default = None, db_index = True)
 
@@ -2332,10 +2213,10 @@ class PlanPositionManager(models.Manager):
 class PlanPosition(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	plan          = models.ForeignKey(Plan,                     on_delete = models.CASCADE)
-	currency      = models.ForeignKey(Currency,                 on_delete = models.CASCADE, null = True, default = None)
-	placing_way   = models.ForeignKey(PlacingWay,               on_delete = models.CASCADE, null = True, default = None)
-	change_reason = models.ForeignKey(PlanPositionChangeReason, on_delete = models.CASCADE, null = True, default = None)
+	plan          = models.ForeignKey(Plan,                     related_name='+', on_delete = models.CASCADE)
+	currency      = models.ForeignKey(Currency,                 related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	placing_way   = models.ForeignKey(PlacingWay,               related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	change_reason = models.ForeignKey(PlanPositionChangeReason, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	number          = models.CharField(max_length = 50, db_index = True)
 	name            = models.TextField(null = True, default = None)
@@ -2361,8 +2242,8 @@ class PlanPosition(models.Model):
 class PlanPositionToOKVED(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	plan_position = models.ForeignKey(PlanPosition, on_delete = models.CASCADE)
-	okved         = models.ForeignKey(OKVED,        on_delete = models.CASCADE)
+	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
+	okved         = models.ForeignKey(OKVED,        related_name='+', on_delete = models.CASCADE)
 
 	class Meta:
 		db_table = 'tenders_planposition_to_okved'
@@ -2372,8 +2253,8 @@ class PlanPositionToOKVED(models.Model):
 class PlanPositionToOKVED2(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	plan_position = models.ForeignKey(PlanPosition, on_delete = models.CASCADE)
-	okved2        = models.ForeignKey(OKVED2,       on_delete = models.CASCADE)
+	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
+	okved2        = models.ForeignKey(OKVED2,       related_name='+', on_delete = models.CASCADE)
 
 	class Meta:
 		db_table = 'tenders_planposition_to_okved2'
@@ -2383,9 +2264,9 @@ class PlanPositionToOKVED2(models.Model):
 class PlanPositionToProduct(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	plan_position = models.ForeignKey(PlanPosition, on_delete = models.CASCADE)
-	product       = models.ForeignKey(Product,      on_delete = models.CASCADE)
-	okei          = models.ForeignKey(OKEI,         on_delete = models.CASCADE, null = True, default = None)
+	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
+	product       = models.ForeignKey(Product,      related_name='+', on_delete = models.CASCADE)
+	okei          = models.ForeignKey(OKEI,         related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	requirement   = models.TextField(null = True, default = None)
 	quantity      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
@@ -2476,41 +2357,41 @@ class PurchaseManager(models.Manager):
 class Purchase(models.Model):
 
 	id                     = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	region                 = models.ForeignKey(Region,       on_delete = models.CASCADE, related_name = 'purchase_region',                 null = True, default = None)
-	responsible            = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'purchase_responsible',            null = True, default = None)
-	specialised            = models.ForeignKey(Organisation, on_delete = models.CASCADE, related_name = 'purchase_specialised',            null = True, default = None)
-	contact_person         = models.ForeignKey(Person,       on_delete = models.CASCADE, related_name = 'purchase_contact_person',         null = True, default = None)
-	placing_way            = models.ForeignKey(PlacingWay,   on_delete = models.CASCADE, related_name = 'purchase_placing_way',            null = True, default = None)
-	grant_place            = models.ForeignKey(Address,      on_delete = models.CASCADE, related_name = 'purchase_grant_place',            null = True, default = None)
-	collecting_place       = models.ForeignKey(Address,      on_delete = models.CASCADE, related_name = 'purchase_collecting_place',       null = True, default = None)
-	opening_place          = models.ForeignKey(Address,      on_delete = models.CASCADE, related_name = 'purchase_opening_place',          null = True, default = None)
-	prequalification_place = models.ForeignKey(Address,      on_delete = models.CASCADE, related_name = 'purchase_prequalification_place', null = True, default = None)
-	scoring_place          = models.ForeignKey(Address,      on_delete = models.CASCADE, related_name = 'purchase_scoring_place',          null = True, default = None)
-	etp                    = models.ForeignKey(ETP,          on_delete = models.CASCADE, related_name = 'purchase_etp',                    null = True, default = None)
+	region                 = models.ForeignKey(Region,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	responsible            = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	specialised            = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	contact_person         = models.ForeignKey(Person,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	placing_way            = models.ForeignKey(PlacingWay,   related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	grant_place            = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	collecting_place       = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	opening_place          = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	prequalification_place = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	scoring_place          = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	etp                    = models.ForeignKey(ETP,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	number                = models.CharField(max_length = 50, unique = True)
-	name                  = models.TextField(null = True, default = None)
-	url                   = models.TextField(null = True, default = None)
-	published             = models.DateTimeField(null = True, default = None, db_index = True)
-	grant_start_time      = models.DateTimeField(null = True, default = None, db_index = True)
-	grant_end_time        = models.DateTimeField(null = True, default = None, db_index = True)
-	collecting_start_time = models.DateTimeField(null = True, default = None, db_index = True)
-	collecting_end_time   = models.DateTimeField(null = True, default = None, db_index = True)
-	opening_time          = models.DateTimeField(null = True, default = None, db_index = True)
-	prequalification_time = models.DateTimeField(null = True, default = None, db_index = True)
-	scoring_time          = models.DateTimeField(null = True, default = None, db_index = True)
-	state                 = models.BooleanField(default = True, db_index = True)
+	number                 = models.CharField(max_length = 50, unique = True)
+	name                   = models.TextField(null = True, default = None)
+	url                    = models.TextField(null = True, default = None)
+	published              = models.DateTimeField(null = True, default = None, db_index = True)
+	grant_start_time       = models.DateTimeField(null = True, default = None, db_index = True)
+	grant_end_time         = models.DateTimeField(null = True, default = None, db_index = True)
+	collecting_start_time  = models.DateTimeField(null = True, default = None, db_index = True)
+	collecting_end_time    = models.DateTimeField(null = True, default = None, db_index = True)
+	opening_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	prequalification_time  = models.DateTimeField(null = True, default = None, db_index = True)
+	scoring_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	state                  = models.BooleanField(default = True, db_index = True)
 
 	attachments = models.ManyToManyField(Attachment, through = 'PurchaseToAttachment', through_fields = ('purchase', 'attachment'))
 
-	objects        = PurchaseManager()
+	objects = PurchaseManager()
 
 	def cancel(self):
 		self.state    = False
 		self.save()
 
 	def __str__(self):
-		return "Закупка: {} {} ".format(self.region, self.number)
+		return "{} {}".format(self.region, self.number)
 
 	class Meta:
 		ordering = ['number']
@@ -2520,8 +2401,8 @@ class Purchase(models.Model):
 class PurchaseToAttachment(models.Model):
 
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	purchase   = models.ForeignKey(Purchase,   on_delete = models.CASCADE)
-	attachment = models.ForeignKey(Attachment, on_delete = models.CASCADE)
+	purchase   = models.ForeignKey(Purchase,   related_name='+', on_delete = models.CASCADE)
+	attachment = models.ForeignKey(Attachment, related_name='+', on_delete = models.CASCADE)
 
 	class Meta:
 		db_table = 'tenders_purchase_to_attachment'
@@ -2530,17 +2411,17 @@ class PurchaseToAttachment(models.Model):
 
 class NotificationManager(models.Manager):
 
-	def take(self, oss_id, **kwargs):
+	def take(self, oos_id, **kwargs):
 
-		if not oss_id:
+		if not oos_id:
 			return None
 
 		try:
-			o = self.get(oss_id = oss_id)
+			o = self.get(oos_id = oos_id)
 
 		except Exception:
 			o = Notification()
-			o.oss_id   = oss_id
+			o.oos_id   = oos_id
 			o.url      = kwargs.get('url', None)
 			o.purchase = kwargs.get('purchase', None)
 			o.save()
@@ -2553,8 +2434,8 @@ class Notification(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	oss_id   = models.BigIntegerField(null = True, default = None, db_index = True)
-	purchase = models.ForeignKey(Purchase, on_delete = models.CASCADE, null = True, default = None)
+	oos_id   = models.BigIntegerField(null = True, default = None, db_index = True)
+	purchase = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	url      = models.TextField(null = True, default = None)
 
@@ -2562,12 +2443,12 @@ class Notification(models.Model):
 
 
 	def __str__(self):
-		return "Уведомление: {}".format(self.oss_id)
+		return "{}".format(self.oos_id)
 
 
 
 	class Meta:
-		ordering = ['oss_id']
+		ordering = ['oos_id']
 
 
 
@@ -2584,6 +2465,8 @@ class LotManager(models.Manager):
 
 		except Exception:
 			o = Lot()
+			o.purchase       = purchase
+			o.number         = number
 			o.name           = kwargs.get('name', None)
 			o.finance_source = kwargs.get('finance_source', None)
 			o.max_price      = kwargs.get('max_price', None)
@@ -2613,8 +2496,8 @@ class LotManager(models.Manager):
 class Lot(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	purchase = models.ForeignKey(Purchase, null = True, default = None, on_delete = models.CASCADE)
-	currency = models.ForeignKey(Currency, null = True, default = None, on_delete = models.CASCADE)
+	purchase = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	currency = models.ForeignKey(Currency, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	number         = models.IntegerField(null = True, default = None, db_index = True)
 	name           = models.TextField(null = True, default = None)
@@ -2634,10 +2517,10 @@ class Lot(models.Model):
 class LotToProduct(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	lot      = models.ForeignKey(Lot,     on_delete = models.CASCADE)
-	product  = models.ForeignKey(Product, on_delete = models.CASCADE)
-	okei     = models.ForeignKey(OKEI,     null = True, default = None, on_delete = models.CASCADE)
-	currency = models.ForeignKey(Currency, null = True, default = None, on_delete = models.CASCADE)
+	lot      = models.ForeignKey(Lot,      related_name='+', on_delete = models.CASCADE)
+	product  = models.ForeignKey(Product,  related_name='+', on_delete = models.CASCADE)
+	okei     = models.ForeignKey(OKEI,     related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	currency = models.ForeignKey(Currency, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	quantity = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	price    = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
@@ -2653,24 +2536,78 @@ class LotToProduct(models.Model):
 class LotToCustomer(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	lot      = models.ForeignKey(Lot,          on_delete = models.CASCADE)
-	customer = models.ForeignKey(Organisation, on_delete = models.CASCADE)
+	lot      = models.ForeignKey(Lot,          related_name='+', on_delete = models.CASCADE)
+	customer = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE)
 
 	class Meta:
 		db_table = 'tenders_lot_to_customer'
 
 
+class ContractManager(models.Manager):
+
+
+	def take(self, purchase, customer, number, **kwargs):
+
+		if not purchase or not customer or not number:
+			return None
+
+		try:
+			o = self.get(purchase = purchase, customer = customer, number = number)
+
+		except Exception:
+			o = Contract()
+			o.purchase  = purchase
+			o.customer  = customer
+			o.number    = number
+			o.currency  = kwargs.get('currency',  None)
+			o.price     = kwargs.get('price',     None)
+			o.price_rub = kwargs.get('price_rub', None)
+			o.sign_date = kwargs.get('sign_date', None)
+
+			o.save()
+
+		return o
+
+
+	def update(self, purchase, number = None, **kwargs):
+
+		if not purchase:
+			return None
+
+		o = self.take(purchase, customer, number, **kwargs)
+		o.currency  = kwargs.get('currency',  None)
+		o.price     = kwargs.get('price',     None)
+		o.price_rub = kwargs.get('price_rub', None)
+		o.sign_date = kwargs.get('sign_date', None)
+
+		o.save()
+
+		return o
+
+
 
 class Contract(models.Model):
 
-	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	purchase = models.ForeignKey(Purchase, null = True, default = None, on_delete = models.CASCADE)
-	currency = models.ForeignKey(Currency, null = True, default = None, on_delete = models.CASCADE)
-	customer = models.ForeignKey(Organisation, null = True, default = None, on_delete = models.CASCADE)
+	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	purchase   = models.ForeignKey(Purchase,     related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	customer   = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	currency   = models.ForeignKey(Currency,     related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	number         = models.CharField(max_length = 50, null = True, default = None, db_index = True)
-	finance_source = models.TextField(null = True, default = None)
-	max_price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	number     = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	price_rub  = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
+	sign_date  = models.DateField(null = True, default = None, db_index = True)
+
+	objects = ContractManager()
+
+	def __str__(self):
+		return "{} {} RUB".format(self.id, self.price_rub)
+
+
+
+
+
+
 
 
 
