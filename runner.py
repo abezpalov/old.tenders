@@ -18,10 +18,6 @@ class Runner:
 			alias       = self.alias,
 			name        = self.name)
 
-		if not self.updater.login or not self.updater.password:
-			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
-			return False
-
 		self.max_time = datetime.timedelta(0, 60*60*23, 0)
 
 

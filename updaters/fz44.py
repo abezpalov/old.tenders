@@ -83,7 +83,13 @@ class Runner(tenders.runner.Runner):
 #			{'category' : 'notifications', 'parser' : self.parse_notification},
 		]
 
+
 	def run(self):
+
+
+		if not self.updater.login or not self.updater.password:
+			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
+			return False
 
 		# Обновляем справочники
 		for essence in self.essences:
@@ -548,7 +554,7 @@ class Runner(tenders.runner.Runner):
 				code = self.get_text(element, './subsystemType'))
 
 			placing_way = PlacingWay.objects.update(
-				id             = self.get_text(element, './placingWayId'),
+				oos_id         = self.get_text(element, './placingWayId'),
 				code           = self.get_text(element, './code'),
 				name           = self.get_text(element, './name'),
 				type_code      = self.get_text(element, './type'),
@@ -565,7 +571,7 @@ class Runner(tenders.runner.Runner):
 		for element in tree.xpath('.//nsiPlanPositionChangeReason'):
 
 			o = PlanPositionChangeReason.objects.update(
-					id          = self.get_text(element, './id'),
+					oos_id      = self.get_text(element, './id'),
 					name        = self.get_text(element, './name'),
 					description = self.get_text(element, './description'),
 					state       = self.get_bool(element, './actual'))
@@ -600,7 +606,7 @@ class Runner(tenders.runner.Runner):
 			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/regNum'))
 
 			plan = Plan.objects.update(
-				id             = self.get_text(element, './id'),
+				oos_id         = self.get_text(element, './id'),
 				number         = self.get_text(element, './planNumber'),
 				year           = self.get_text(element, './year'),
 				version        = self.get_text(element, './versionNumber'),
@@ -634,7 +640,7 @@ class Runner(tenders.runner.Runner):
 				fax         = fax)
 
 			plan = Plan.objects.update(
-				id             = self.get_text(element, './commonInfo/id'),
+				oos_id         = self.get_text(element, './commonInfo/id'),
 				number         = self.get_text(element, './commonInfo/planNumber'),
 				year           = self.get_text(element, './commonInfo/year'),
 				version        = self.get_text(element, './commonInfo/versionNumber'),
@@ -648,7 +654,7 @@ class Runner(tenders.runner.Runner):
 				customer       = customer,
 				contact_person = contact_person)
 
-			print('Неструктурированный план: {}'.format(plan.number))
+			print('{} - unstructured.'.format(plan.number))
 
 
 		for element in tree.xpath('.//tenderPlan'):
@@ -669,7 +675,7 @@ class Runner(tenders.runner.Runner):
 				fax         = fax)
 
 			plan = Plan.objects.update(
-					id             = self.get_text(element, './commonInfo/id'),
+					oos_id         = self.get_text(element, './commonInfo/id'),
 					number         = self.get_text(element, './commonInfo/planNumber'),
 					year           = self.get_text(element, './commonInfo/year'),
 					version        = self.get_text(element, './commonInfo/versionNumber'),
@@ -683,15 +689,15 @@ class Runner(tenders.runner.Runner):
 					customer       = customer,
 					contact_person = contact_person)
 
-			print(plan)
+			print('{} {}.'.format(plan.number, plan))
 
 			for pos in element.xpath('.//positions/position'):
 
 				currency = Currency.objects.take(code = self.get_text(pos, './commonInfo/contractCurrency/code'))
 				placing_way = PlacingWay.objects.take(code = self.get_text(pos, './commonInfo/placingWay/code'))
 
-				change_reason = PlanPositionChangeReasonManager.objects.take(
-					id = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
+				change_reason = PlanPositionChangeReason.objects.take(
+					oos_id = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
 
 				position = PlanPosition.objects.update(
 					plan            = plan,
@@ -704,9 +710,7 @@ class Runner(tenders.runner.Runner):
 					max_price       = self.get_float(pos, './commonInfo/contractMaxPrice'),
 					currency        = currency,
 					placing_way     = placing_way,
-					change_reason   = change_reason,
-					okveds          = okveds,
-					okveds2         = okveds2)
+					change_reason   = change_reason)
 
 				position.okveds.clear()
 				for okv in pos.xpath('.//OKVEDs/OKVED'):

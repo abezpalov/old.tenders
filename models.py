@@ -624,7 +624,7 @@ class OKPD(models.Model):
 class OKPD2Manager(models.Manager):
 
 
-	def take(self, oos_id, code = None, **kwargs):
+	def take(self, oos_id = None, code = None, **kwargs):
 
 		if not oos_id and not code:
 			return None
@@ -1422,11 +1422,6 @@ class Phone(models.Model):
 
 
 
-
-
-
-
-
 #class BankManager(models.Manager):
 
 #	def take(self, bik, **kwargs):
@@ -1771,34 +1766,39 @@ class Organisation(models.Model):
 class PlacingWayManager(models.Manager):
 
 
-	def take(self, oos_id, **kwargs):
+	def take(self, oos_id = None, code = None, **kwargs):
 
-		if not oos_id:
+		if not oos_id and not code:
 			return None
 
-		try:
-			o = self.get(oos_id = oos_id)
-
-		except Exception:
-			o = PlacingWay()
-			o.oos_id          = oos_id
-			o.code            = kwargs.get('code', None)
-			o.name            = kwargs.get('name', None)
-			o.type_code       = kwargs.get('type_code', None)
-			o.subsystem_type  = kwargs.get('subsystem_type', None)
-			o.state           = kwargs.get('state', True)
-			o.save()
+		if oos_id:
+			try:
+				o = self.get(oos_id = oos_id)
+			except Exception:
+				o = PlacingWay()
+				o.oos_id          = oos_id
+				o.code            = code
+				o.name            = kwargs.get('name', None)
+				o.type_code       = kwargs.get('type_code', None)
+				o.subsystem_type  = kwargs.get('subsystem_type', None)
+				o.state           = kwargs.get('state', True)
+				o.save()
+		elif code:
+			try:
+				o = self.get(code = code, state = True)
+			except Exception:
+				o = None
 
 		return o
 
 
-	def update(self, oos_id, **kwargs):
+	def update(self, oos_id, code, **kwargs):
 
 		if not oos_id:
 			return None
 
-		o = self.take(oos_id, **kwargs)
-		o.code           = kwargs.get('code', None)
+		o = self.take(oos_id, code, **kwargs)
+		o.code           = code
 		o.name           = kwargs.get('name', None)
 		o.type_code      = kwargs.get('type_code', None)
 		o.subsystem_type = kwargs.get('subsystem_type', None)
@@ -1921,7 +1921,7 @@ class PlanPositionChangeReason(models.Model):
 	objects     = PlanPositionChangeReasonManager()
 
 	def __str__(self):
-		return "{} {}".format(self.id, self.name)
+		return "{} {}".format(self.oos_id, self.name)
 
 	class Meta:
 		ordering = ['oos_id']
@@ -2111,7 +2111,7 @@ class Plan(models.Model):
 	objects        = PlanManager()
 
 	def __str__(self):
-		return "{} {} ".format(self.year, self.customer)
+		return "{} {}".format(self.year, self.customer)
 
 	class Meta:
 		ordering = ['year', 'number', 'version']
@@ -2265,7 +2265,7 @@ class PlanPositionToProduct(models.Model):
 
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
-	product       = models.ForeignKey(Product,      related_name='+', on_delete = models.CASCADE)
+	product       = models.ForeignKey(Product,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	okei          = models.ForeignKey(OKEI,         related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	requirement   = models.TextField(null = True, default = None)

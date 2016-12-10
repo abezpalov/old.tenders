@@ -1,7 +1,7 @@
 import tenders.updaters.fz44
 from tenders.models import *
 
-class Runner(tenders.updaters.zakupki.Runner):
+class Runner(tenders.updaters.fz44.Runner):
 
 	subcategories = [
 #		None,
@@ -17,7 +17,7 @@ class Runner(tenders.updaters.zakupki.Runner):
 		]
 
 		self.region_essences = [
-#			{'category' : 'plangraphs',    'parser' : self.parse_tenderplan},
+			{'category' : 'plangraphs',    'parser' : self.parse_plan},
 			{'category' : 'notifications', 'parser' : self.parse_notification},
 		]
 
