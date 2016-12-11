@@ -561,22 +561,17 @@ class OKOPF(models.Model):
 class OKPDManager(models.Manager):
 
 
-	def take(self, oos_id = None, code = None, **kwargs):
+	def take(self, code, **kwargs):
 
-		if not oos_id and not code:
+		if not code:
 			return None
 
 		try:
-			if oos_id:
-				o = self.get(oos_id = oos_id)
-			else:
-				o = self.get(code = code)
+			o = self.get(code = code)
 
 		except OKPD.DoesNotExist:
 			o = OKPD()
-			o.oos_id = oos_id
-			if code:
-				o.code = code[:50]
+			o.code   = code[:50]
 			o.name   = kwargs.get('name',   None)
 			o.parent = kwargs.get('parent', None)
 			o.state  = kwargs.get('state',  True)
@@ -585,13 +580,12 @@ class OKPDManager(models.Manager):
 		return o
 
 
-	def update(self, oos_id, code = None, **kwargs):
+	def update(self, code, **kwargs):
 
 		if not code:
 			return None
 
-		o = self.take(oos_id, code, **kwargs)
-		o.code     = code[:50]
+		o = self.take(code, **kwargs)
 		o.name     = kwargs.get('name',   None)
 		o.parent   = kwargs.get('parent', None)
 		o.state    = kwargs.get('state',  True)
@@ -606,7 +600,6 @@ class OKPD(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	parent   = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -619,6 +612,61 @@ class OKPD(models.Model):
 	class Meta:
 		ordering = ['code']
 
+
+# TODO TEST
+class OKPDExtKeyManager(models.Manager):
+
+
+	def take(self, updater, ext_key, okpd = None):
+
+		if not updater or not ext_key:
+			return None
+
+		try:
+			o = self.get(updater = updater, ext_key = ext_key)
+
+		except OKPDExtKey.DoesNotExist:
+
+			if okpd is not None:
+				o = OKPDExtKey()
+				o.updater = updater
+				o.ext_key = ext_key
+				o.okpd    = okpd
+				o.save()
+
+		return o
+
+
+	def update(self, updater, ext_key, okpd):
+
+		if not updater or not ext_key or not okpd:
+			return None
+
+		o = self.take(updater, ext_key, okpd)
+		o.okpd = okpd
+		o.save()
+
+		return o
+
+
+
+class OKPDExtKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	okpd     = models.ForeignKey(OKPD,    related_name='+', on_delete = models.CASCADE)
+
+	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	objects  = OKPDExtKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.ext_key)
+
+	class Meta:
+		db_table        = 'tenders_okpd_ext_key'
+		ordering        = ['ext_key']
+		unique_together = ('updater', 'ext_key')
 
 
 class OKPD2Manager(models.Manager):
@@ -1748,6 +1796,8 @@ class Organisation(models.Model):
 	state             = models.BooleanField(default = True, db_index = True)
 	register          = models.BooleanField(default = True, db_index = True)
 
+# TODO сотрудники
+#           = models.ManyToManyField(Account, through = 'OrganisationToAccount', through_fields = ('organisation', 'account'))
 #	accounts          = models.ManyToManyField(Account, through = 'OrganisationToAccount', through_fields = ('organisation', 'account'))
 #	budgets           = models.ManyToManyField(Budget,  through = 'OrganisationToBudget',  through_fields = ('organisation', 'budget'))
 #	okveds            = models.ManyToManyField(OKVED,   through = 'OrganisationToOKVED',   through_fields = ('organisation', 'okved'))

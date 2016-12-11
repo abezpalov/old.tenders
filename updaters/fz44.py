@@ -329,16 +329,23 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiOKPD'):
 
-			parent = OKPD.objects.take(oos_id = self.get_text(element, './parentId'))
+			parent = OKPDExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './parentId'))
 
 			okpd = OKPD.objects.update(
-				oos_id = self.get_text(element, './id'),
 				parent = parent,
 				code   = self.get_text(element, './code'),
 				name   = self.get_text(element, './name'),
 				state  = self.get_bool(element, './actual'))
 
+			ext_key = OKPDExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './id'),
+				okpd    = okpd)
+
 			print("ОКПД: {}.".format(okpd))
+			print("Ext Key: {}.".format(ext_key))
 
 		return True
 
