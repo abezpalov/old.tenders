@@ -613,7 +613,6 @@ class OKPD(models.Model):
 		ordering = ['code']
 
 
-# TODO TEST
 class OKPDExtKeyManager(models.Manager):
 
 
@@ -627,12 +626,14 @@ class OKPDExtKeyManager(models.Manager):
 
 		except OKPDExtKey.DoesNotExist:
 
-			if okpd is not None:
+			if okpd:
 				o = OKPDExtKey()
 				o.updater = updater
 				o.ext_key = ext_key
 				o.okpd    = okpd
 				o.save()
+			else:
+				return None
 
 		return o
 
@@ -669,23 +670,20 @@ class OKPDExtKey(models.Model):
 		unique_together = ('updater', 'ext_key')
 
 
+
 class OKPD2Manager(models.Manager):
 
 
-	def take(self, oos_id = None, code = None, **kwargs):
+	def take(self, code, **kwargs):
 
-		if not oos_id and not code:
+		if not code:
 			return None
 
 		try:
-			if oos_id:
-				o = self.get(oos_id = oos_id)
-			else:
-				o = self.get(code = code)
+			o = self.get(code = code)
 
 		except OKPD2.DoesNotExist:
 			o = OKPD2()
-			o.oos_id       = oos_id
 			o.code     = code[:50]
 			o.name     = kwargs.get('name',   None)
 			o.parent   = kwargs.get('parent', None)
@@ -695,13 +693,12 @@ class OKPD2Manager(models.Manager):
 		return o
 
 
-	def update(self, oos_id, code, **kwargs):
+	def update(self, code, **kwargs):
 
-		if not oos_id:
+		if not code:
 			return None
 
-		o = self.take(oos_id, code, **kwargs)
-		o.code   = code[:50]
+		o = self.take(code, **kwargs)
 		o.name   = kwargs.get('name',   None)
 		o.parent = kwargs.get('parent', None)
 		o.state  = kwargs.get('state',  True)
@@ -716,7 +713,6 @@ class OKPD2(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	parent   = models.ForeignKey('self', related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	oos_id   = models.IntegerField(null = True, default = None)
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
 	state    = models.BooleanField(default = True, db_index = True)
@@ -728,6 +724,64 @@ class OKPD2(models.Model):
 
 	class Meta:
 		ordering = ['code']
+
+
+
+class OKPD2ExtKeyManager(models.Manager):
+
+
+	def take(self, updater, ext_key, okpd2 = None):
+
+		if not updater or not ext_key:
+			return None
+
+		try:
+			o = self.get(updater = updater, ext_key = ext_key)
+
+		except OKPD2ExtKey.DoesNotExist:
+
+			if okpd2:
+				o = OKPD2ExtKey()
+				o.updater = updater
+				o.ext_key = ext_key
+				o.okpd2   = okpd2
+				o.save()
+			else:
+				return None
+
+		return o
+
+
+	def update(self, updater, ext_key, okpd2):
+
+		if not updater or not ext_key or not okpd2:
+			return None
+
+		o = self.take(updater, ext_key, okpd2)
+		o.okpd2 = okpd2
+		o.save()
+
+		return o
+
+
+
+class OKPD2ExtKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	okpd2    = models.ForeignKey(OKPD2,   related_name='+', on_delete = models.CASCADE)
+
+	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	objects  = OKPD2ExtKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.ext_key)
+
+	class Meta:
+		db_table        = 'tenders_okpd2_ext_key'
+		ordering        = ['ext_key']
+		unique_together = ('updater', 'ext_key')
 
 
 
