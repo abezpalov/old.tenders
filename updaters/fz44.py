@@ -408,16 +408,28 @@ class Runner(tenders.runner.Runner):
 
 			section    = OKVEDSection.objects.take(name = self.get_text(element, './section'))
 			subsection = OKVEDSubSection.objects.take(name = self.get_text(element, './subsection'))
-			parent     = OKVED.objects.take(oos_id = self.get_text(element, './parentId'))
+
+			ext_key = OKVEDExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './parentId'))
+			if ext_key:
+				parent = ext_key.okved
+			else:
+				parent = None
 
 			okved = OKVED.objects.update(
-				oos_id     = self.get_text(element, './id'),
+				code       = self.get_text(element, './code'),
 				section    = section,
 				subsection = subsection,
 				parent     = parent,
-				code       = self.get_text(element, './code'),
 				name       = self.get_text(element, './name'),
 				state      = self.get_bool(element, './actual'))
+
+			ext_key = OKVEDExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './id'),
+				okved   = okved)
+
 
 			print("ОКВЭД: {}.".format(okved))
 
@@ -432,16 +444,21 @@ class Runner(tenders.runner.Runner):
 			section = OKVED2Section.objects.take(name = self.get_text(element, './section'))
 			parent  = OKVED2.objects.take(code = self.get_text(element, './parentCode'))
 
-			okved = OKVED2.objects.update(
+			okved2 = OKVED2.objects.update(
 				code       = self.get_text(element, './code'),
-				oos_id     = self.get_text(element, './id'),
 				section    = section,
 				parent     = parent,
 				name       = self.get_text(element, './name'),
 				comment    = self.get_text(element, './comment'),
 				state      = self.get_bool(element, './actual'))
 
-			print("ОКВЭД2: {}.".format(okved))
+			ext_key = OKVED2ExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './id'),
+				okved2   = okved2)
+
+
+			print("ОКВЭД2: {}.".format(okved2))
 
 		return True
 

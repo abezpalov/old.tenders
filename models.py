@@ -942,23 +942,18 @@ class OKVEDSubSection(models.Model):
 
 class OKVEDManager(models.Manager):
 
-	def take(self, oos_id = None, code = None, **kwargs):
+	def take(self, code, **kwargs):
 
 
-		if not oos_id and not code:
+		if not code:
 			return None
 
 		try:
-			if oos_id:
-				o = self.get(oos_id = oos_id)
-			else:
-				o = self.get(code = code)
+			o = self.get(code = code)
 
 		except OKVED.DoesNotExist:
 			o = OKVED()
-			o.oos_id = oos_id
-			if code:
-				o.code = code[:100]
+			o.code       = code[:100]
 			o.section    = kwargs.get('section',    None)
 			o.subsection = kwargs.get('subsection', None)
 			o.parent     = kwargs.get('parent',     None)
@@ -968,12 +963,12 @@ class OKVEDManager(models.Manager):
 
 		return o
 
-	def update(self, oos_id, code = None, **kwargs):
+	def update(self, code, **kwargs):
 
-		if not oos_id:
+		if not code:
 			return None
 
-		o = self.take(oos_id, code, **kwargs)
+		o = self.take(code, **kwargs)
 		o.code       = code[:100]
 		o.section    = kwargs.get('section',    None)
 		o.subsection = kwargs.get('subsection', None)
@@ -993,7 +988,6 @@ class OKVED(models.Model):
 	subsection = models.ForeignKey(OKVEDSubSection, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	parent     = models.ForeignKey('self',          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	oos_id     = models.IntegerField(null = True, default = None)
 	code       = models.CharField(max_length = 100, null = True, default = None, db_index = True)
 	name       = models.TextField(null = True, default = None)
 	state      = models.BooleanField(default = True, db_index = True)
@@ -1005,6 +999,64 @@ class OKVED(models.Model):
 
 	class Meta:
 		ordering = ['code']
+
+
+
+class OKVEDExtKeyManager(models.Manager):
+
+
+	def take(self, updater, ext_key, okved = None):
+
+		if not updater or not ext_key:
+			return None
+
+		try:
+			o = self.get(updater = updater, ext_key = ext_key)
+
+		except OKVEDExtKey.DoesNotExist:
+
+			if okved:
+				o = OKVEDExtKey()
+				o.updater = updater
+				o.ext_key = ext_key
+				o.okved   = okved
+				o.save()
+			else:
+				return None
+
+		return o
+
+
+	def update(self, updater, ext_key, okved):
+
+		if not updater or not ext_key or not okved:
+			return None
+
+		o = self.take(updater, ext_key, okved)
+		o.okved = okved
+		o.save()
+
+		return o
+
+
+
+class OKVEDExtKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	okved    = models.ForeignKey(OKVED,   related_name='+', on_delete = models.CASCADE)
+
+	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	objects  = OKVEDExtKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.ext_key)
+
+	class Meta:
+		db_table        = 'tenders_okved_ext_key'
+		ordering        = ['ext_key']
+		unique_together = ('updater', 'ext_key')
 
 
 
@@ -1064,20 +1116,16 @@ class OKVED2Section(models.Model):
 class OKVED2Manager(models.Manager):
 
 
-	def take(self, code, oos_id = None, **kwargs):
+	def take(self, code, **kwargs):
 
-		if not code and not oos_id:
+		if not code:
 			return None
 
 		try:
-			if code:
-				o = self.get(code = code)
-			else:
-				o = self.get(oos_id = oos_id)
+			o = self.get(code = code)
 
 		except OKVED2.DoesNotExist:
 			o = OKVED2()
-			o.oos_id  = oos_id
 			o.code    = code[:100]
 			o.section = kwargs.get('section', None)
 			o.parent  = kwargs.get('parent',  None)
@@ -1089,13 +1137,12 @@ class OKVED2Manager(models.Manager):
 		return o
 
 
-	def update(self, code, oos_id, **kwargs):
+	def update(self, code, **kwargs):
 
-		if not code or not oos_id:
+		if not code:
 			return None
 
-		o = self.take(code, oos_id, **kwargs)
-		o.oos_id         = oos_id
+		o = self.take(code, **kwargs)
 		o.section    = kwargs.get('section', None)
 		o.parent     = kwargs.get('parent',  None)
 		o.name       = kwargs.get('name',    None)
@@ -1113,7 +1160,6 @@ class OKVED2(models.Model):
 	section = models.ForeignKey(OKVED2Section, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	parent  = models.ForeignKey('self',        related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	oos_id  = models.BigIntegerField(null = True, default = None)
 	code    = models.CharField(max_length = 100, null = True, default = None, unique = True)
 	name    = models.TextField(null = True, default = None)
 	comment = models.TextField(null = True, default = None)
@@ -1126,6 +1172,64 @@ class OKVED2(models.Model):
 
 	class Meta:
 		ordering = ['code']
+
+
+
+class OKVED2ExtKeyManager(models.Manager):
+
+
+	def take(self, updater, ext_key, okved2 = None):
+
+		if not updater or not ext_key:
+			return None
+
+		try:
+			o = self.get(updater = updater, ext_key = ext_key)
+
+		except OKVED2ExtKey.DoesNotExist:
+
+			if okved2:
+				o = OKVED2ExtKey()
+				o.updater = updater
+				o.ext_key = ext_key
+				o.okved2  = okved2
+				o.save()
+			else:
+				return None
+
+		return o
+
+
+	def update(self, updater, ext_key, okved2):
+
+		if not updater or not ext_key or not okved2:
+			return None
+
+		o = self.take(updater, ext_key, okved2)
+		o.okved2 = okved2
+		o.save()
+
+		return o
+
+
+
+class OKVED2ExtKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	okved2   = models.ForeignKey(OKVED2,  related_name='+', on_delete = models.CASCADE)
+
+	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	objects  = OKVED2ExtKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.ext_key)
+
+	class Meta:
+		db_table        = 'tenders_okved2_ext_key'
+		ordering        = ['ext_key']
+		unique_together = ('updater', 'ext_key')
 
 
 
