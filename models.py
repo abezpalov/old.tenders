@@ -2872,14 +2872,15 @@ class ProductManager(models.Manager):
 
 	def take(self, okpd, okpd2, name):
 
-		if not okpd and not okpd2 and not name:
+		if not okdp and not okpd and not okpd2 and not name:
 			return None
 
 		try:
-			o = self.get(okpd = okpd, okpd2 = okpd2, name = name)
+			o = self.get(okdp = okdp, okpd = okpd, okpd2 = okpd2, name = name)
 
 		except Exception:
 			o = Product()
+			o.okdp  = okdp
 			o.okpd  = okpd
 			o.okpd2 = okpd2
 			o.name  = name
@@ -2892,6 +2893,7 @@ class ProductManager(models.Manager):
 class Product(models.Model):
 
 	id    = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	okdp  = models.ForeignKey(OKDP,  related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	okpd  = models.ForeignKey(OKPD,  related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	okpd2 = models.ForeignKey(OKPD2, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
@@ -2904,7 +2906,7 @@ class Product(models.Model):
 
 	class Meta:
 		ordering = ['name']
-		unique_together = ('okpd', 'okpd2', 'name')
+		unique_together = ('okdp', 'okpd', 'okpd2', 'name')
 
 
 
@@ -3191,7 +3193,7 @@ class Notification(models.Model):
 	updater  = models.ForeignKey(Updater,  related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	purchase = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	code     = models.CharField(max_lenght = 50, null = True, default = None, db_index = True)
+	code     = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 	url      = models.TextField(null = True, default = None)
 
 	objects = NotificationManager()
