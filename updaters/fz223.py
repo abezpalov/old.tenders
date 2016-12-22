@@ -16,8 +16,7 @@ class Runner(tenders.runner.Runner):
 
 	subcategories = [
 		None,
-		'prevMonth',
-		'currMonth'
+		'daily'
 		]
 
 
@@ -28,12 +27,11 @@ class Runner(tenders.runner.Runner):
 		self.url = 'ftp.zakupki.gov.ru'
 
 		self.essences = [
-			{'category' : 'nsiOkpd',           'parser' : self.parse_},
+			{'category' : 'nsiOkdp',           'parser' : self.parse_okdp},
+			{'category' : 'nsiOkato',          'parser' : self.parse_okato},
 
 #			{'category' : 'nsiAgency',         'parser' : self.parse_},
-#			{'category' : 'nsiOrganisation',   'parser' : self.parse_},
 #			{'category' : 'nsiClauseType',     'parser' : self.parse_},
-#			{'category' : 'nsiOkato',          'parser' : self.parse_},
 #			{'category' : 'nsiOkei',           'parser' : self.parse_},
 #			{'category' : 'nsiOkfs',           'parser' : self.parse_},
 #			{'category' : 'nsiOkogu',          'parser' : self.parse_},
@@ -43,6 +41,7 @@ class Runner(tenders.runner.Runner):
 #			{'category' : 'nsiOkv',            'parser' : self.parse_},
 #			{'category' : 'nsiOkved',          'parser' : self.parse_},
 #			{'category' : 'nsiOkved2',         'parser' : self.parse_},
+#			{'category' : 'nsiOrganisation',   'parser' : self.parse_},
 #			{'category' : 'nsiProtokol',       'parser' : self.parse_},
 #			{'category' : 'nsiPurchaseMethod', 'parser' : self.parse_},
 		]
@@ -137,6 +136,69 @@ class Runner(tenders.runner.Runner):
 			source.complite()
 
 		return True
+
+
+	def parse_okdp(self, tree):
+		'Парсит ОКДП.'
+
+		# TODO KILL
+		import xml.etree.ElementTree as ET
+#		print(ET.tostring(element, encoding = 'unicode'))
+
+
+		for element in tree.xpath('.//item'):
+
+			parent = OKDP.objects.take(code = self.get_text(element, './nsiOkdpData/parentCode'))
+
+			okdp = OKDP.objects.update(
+				code = self.get_text(element, './nsiOkdpData/code'),
+				name = self.get_text(element, './nsiOkdpData/name'),
+				parent        = parent,
+				state         = True)
+			print("ОКДП: {}.".format(okdp))
+
+			ext_key = OKDPExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './guid'),
+				okdp = okdp)
+
+			ext_key = OKDPExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './nsiOkdpData/guid'),
+				okdp = okdp)
+
+		return True
+
+
+
+	def parse_okato(self, tree):
+		'Парсит ОКАТО'
+
+		for element in tree.xpath('.//item'):
+
+			parent = OKATO.objects.take(code = self.get_text(element, './nsiOkatoData/parentCode'))
+
+			okato = OKATO.objects.update(
+				code = self.get_text(element, './nsiOkatoData/code'),
+				name = self.get_text(element, './nsiOkatoData/name'),
+				parent        = parent,
+				state         = True)
+			print("ОКАТО: {}.".format(okato))
+
+			ext_key = OKATOExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './guid'),
+				okato   = okato)
+
+		return True
+
+
+
+
+
+# TODO END
+
+
 
 
 

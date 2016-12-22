@@ -13,10 +13,12 @@ class Runner(tenders.updaters.fz44.Runner):
 		super().__init__()
 
 		self.essences = [
-#			{'category' : 'nsiOKPD',   'parser' : self.parse_okpd},
-#			{'category' : 'nsiOKPD2',  'parser' : self.parse_okpd2},
-			{'category' : 'nsiOKVED',  'parser' : self.parse_okved},
-			{'category' : 'nsiOKVED2', 'parser' : self.parse_okved2},
+#			{'category' : 'nsiOKPD', 'parser' : self.parse_okpd},
+#			{'category' : 'nsiOKPD2', 'parser' : self.parse_okpd2},
+#			{'category' : 'nsiOKVED', 'parser' : self.parse_okved},
+#			{'category' : 'nsiOKVED2', 'parser' : self.parse_okved2},
+			{'category' : 'nsiOrganization', 'parser' : self.parse_organisation},
+
 		]
 
 		self.region_essences = [

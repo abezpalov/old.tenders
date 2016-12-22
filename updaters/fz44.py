@@ -42,9 +42,11 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiOffBudgetType',                  'parser' : self.parse_budget_type},
 			{'category' : 'nsiOrganizationType',               'parser' : self.parse_organisation_type},
 			{'category' : 'nsiOrganization',                   'parser' : self.parse_organisation},
-			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placing_way},
+			{'category' : 'nsiPlacingWay',                     'parser' : self.parse_placingway},
 			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
-			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_contract_modification_reason},
+#			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_contract_modification_reason},
+
+
 
 #			{'category' : 'nsiPurchaseDocumentTypes',          'parser' : self.parse_},
 #			{'category' : 'nsiPurchasePreferences',            'parser' : self.parse_},
@@ -528,13 +530,21 @@ class Runner(tenders.runner.Runner):
 				phone       = phone,
 				fax         = fax)
 
-			head_agency = Organisation.objects.take(
-				oos_number = self.get_text(element, './headAgency/regNum'),
-				full_name  = self.get_text(element, './headAgency/fullName'))
+			ext_key = OrganisationExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './headAgency/regNum'))
+			if ext_key:
+				head_agency = ext_key.organisation
+			else:
+				head_agency = None
 
-			ordering_agency = Organisation.objects.take(
-				oos_number = self.get_text(element, './orderingAgency/regNum'),
-				full_name  = self.get_text(element, './orderingAgency/fullName'))
+			ext_key = OrganisationExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './orderingAgency/regNum'))
+			if ext_key:
+				ordering_agency = ext_key.organisation
+			else:
+				ordering_agency = None
 
 			okopf = OKOPF.objects.take(
 				code      = self.get_text(element, './OKOPF/code'),
@@ -555,11 +565,10 @@ class Runner(tenders.runner.Runner):
 				code = self.get_text(element, './OKTMO/code'))
 
 			organisation = Organisation.objects.update(
-				oos_number        = self.get_text(element, './regNumber'),
-				short_name        = self.get_text(element, './shortName'),
-				full_name         = self.get_text(element, './fullName'),
 				inn               = self.get_text(element, './INN'),
 				kpp               = self.get_text(element, './KPP'),
+				short_name        = self.get_text(element, './shortName'),
+				full_name         = self.get_text(element, './fullName'),
 				ogrn              = self.get_text(element, './OGRN'),
 				okpo              = self.get_text(element, './OKPO'),
 				factual_address   = factual_address,
@@ -578,27 +587,36 @@ class Runner(tenders.runner.Runner):
 				state             = self.get_bool(element, './actual'),
 				register          = self.get_bool(element, './register'))
 
+			ext_key = OrganisationExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './regNumber'),
+				organisation = organisation)
+
 			print('Организация: {}'.format(organisation))
 
 		return True
 
 
-	def parse_placing_way(self, tree):
+	def parse_placingway(self, tree):
 
 		for element in tree.xpath('.//nsiPlacingWay'):
 
 			subsystem_type = SubsystemType.objects.take(
 				code = self.get_text(element, './subsystemType'))
 
-			placing_way = PlacingWay.objects.update(
-				oos_id         = self.get_text(element, './placingWayId'),
+			placingway = PlacingWay.objects.update(
 				code           = self.get_text(element, './code'),
 				name           = self.get_text(element, './name'),
 				type_code      = self.get_text(element, './type'),
 				subsystem_type = subsystem_type,
 				state          = self.get_bool(element, './actual'))
 
-			print(placing_way)
+			ext_key = PlacingWayExtKey.objects.update(
+				updater    = self.updater,
+				ext_key    = self.get_text(element, './placingWayId'),
+				placingway = placingway)
+
+			print(placingway)
 
 		return True
 
@@ -607,13 +625,17 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiPlanPositionChangeReason'):
 
-			o = PlanPositionChangeReason.objects.update(
-					oos_id      = self.get_text(element, './id'),
+			changereason = PlanPositionChangeReason.objects.update(
 					name        = self.get_text(element, './name'),
 					description = self.get_text(element, './description'),
 					state       = self.get_bool(element, './actual'))
 
-			print(o)
+			ext_key = PlanPositionChangeReasonExtKey.objects.update(
+				updater    = self.updater,
+				ext_key    = self.get_text(element, './id'),
+				planpositionchangereason = changereason)
+
+			print(changereason)
 
 		return True
 
@@ -635,18 +657,14 @@ class Runner(tenders.runner.Runner):
 	def parse_plan(self, tree, region):
 		'Парсит планы-графики.'
 
-		# TODO KILL
-		import xml.etree.ElementTree as ET
-
 		for element in tree.xpath('.//tenderPlanCancel'):
 
 			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/regNum'))
 
 			plan = Plan.objects.update(
-				oos_id         = self.get_text(element, './id'),
 				number         = self.get_text(element, './planNumber'),
-				year           = self.get_text(element, './year'),
 				version        = self.get_text(element, './versionNumber'),
+				year           = self.get_text(element, './year'),
 				description    = self.get_text(element, './description'),
 				url            = self.get_text(element, './printForm/url'),
 				created        = self.get_text(element, './cancelDate'),
@@ -654,7 +672,10 @@ class Runner(tenders.runner.Runner):
 				customer       = customer,
 				state          = False)
 
-			Plan.objects.filter(number = plan.number).update(state = False)
+			ext_key = PlanExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './id'),
+				plan = plan)
 
 			print('Отменён: {}.'.format(plan.number))
 
@@ -677,10 +698,9 @@ class Runner(tenders.runner.Runner):
 				fax         = fax)
 
 			plan = Plan.objects.update(
-				oos_id         = self.get_text(element, './commonInfo/id'),
 				number         = self.get_text(element, './commonInfo/planNumber'),
-				year           = self.get_text(element, './commonInfo/year'),
 				version        = self.get_text(element, './commonInfo/versionNumber'),
+				year           = self.get_text(element, './commonInfo/year'),
 				description    = self.get_text(element, './commonInfo/description'),
 				url            = self.get_text(element, './printForm/url'),
 				created        = self.get_text(element, './commonInfo/createDate'),
@@ -690,6 +710,11 @@ class Runner(tenders.runner.Runner):
 				owner          = owner,
 				customer       = customer,
 				contact_person = contact_person)
+
+			ext_key = PlanExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './commonInfo/id'),
+				plan = plan)
 
 			print('{} - unstructured.'.format(plan.number))
 
@@ -712,10 +737,9 @@ class Runner(tenders.runner.Runner):
 				fax         = fax)
 
 			plan = Plan.objects.update(
-					oos_id         = self.get_text(element, './commonInfo/id'),
 					number         = self.get_text(element, './commonInfo/planNumber'),
-					year           = self.get_text(element, './commonInfo/year'),
 					version        = self.get_text(element, './commonInfo/versionNumber'),
+					year           = self.get_text(element, './commonInfo/year'),
 					description    = self.get_text(element, './commonInfo/description'),
 					url            = self.get_text(element, './printForm/url'),
 					created        = self.get_text(element, './commonInfo/createDate'),
@@ -726,6 +750,12 @@ class Runner(tenders.runner.Runner):
 					customer       = customer,
 					contact_person = contact_person)
 
+			ext_key = PlanExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './commonInfo/id'),
+				plan = plan)
+
+
 			print('{} {}.'.format(plan.number, plan))
 
 			for pos in element.xpath('.//positions/position'):
@@ -733,8 +763,9 @@ class Runner(tenders.runner.Runner):
 				currency = Currency.objects.take(code = self.get_text(pos, './commonInfo/contractCurrency/code'))
 				placing_way = PlacingWay.objects.take(code = self.get_text(pos, './commonInfo/placingWay/code'))
 
-				change_reason = PlanPositionChangeReason.objects.take(
-					oos_id = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
+				change_reason = PlanPositionChangeReasonExtKey.objects.take(
+					updater = updater,
+					ext_key = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
 
 				position = PlanPosition.objects.update(
 					plan            = plan,
