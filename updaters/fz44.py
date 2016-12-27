@@ -663,7 +663,9 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlanCancel'):
 
-			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/regNum'))
+			customer = OrganisationExtKey.objects.get_organisation(
+				updater = self.updater,
+				ext_key = self.get_text(element, './customerInfo/regNum'))
 
 			plan = Plan.objects.update(
 				number         = self.get_text(element, './planNumber'),
@@ -686,8 +688,13 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlanUnstructured'):
 
-			owner    = Organisation.objects.get(oos_number = self.get_text(element, './commonInfo/owner/regNum'))
-			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/customer/regNum'))
+			owner = OrganisationExtKey.objects.get_organisation(
+				updater = self.updater,
+				ext_key = self.get_text(element, './commonInfo/owner/regNum'))
+
+			customer = OrganisationExtKey.objects.get_organisation(
+				updater = self.updater,
+				ext_key = self.get_text(element, './customerInfo/customer/regNum'))
 
 			email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
 			phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
@@ -725,8 +732,13 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//tenderPlan'):
 
-			owner    = Organisation.objects.take(oos_number = self.get_text(element, './commonInfo/owner/regNum'))
-			customer = Organisation.objects.get(oos_number = self.get_text(element, './customerInfo/customer/regNum'))
+			owner = OrganisationExtKey.objects.get_organisation(
+				updater = self.updater,
+				ext_key = self.get_text(element, './commonInfo/owner/regNum'))
+
+			customer = OrganisationExtKey.objects.get_organisation(
+				updater = self.updater,
+				ext_key = self.get_text(element, './customerInfo/customer/regNum'))
 
 			email = Email.objects.take(email = self.get_text(element, './responsibleContactInfo/email'))
 			phone = Phone.objects.take(phone = self.get_text(element, './responsibleContactInfo/phone'))
@@ -767,8 +779,8 @@ class Runner(tenders.runner.Runner):
 				currency = Currency.objects.take(code = self.get_text(pos, './commonInfo/contractCurrency/code'))
 				placing_way = PlacingWay.objects.take(code = self.get_text(pos, './commonInfo/placingWay/code'))
 
-				change_reason = PlanPositionChangeReasonExtKey.objects.take(
-					updater = updater,
+				change_reason = PlanPositionChangeReasonExtKey.objects.get_change_reason(
+					updater = self.updater,
 					ext_key = self.get_text(pos, './commonInfo/positionModification/changeReason/id'))
 
 				position = PlanPosition.objects.update(

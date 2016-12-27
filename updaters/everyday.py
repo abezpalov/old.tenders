@@ -39,6 +39,7 @@ class Runner:
 					channel    = "error",
 					title      = "Exception",
 					description = error)
+				print('Exception: {}.'.format(error))
 
 		print("Обработки завершены за {}.".format(datetime.datetime.now() - start))
 

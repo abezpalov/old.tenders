@@ -2395,6 +2395,14 @@ class OrganisationExtKeyManager(models.Manager):
 
 		return o
 
+	def get_organisation(self, updater, ext_key):
+
+		ext_key = self.take(
+			updater = updater,
+			ext_key = ext_key)
+
+		return ext_key.organisation
+
 
 
 class OrganisationExtKey(models.Model):
@@ -2679,6 +2687,18 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 		return o
 
 
+	def get_change_reason(self, updater, ext_key):
+
+		ext_key = self.take(
+			updater = updater,
+			ext_key = ext_key)
+
+		if ext_key:
+			return ext_key.planpositionchangereason
+		else:
+			return None
+
+
 
 class PlanPositionChangeReasonExtKey(models.Model):
 
@@ -2916,7 +2936,7 @@ class PlanExtKeyManager(models.Manager):
 		if not updater or not ext_key or not plan:
 			return None
 
-		o = self.take(updater, ext_key, planpositionchangereason)
+		o = self.take(updater, ext_key, plan)
 		o.plan = plan
 		o.save()
 
@@ -2947,7 +2967,7 @@ class PlanExtKey(models.Model):
 class ProductManager(models.Manager):
 
 
-	def take(self, okpd, okpd2, name):
+	def take(self, okdp = None, okpd = None, okpd2 = None, name = None):
 
 		if not okdp and not okpd and not okpd2 and not name:
 			return None
