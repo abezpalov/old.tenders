@@ -1,3 +1,5 @@
+import datetime
+
 import tenders.runner
 from tenders.models import *
 
@@ -23,6 +25,8 @@ class Runner(tenders.runner.Runner):
 	def __init__(self):
 
 		super().__init__()
+
+		self.max_time = datetime.timedelta(0, 60*60*12, 0)
 
 		self.url = 'ftp.zakupki.gov.ru'
 
@@ -161,7 +165,7 @@ class Runner(tenders.runner.Runner):
 				if tree:
 					tree = self.clear_tags(tree)
 				else:
-					return False
+					continue
 
 				# Обрабатываем файл
 				parse = essence['parser']
@@ -210,7 +214,7 @@ class Runner(tenders.runner.Runner):
 					if tree:
 						tree = self.clear_tags(tree)
 					else:
-						return False
+						continue
 
 					# Обрабатываем файл
 					parse = essence['parser']
@@ -278,7 +282,7 @@ class Runner(tenders.runner.Runner):
 
 			okei = OKEI.objects.update(
 				code                 = self.get_text(element, './code'),
-				full_name            = self.get_text(element, './fullName'),
+				name                 = self.get_text(element, './fullName'),
 				section              = okei_section,
 				group                = okei_group,
 				local_name           = self.get_text(element, './localName'),

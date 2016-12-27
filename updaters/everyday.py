@@ -9,7 +9,7 @@ class Runner:
 	name  = 'Anodos-tenders: ежедневный запуск'
 	alias = 'anodos-tenders-everyday'
 
-	updaters = ['fz44']
+	updaters = ['fz44', 'fz223']
 
 	def __init__(self):
 

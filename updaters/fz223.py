@@ -1,3 +1,5 @@
+import datetime
+
 import tenders.runner
 from tenders.models import *
 
@@ -24,15 +26,19 @@ class Runner(tenders.runner.Runner):
 
 		super().__init__()
 
+		self.max_time = datetime.timedelta(0, 60*60*11, 0)
+
 		self.url = 'ftp.zakupki.gov.ru'
 
 		self.essences = [
 			{'category' : 'nsiOkdp',           'parser' : self.parse_okdp},
 			{'category' : 'nsiOkato',          'parser' : self.parse_okato},
 
-#			{'category' : 'nsiAgency',         'parser' : self.parse_},
+			{'category' : 'nsiOkei',           'parser' : self.parse_okei},
+
+
+#			{'category' : 'nsiAgency',         'parser' : self.parse_agency},
 #			{'category' : 'nsiClauseType',     'parser' : self.parse_},
-#			{'category' : 'nsiOkei',           'parser' : self.parse_},
 #			{'category' : 'nsiOkfs',           'parser' : self.parse_},
 #			{'category' : 'nsiOkogu',          'parser' : self.parse_},
 #			{'category' : 'nsiOkopf',          'parser' : self.parse_},
@@ -97,43 +103,48 @@ class Runner(tenders.runner.Runner):
 	def update_essence(self, essence):
 		'Получает файлы сущностей для анализа и обработки'
 
-		catalog = "{}/{}".format(self.categories['essences'], essence['category'])
+		for subcategory in self.subcategories:
 
-		zip_names = self.get_ftp_catalog(self.url, catalog)
+			if subcategory:
+				catalog = "{}/{}/{}".format(self.categories['essences'], essence['category'], subcategory)
+			else:
+				catalog = "{}/{}".format(self.categories['essences'], essence['category'])
 
-		# Загружаем архивы
-		for zip_name in zip_names:
+			zip_names = self.get_ftp_catalog(self.url, catalog)
 
-			# Проверяем, не вышло ли время
-			if self.is_time_up():
-				return True
+			# Загружаем архивы
+			for zip_name in zip_names:
 
-			# Проверяем, не обработан ли файл
-			source = Source.objects.take(url = "{}/{}/{}".format(self.url, catalog, zip_name))
-			if source.is_parsed():
-				continue
+				# Проверяем, не вышло ли время
+				if self.is_time_up():
+					return True
 
-			# Скачиваем архив
-			zip_data = self.get_file_from_ftp(self.url, catalog, zip_name)
+				# Проверяем, не обработан ли файл
+				source = Source.objects.take(url = "{}/{}/{}".format(self.url, catalog, zip_name))
+				if source.is_parsed():
+					continue
 
-			if not zip_data:
-				continue
+				# Скачиваем архив
+				zip_data = self.get_file_from_ftp(self.url, catalog, zip_name)
 
-			# Проходим по всем файлам в архиве
-			for xml_name in zip_data.namelist():
+				if not zip_data:
+					continue
 
-				# Извлекаем данные
-				tree = self.get_tree_from_zip(zip_data, xml_name)
-				if tree:
-					tree = self.clear_tags(tree)
-				else:
-					return False
+				# Проходим по всем файлам в архиве
+				for xml_name in zip_data.namelist():
 
-				# Обрабатываем файл
-				parse = essence['parser']
-				parse(tree)
+					# Извлекаем данные
+					tree = self.get_tree_from_zip(zip_data, xml_name)
+					if tree:
+						tree = self.clear_tags(tree)
+					else:
+						continue
 
-			source.complite()
+					# Обрабатываем файл
+					parse = essence['parser']
+					parse(tree)
+
+				source.complite()
 
 		return True
 
@@ -172,7 +183,7 @@ class Runner(tenders.runner.Runner):
 
 
 	def parse_okato(self, tree):
-		'Парсит ОКАТО'
+		'Парсит ОКАТО (классификация населённых пунктов'
 
 		for element in tree.xpath('.//item'):
 
@@ -191,6 +202,40 @@ class Runner(tenders.runner.Runner):
 				okato   = okato)
 
 		return True
+
+
+
+	def parse_okei(self, tree):
+		'Парсит ОКЕИ (единицы измерения)'
+
+		for element in tree.xpath('.//item'):
+
+			section = OKEISection.objects.take(
+				code  = self.get_text(element, './nsiOkeiData/section/code'),
+				name  = self.get_text(element, './nsiOkeiData/section/name'),
+				state = True)
+
+			group = OKEIGroup.objects.take(
+				code  = self.get_text(element, './nsiOkeiData/group/code'),
+				name  = self.get_text(element, './nsiOkeiData/group/name'),
+				state = True)
+
+			okei = OKEI.objects.update(
+				code    = self.get_text(element, './nsiOkeiData/code'),
+				section = section,
+				group   = group,
+				name    = self.get_text(element, './nsiOkeiData/name'),
+				symbol  = self.get_text(element, './nsiOkeiData/symbol'))
+			print("Единица измерения: {}.".format(okei))
+
+			ext_key = OKEIExtKey.objects.update(
+				updater = self.updater,
+				ext_key = self.get_text(element, './guid'),
+				okei    = okei)
+
+		return True
+
+
 
 
 

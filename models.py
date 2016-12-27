@@ -392,15 +392,24 @@ class OKEIManager(models.Manager):
 
 		except OKEI.DoesNotExist:
 			o = OKEI()
-			o.code                 = code[:10]
-			o.full_name            = kwargs.get('full_name',            None)
-			o.section              = kwargs.get('section',              None)
-			o.group                = kwargs.get('group',                None)
-			o.local_name           = kwargs.get('local_name',           None)
-			o.international_name   = kwargs.get('international_name',   None)
-			o.local_symbol         = kwargs.get('local_symbol',         None)
-			o.international_symbol = kwargs.get('international_symbol', None)
-			o.state                = kwargs.get('state',                True)
+			o.code = code[:10]
+			if kwargs.get('name', None):
+				o.name = kwargs.get('name', None)
+			if kwargs.get('section', None):
+				o.section = kwargs.get('section', None)
+			if kwargs.get('group', None):
+				o.group = kwargs.get('group', None)
+			if kwargs.get('local_name', None):
+				o.local_name = kwargs.get('local_name', None)
+			if kwargs.get('international_name', None):
+				o.international_name = kwargs.get('international_name', None)
+			if kwargs.get('symbol', None):
+				o.symbol = kwargs.get('symbol', None)
+			if kwargs.get('local_symbol', None):
+				o.local_symbol = kwargs.get('local_symbol', None)
+			if kwargs.get('international_symbol', None):
+				o.international_symbol = kwargs.get('international_symbol', None)
+			o.state = kwargs.get('state', True)
 			o.save()
 
 		return o
@@ -412,14 +421,23 @@ class OKEIManager(models.Manager):
 
 		o = self.take(code, **kwargs)
 
-		o.full_name            = kwargs.get('full_name',            None)
-		o.section              = kwargs.get('section',              None)
-		o.group                = kwargs.get('group',                None)
-		o.local_name           = kwargs.get('local_name',           None)
-		o.international_name   = kwargs.get('international_name',   None)
-		o.local_symbol         = kwargs.get('local_symbol',         None)
-		o.international_symbol = kwargs.get('international_symbol', None)
-		o.state                = kwargs.get('state',                True)
+		if kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+		if kwargs.get('section', None):
+			o.section = kwargs.get('section', None)
+		if kwargs.get('group', None):
+			o.group = kwargs.get('group', None)
+		if kwargs.get('local_name', None):
+			o.local_name = kwargs.get('local_name', None)
+		if kwargs.get('international_name', None):
+			o.international_name = kwargs.get('international_name', None)
+		if kwargs.get('symbol', None):
+			o.symbol = kwargs.get('symbol', None)
+		if kwargs.get('local_symbol', None):
+			o.local_symbol = kwargs.get('local_symbol', None)
+		if kwargs.get('international_symbol', None):
+			o.international_symbol = kwargs.get('international_symbol', None)
+		o.state = kwargs.get('state', True)
 		o.save()
 
 		return o
@@ -433,9 +451,10 @@ class OKEI(models.Model):
 	group                = models.ForeignKey(OKEIGroup,   related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	code                 = models.CharField(max_length = 10, unique = True)
-	full_name            = models.TextField(null = True, default = None)
+	name                 = models.TextField(null = True, default = None)
 	local_name           = models.TextField(null = True, default = None)
 	international_name   = models.TextField(null = True, default = None)
+	symbol               = models.TextField(null = True, default = None)
 	local_symbol         = models.TextField(null = True, default = None)
 	international_symbol = models.TextField(null = True, default = None)
 	state                = models.BooleanField(default = True, db_index = True)
@@ -443,10 +462,68 @@ class OKEI(models.Model):
 	objects              = OKEIManager()
 
 	def __str__(self):
-		return "{}".format(self.full_name)
+		return "{}".format(self.name)
 
 	class Meta:
 		ordering = ['code']
+
+
+
+class OKEIExtKeyManager(models.Manager):
+
+
+	def take(self, updater, ext_key, okei = None):
+
+		if not updater or not ext_key:
+			return None
+
+		try:
+			o = self.get(updater = updater, ext_key = ext_key)
+
+		except OKEIExtKey.DoesNotExist:
+
+			if okei:
+				o = OKEIExtKey()
+				o.updater = updater
+				o.ext_key = ext_key
+				o.okei    = okei
+				o.save()
+			else:
+				return None
+
+		return o
+
+
+	def update(self, updater, ext_key, okei):
+
+		if not updater or not ext_key or not okei:
+			return None
+
+		o = self.take(updater, ext_key, okei)
+		o.okei = okei
+		o.save()
+
+		return o
+
+
+
+class OKEIExtKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	okei     = models.ForeignKey(OKEI,    related_name='+', on_delete = models.CASCADE)
+
+	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	objects  = OKEIExtKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.ext_key)
+
+	class Meta:
+		db_table        = 'tenders_okei_ext_key'
+		ordering        = ['ext_key']
+		unique_together = ('updater', 'ext_key')
 
 
 

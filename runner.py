@@ -97,7 +97,10 @@ class Runner:
 			return False
 
 		# Парсим
-		tree = etree.parse(xml_data)
+		try:
+			tree = etree.parse(xml_data)
+		except Exception:
+			tree = None
 
 		return tree
 
