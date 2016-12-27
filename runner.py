@@ -109,7 +109,7 @@ class Runner:
 		'Определяет не вышло ли время'
 
 		if timezone.now() - self.start_time > self.max_time:
-				print("Время вышло {}.".format(timezone.now() - self.start))
+				print("Время вышло {}.".format(timezone.now() - self.start_time))
 				return True
 
 		else:
