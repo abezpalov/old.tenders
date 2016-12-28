@@ -90,6 +90,14 @@ class Source(models.Model):
 
 	def complite(self):
 
+		from project.models import Log
+
+		Log.objects.add(
+			subject     = 'source.complite',
+			channel     = 'info',
+			title       = 'complite',
+			description = 'Обработан: {}.'.format(self.url))
+
 		self.state = True
 		self.save()
 		return True

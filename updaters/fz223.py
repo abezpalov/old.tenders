@@ -26,7 +26,7 @@ class Runner(tenders.runner.Runner):
 
 		super().__init__()
 
-		self.max_time = datetime.timedelta(0, 60*60*11, 0)
+		self.max_time = datetime.timedelta(0, 60*60*23, 0)
 
 		self.url = 'ftp.zakupki.gov.ru'
 

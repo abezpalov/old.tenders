@@ -26,7 +26,7 @@ class Runner(tenders.runner.Runner):
 
 		super().__init__()
 
-		self.max_time = datetime.timedelta(0, 60*60*12, 0)
+		self.max_time = datetime.timedelta(0, 60*60*23, 0)
 
 		self.url = 'ftp.zakupki.gov.ru'
 
@@ -226,7 +226,6 @@ class Runner(tenders.runner.Runner):
 
 
 	def parse_country(self, tree):
-		'Парсит страны.'
 
 		for element in tree.xpath('.//nsiOKSM'):
 
@@ -234,14 +233,10 @@ class Runner(tenders.runner.Runner):
 				code         = self.get_text(element, './countryCode'),
 				full_name    = self.get_text(element, './countryFullName'),
 				state        = self.get_bool(element, './actual'))
-
 			print("Страна: {}.".format(country))
-
-		return True
 
 
 	def parse_currency(self, tree):
-		'Парсит валюты.'
 
 		for element in tree.xpath('.//nsiCurrency'):
 
@@ -250,7 +245,6 @@ class Runner(tenders.runner.Runner):
 				digital_code = self.get_text(element, './digitalCode'),
 				name         = self.get_text(element, './name'),
 				state        = self.get_bool(element, './actual'))
-
 			print("Валюта: {}.".format(currency))
 
 		for element in tree.xpath('.//currency'):
@@ -259,14 +253,10 @@ class Runner(tenders.runner.Runner):
 				code         = self.get_text(element, './code'),
 				digital_code = self.get_text(element, './digitalCode'),
 				name         = self.get_text(element, './name'))
-
 			print("Валюта: {}.".format(currency))
-
-		return True
 
 
 	def parse_okei(self, tree):
-		'Парсит единицы измерения.'
 
 		for element in tree.xpath('.//nsiOKEI'):
 
@@ -290,10 +280,7 @@ class Runner(tenders.runner.Runner):
 				local_symbol         = self.get_text(element, './localSymbol'),
 				international_symbol = self.get_text(element, './internationalSymbol'),
 				state                = self.get_bool(element, './actual'))
-
 			print("Единица измерения: {}.".format(okei))
-
-		return True
 
 
 	def parse_kosgu(self, tree):
@@ -310,14 +297,11 @@ class Runner(tenders.runner.Runner):
 				parent = parent,
 				name   = self.get_text(element, './name'),
 				state  = self.get_bool(element, './actual'))
-
 			print("КОСГУ: {}.".format(kosgu))
-
-		return True
 
 
 	def parse_okopf(self, tree):
-		'Парсит ОКОПФ.'
+
 		for element in tree.xpath('.//nsiOKOPF'):
 			parent = OKOPF.objects.take(code = self.get_text(element, './parentCode'))
 			okopf = OKOPF.objects.update(
@@ -327,11 +311,9 @@ class Runner(tenders.runner.Runner):
 				parent        = parent,
 				state         = self.get_bool(element, './actual'))
 			print("ОКОПФ: {}.".format(okopf))
-		return True
 
 
 	def parse_okpd(self, tree):
-		'Парсит ОКПД.'
 
 		for element in tree.xpath('.//nsiOKPD'):
 
@@ -353,14 +335,10 @@ class Runner(tenders.runner.Runner):
 				updater = self.updater,
 				ext_key = self.get_text(element, './id'),
 				okpd    = okpd)
-
 			print("ОКПД: {}.".format(okpd))
-
-		return True
 
 
 	def parse_okpd2(self, tree):
-		'Парсит ОКПД2.'
 
 		for element in tree.xpath('.//nsiOKPD2'):
 
@@ -382,15 +360,10 @@ class Runner(tenders.runner.Runner):
 				updater = self.updater,
 				ext_key = self.get_text(element, './id'),
 				okpd2    = okpd2)
-
 			print("ОКПД2: {}.".format(okpd2))
-
-		return True
-
 
 
 	def parse_oktmo(self, tree):
-		'Парсит ОКТМО.'
 
 		for element in tree.xpath('.//nsiOKTMO'):
 
@@ -400,15 +373,10 @@ class Runner(tenders.runner.Runner):
 				code   = self.get_text(element, './code'),
 				parent = parent,
 				name   = self.get_text(element, './fullName'))
-
 			print("ОКТМО: {}.".format(oktmo))
-
-		return True
-
 
 
 	def parse_okved(self, tree):
-		'Парсит ОКВЭД.'
 
 		for element in tree.xpath('.//nsiOKVED'):
 
@@ -435,15 +403,10 @@ class Runner(tenders.runner.Runner):
 				updater = self.updater,
 				ext_key = self.get_text(element, './id'),
 				okved   = okved)
-
-
 			print("ОКВЭД: {}.".format(okved))
-
-		return True
 
 
 	def parse_okved2(self, tree):
-		'Парсит ОКВЭД2.'
 
 		for element in tree.xpath('.//nsiOKVED2'):
 
@@ -462,15 +425,10 @@ class Runner(tenders.runner.Runner):
 				updater = self.updater,
 				ext_key = self.get_text(element, './id'),
 				okved2   = okved2)
-
-
 			print("ОКВЭД2: {}.".format(okved2))
-
-		return True
 
 
 	def parse_budget(self, tree):
-		'Парсит бюджет.'
 
 		for element in tree.xpath('.//nsiBudget'):
 
@@ -478,14 +436,10 @@ class Runner(tenders.runner.Runner):
 				code       = self.get_text(element, './code'),
 				name       = self.get_text(element, './name'),
 				state      = self.get_bool(element, './actual'))
-
 			print("Бюджет: {}.".format(budget))
-
-		return True
 
 
 	def parse_budget_type(self, tree):
-		'Парсит типы бюджета.'
 
 		for element in tree.xpath('.//nsiOffBudget'):
 
@@ -496,26 +450,20 @@ class Runner(tenders.runner.Runner):
 				name           = self.get_text(element, './name'),
 				subsystem_type = subsystem_type,
 				state          = self.get_bool(element, './actual'))
-
 			print("Тип бюджета: {}.".format(budget_type))
-
-		return True
 
 
 	def parse_organisation_type(self, tree):
-		'Парсит типы организаций.'
+
 		for element in tree.xpath('.//nsiOrganizationType'):
 			organisation_type = OrganisationType.objects.update(
 				code        = self.get_text(element, './code'),
 				name        = self.get_text(element, './name'),
 				description = self.get_text(element, './description'))
 			print("Тип организации: {}".format(organisation_type))
-		return True
-
 
 
 	def parse_organisation(self, tree):
-		'Парсит организации.'
 
 		for element in tree.xpath('.//nsiOrganization'):
 
@@ -595,10 +543,7 @@ class Runner(tenders.runner.Runner):
 				updater = self.updater,
 				ext_key = self.get_text(element, './regNumber'),
 				organisation = organisation)
-
 			print('Организация: {}'.format(organisation))
-
-		return True
 
 
 	def parse_placingway(self, tree):
