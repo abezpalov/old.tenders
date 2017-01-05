@@ -96,7 +96,7 @@ class Source(models.Model):
 			subject     = 'source.complite',
 			channel     = 'info',
 			title       = 'complite',
-			description = 'Обработан: {}.'.format(self.url))
+			description = self.url)
 
 		self.state = True
 		self.save()
@@ -2409,7 +2409,10 @@ class OrganisationExtKeyManager(models.Manager):
 			updater = updater,
 			ext_key = ext_key)
 
-		return ext_key.organisation
+		if ext_key:
+			return ext_key.organisation
+		else:
+			return None
 
 
 

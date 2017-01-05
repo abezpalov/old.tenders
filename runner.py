@@ -116,9 +116,19 @@ class Runner:
 			return False
 
 
+	def clear_tags(self, tree):
 
+		# Чистим теги
+		for element in tree.xpath('//*'):
 
+			try:
+				element.tag = element.tag.split('}')[1]
+			except Exception:
+				pass
 
+			try:
+				element.tag = element.tag.split(':')[1]
+			except Exception:
+				pass
 
-
-
+		return tree

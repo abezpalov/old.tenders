@@ -50,8 +50,6 @@ class Runner(tenders.runner.Runner):
 			{'category' : 'nsiPlanPositionChangeReason',       'parser' : self.parse_plan_position_change_reason},
 #			{'category' : 'nsiContractModificationReason',     'parser' : self.parse_contract_modification_reason},
 
-
-
 #			{'category' : 'nsiPurchaseDocumentTypes',          'parser' : self.parse_},
 #			{'category' : 'nsiPurchasePreferences',            'parser' : self.parse_},
 #			{'category' : 'nsiPurchaseRejectReason',           'parser' : self.parse_},
@@ -97,16 +95,17 @@ class Runner(tenders.runner.Runner):
 			print('Ошибка: Проверьте параметры авторизации. Кажется их нет.')
 			return False
 
-		# Обновляем справочники
+		print('Обновляем справочники')
 		for essence in self.essences:
 
+			print(essence['category'])
 			# Проверяем не вышло ли время
 			if self.is_time_up():
 				return True
 
 			self.update_essence(essence)
 
-		# Обновляем данные с регионов
+		print('Обновляем данные с регионов')
 		for region in self.get_ftp_catalog(self.url, self.categories['regions']):
 
 			if (not region in self.black_list) and (not '.'in region):
@@ -124,6 +123,8 @@ class Runner(tenders.runner.Runner):
 				if region.state:
 
 					for essence in self.region_essences:
+						if self.is_time_up():
+							return True
 						self.update_region_essence(region, essence)
 
 
@@ -785,41 +786,49 @@ class Runner(tenders.runner.Runner):
 
 		# TODO KILL
 		import xml.etree.ElementTree as ET
-#		print(ET.tostring(element, encoding = 'unicode'))
+#		print('parse_notification')
+#		print(ET.tostring(tree.getroot(), encoding = 'unicode'))
 		ok = False
 
 		# Новая закупка
-		for element in tree.xpath('.//fcsNotificationZK'):
+		for element in tree.xpath('//fcsNotificationZK'):
+			print('fcsNotificationZK')
 			ok = self.parse_notification_get_universal(element, region)
 
-		for element in tree.xpath('.//fcsNotificationEP'):
+		for element in tree.xpath('//fcsNotificationEP'):
+			print('fcsNotificationEP')
 			ok = self.parse_notification_get_universal(element, region)
 
-		for element in tree.xpath('.//fcsNotificationEF'):
+		for element in tree.xpath('//fcsNotificationEF'):
+			print('fcsNotificationEF')
 			ok = self.parse_notification_get_universal(element, region)
 
-		for element in tree.xpath('.//fcsNotificationOK'):
+		for element in tree.xpath('//fcsNotificationOK'):
+			print('fcsNotificationOK')
 			ok = self.parse_notification_get_universal(element, region)
 
-		for element in tree.xpath('.//fcsNotificationZP'):
+		for element in tree.xpath('//fcsNotificationZP'):
+			print('fcsNotificationZP')
 			ok = self.parse_notification_get_universal(element, region)
 
-		for element in tree.xpath('.//fcsNotificationOKOU'):
+		for element in tree.xpath('//fcsNotificationOKOU'):
+			print('fcsNotificationOKOU')
 			ok = self.parse_notification_get_universal(element, region)
 
 		# Продление закупки
-		for element in tree.xpath('.//fcsPurchaseProlongationZK'):
+		for element in tree.xpath('//fcsPurchaseProlongationZK'):
+			print('fcsPurchaseProlongationZK')
 			ok = self.parse_notification_prolongation(element, region)
 
 		# Отмена закупки
-		for element in tree.xpath('.//fcsNotificationCancel'):
+		for element in tree.xpath('//fcsNotificationCancel'):
+			print('fcsNotificationCancel')
 			ok = self.parse_notification_cancel(element, region)
 
 		# Подписание контракта
-		for element in tree.xpath('.//fcsContractSign'):
+		for element in tree.xpath('//fcsContractSign'):
+			print('fcsContractSign')
 			self.parse_notification_sign(element, region)
-
-
 
 
 
@@ -889,7 +898,7 @@ class Runner(tenders.runner.Runner):
 #		purchase.scoring_time           = self.get_datetime(element, './'),
 		purchase.save()
 
-		print('Закупка {} - prolongated'.format(purchase))
+		print('{} - prolongated'.format(purchase))
 
 		notification = Notification.objects.take(
 			id       = self.get_int(element, './id'),
@@ -909,15 +918,25 @@ class Runner(tenders.runner.Runner):
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 		purchase.cancel()
-		print('Закупка {} - cancel'.format(purchase))
+		print('{} - canceled'.format(purchase))
 
 		return True
 
 
 	def parse_notification_get_universal(self, element, region):
 
-		responsible = Organisation.objects.take(oos_number = self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
-		specialised = Organisation.objects.take(oos_number = self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
+#		print(self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
+#		print(self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
+
+		responsible = OrganisationExtKey.objects.get_organisation(
+			updater = self.updater,
+			ext_key = self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
+
+		specialised = OrganisationExtKey.objects.get_organisation(
+			updater = self.updater,
+			ext_key = self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
+
+
 
 		# TODO TEST
 		import xml.etree.ElementTree as ET
@@ -935,12 +954,7 @@ class Runner(tenders.runner.Runner):
 			email       = email,
 			phon        = phone)
 
-		try:
-			placing_way = PlacingWay.objects.get(
-				code = self.get_text(element, './placingWay/code'),
-				state = True)
-		except Exception:
-			placing_way = None
+		placing_way = PlacingWay.objects.take(code = self.get_text(element, './placingWay/code'))
 
 		grant_place            = Address.objects.take(address = self.get_text(element, './purchaseDocumentation/grantPlace'))
 		collecting_place       = Address.objects.take(address = self.get_text(element, './procedureInfo/collecting/place'))
@@ -976,10 +990,11 @@ class Runner(tenders.runner.Runner):
 			prequalification_place = prequalification_place,
 			scoring_place          = scoring_place,
 			etp                    = etp)
-		print('Закупка {} - added'.format(purchase))
+		print('{} - added'.format(purchase))
 
 		notification = Notification.objects.take(
-			oos_id   = self.get_int(element, './id'),
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 
@@ -1063,16 +1078,6 @@ class Runner(tenders.runner.Runner):
 					link.save()
 
 		return True
-
-
-	def clear_tags(self, tree):
-
-		# Чистим теги
-		for element in tree.xpath('.//*'):
-			element.tag = element.tag.split('}')[1]
-
-		return tree
-
 
 
 	def get_text(self, element, query):
