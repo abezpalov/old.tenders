@@ -2364,6 +2364,8 @@ class Organisation(models.Model):
 
 	class Meta:
 		ordering = ['name']
+		unique_together = ('inn', 'kpp')
+
 
 
 
