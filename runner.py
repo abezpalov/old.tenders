@@ -20,6 +20,12 @@ class Runner:
 
 		self.max_time = datetime.timedelta(0, 60*60*23, 0)
 
+		Log.objects.add(
+			subject     = "tenders.updater.{}".format(self.updater.alias),
+			channel     = "start",
+			title       = "Start",
+			description = "Запущен загрузчик {}.".format(self.updater.name))
+
 
 	def log(self):
 

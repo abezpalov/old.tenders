@@ -2235,14 +2235,6 @@ class OrganisationManager(models.Manager):
 
 			o.save()
 
-		except Exception:
-
-			os = Organisation.objects.filter(inn = inn, kpp = kpp)
-
-			for o in os:
-				print('{} {} {} {} {}'.format(o.id, o.inn, o.kpp, o.state, o.name))
-			exit()
-
 		return o
 
 
