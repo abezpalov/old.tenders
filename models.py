@@ -186,17 +186,27 @@ class CountryManager(models.Manager):
 		if not code:
 			return None
 
+		need_save = False
+
 		o = self.take(code, **kwargs)
 
-		o.full_name = kwargs.get('full_name', None)
-		o.state     = kwargs.get('state',     True)
+		if o.full_name != kwargs.get('full_name', None):
+			o.full_name = kwargs.get('full_name', None)
+			need_save = True
 
-		if kwargs.get('name', None):
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if kwargs.get('name', None) and o.name != kwargs.get('name'):
 			o.name = kwargs.get('name')
-		else:
+			need_save = True
+		elif o.name != kwargs.get('full_name', None):
 			o.name = kwargs.get('full_name', None)
+			need_save = True
 
-		o.save()
+		if need_save:
+			o.save()
 
 		return o
 
@@ -251,12 +261,24 @@ class CurrencyManager(models.Manager):
 		if not code:
 			return None
 
+		need_save = False
+
 		o = self.take(code, **kwargs)
 
-		o.digital_code = kwargs.get('digital_code', None)
-		o.name         = kwargs.get('name',         None)
-		o.state        = kwargs.get('state',        True)
-		o.save()
+		if o.digital_code != kwargs.get('digital_code', None):
+			o.digital_code = kwargs.get('digital_code', None)
+			need_save = True
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -306,11 +328,20 @@ class OKEISectionManager(models.Manager):
 		if not code:
 			return None
 
+		need_save = False
+
 		o = self.take(code, **kwargs)
 
-		o.name  = kwargs.get('name',  None)
-		o.state = kwargs.get('state', True)
-		o.save()
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -359,6 +390,8 @@ class OKEIGroupManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 
@@ -426,6 +459,8 @@ class OKEIManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 
@@ -507,6 +542,8 @@ class OKEIExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okei:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okei)
 		o.okei = okei
 		o.save()
@@ -562,6 +599,8 @@ class KOSGUManager(models.Manager):
 		if not code:
 			return None
 
+		need_save = False
+
 		o = self.take(code, **kwargs)
 		o.name   = kwargs.get('name',   None)
 		o.parent = kwargs.get('parent', None)
@@ -611,14 +650,20 @@ class OKOPFManager(models.Manager):
 
 
 	def update(self, code, **kwargs):
+
 		if not code:
 			return None
+
+		need_save = False
+
 		o = self.take(code, **kwargs)
+
 		o.full_name     = kwargs.get('full_name',     None)
 		o.singular_name = kwargs.get('singular_name', None)
 		o.parent        = kwargs.get('parent',        None)
 		o.state         = kwargs.get('state',         True)
 		o.save()
+
 		return o
 
 
@@ -669,6 +714,8 @@ class OKDPManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name     = kwargs.get('name',   None)
@@ -728,6 +775,8 @@ class OKDPExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okdp:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okdp)
 		o.okdp = okdp
 		o.save()
@@ -782,6 +831,8 @@ class OKPDManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name     = kwargs.get('name',   None)
@@ -841,6 +892,8 @@ class OKPDExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okpd:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okpd)
 		o.okpd = okpd
 		o.save()
@@ -895,6 +948,8 @@ class OKPD2Manager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name   = kwargs.get('name',   None)
@@ -955,6 +1010,8 @@ class OKPD2ExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okpd2:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okpd2)
 		o.okpd2 = okpd2
 		o.save()
@@ -1009,6 +1066,8 @@ class OKTMOManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name     = kwargs.get('name',   None)
@@ -1065,6 +1124,8 @@ class OKATOManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name     = kwargs.get('name',   None)
@@ -1125,6 +1186,8 @@ class OKATOExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okato:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okato)
 		o.okato = okato
 		o.save()
@@ -1177,6 +1240,8 @@ class OKVEDSectionManager(models.Manager):
 		if not name:
 			return None
 
+		need_save = False
+
 		o = self.take(name, **kwargs)
 		o.state = kwargs.get('state', True)
 		o.save()
@@ -1226,6 +1291,8 @@ class OKVEDSubSectionManager(models.Manager):
 
 		if not name:
 			return None
+
+		need_save = False
 
 		o = self.take(name, **kwargs)
 		o.state = kwargs.get('state', True)
@@ -1279,6 +1346,8 @@ class OKVEDManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.code       = code[:100]
@@ -1344,6 +1413,8 @@ class OKVEDExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okved:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okved)
 		o.okved = okved
 		o.save()
@@ -1396,6 +1467,8 @@ class OKVED2SectionManager(models.Manager):
 
 		if not name:
 			return None
+
+		need_save = False
 
 		o = self.take(name, **kwargs)
 		o.state = kwargs.get('state', True)
@@ -1453,6 +1526,8 @@ class OKVED2Manager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.section    = kwargs.get('section', None)
@@ -1517,6 +1592,8 @@ class OKVED2ExtKeyManager(models.Manager):
 		if not updater or not ext_key or not okved2:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, okved2)
 		o.okved2 = okved2
 		o.save()
@@ -1570,6 +1647,8 @@ class BudgetManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name  = kwargs.get('name',  None)
@@ -1670,6 +1749,8 @@ class BudgetTypeManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name           = kwargs.get('name',           None)
@@ -2075,8 +2156,12 @@ class OrganisationTypeManager(models.Manager):
 
 
 	def update(self, code, **kwargs):
+
 		if not code:
 			return None
+
+		need_save = False
+
 		o = self.take(code = code)
 		o.name        = kwargs.get('name', None)
 		o.description = kwargs.get('description', None)
@@ -2243,72 +2328,95 @@ class OrganisationManager(models.Manager):
 		if not inn:
 			return None
 
+		need_save = False
+
 		o = self.take(inn, kpp, **kwargs)
 
 		if kwargs.get('state', True) or not o.state:
 
 
-			if kwargs.get('short_name', None):
+			if kwargs.get('short_name', None) and o.short_name != kwargs.get('short_name', None):
 				o.short_name = kwargs.get('short_name', None)
+				need_save = True
 
 			if kwargs.get('full_name', None):
 				o.full_name = kwargs.get('full_name', None)
+				need_save = True
 
 			if kwargs.get('ogrn', None):
 				o.ogrn = kwargs.get('ogrn', None)
+				need_save = True
 
 			if kwargs.get('okpo', None):
 				o.okpo = kwargs.get('okpo', None)
+				need_save = True
 
 			if kwargs.get('factual_address', None):
 				o.factual_address = kwargs.get('factual_address', None)
+				need_save = True
 
 			if kwargs.get('postal_address', None):
 				o.postal_address = kwargs.get('postal_address',    None)
+				need_save = True
 
 			if kwargs.get('email', None):
 				o.email = kwargs.get('email', None)
+				need_save = True
 
 			if kwargs.get('phone', None):
 				o.phone = kwargs.get('phone', None)
+				need_save = True
 
 			if kwargs.get('fax', None):
 				o.fax = kwargs.get('fax', None)
+				need_save = True
 
 			if kwargs.get('contact_person', None):
 				o.contact_person = kwargs.get('contact_person', None)
+				need_save = True
 
 			if kwargs.get('head_agency', None):
 				o.head_agency = kwargs.get('head_agency', None)
+				need_save = True
 
 			if kwargs.get('ordering_agency', None):
 				o.ordering_agency = kwargs.get('ordering_agency', None)
+				need_save = True
 
 			if kwargs.get('okopf', None):
 				o.okopf = kwargs.get('okopf', None)
+				need_save = True
 
 			if kwargs.get('okogu', None):
 				o.okogu = kwargs.get('okogu', None)
+				need_save = True
 
 			if kwargs.get('organisation_role', None):
 				o.organisation_role = kwargs.get('organisation_role', None)
+				need_save = True
 
-			if kwargs.get('organisation_type', None):
+			if kwargs.get('organisation_type', None) and o.organisation_type != kwargs.get('organisation_type', None):
 				o.organisation_type = kwargs.get('organisation_type', None)
+				need_save = True
 
-			if kwargs.get('oktmo', None):
+			if kwargs.get('oktmo', None) and o.oktmo != kwargs.get('oktmo', None):
 				o.oktmo = kwargs.get('oktmo', None)
+				need_save = True
 
-			if kwargs.get('state', False):
+			if kwargs.get('state', False) and o.state != kwargs.get('state', False):
 				o.state = kwargs.get('state', False)
+				need_save = True
 
-			if kwargs.get('register', False):
+			if kwargs.get('register', False) and o.register != kwargs.get('register', False):
 				o.register = kwargs.get('register', False)
+				need_save = True
 
-			if kwargs.get('name', None):
+			if kwargs.get('name', None) and o.name != kwargs.get('name', None):
 				o.name = kwargs.get('name', None)
-			else:
+				need_save = True
+			elif kwargs.get('full_name', None) and o.name != kwargs.get('full_name', None):
 				o.name = kwargs.get('full_name', None)
+				need_save = True
 
 		o.save()
 
@@ -2391,6 +2499,8 @@ class OrganisationExtKeyManager(models.Manager):
 		if not updater or not ext_key or not organisation:
 			return None
 
+		need_save = False
+
 		o = self.take(updater, ext_key, organisation)
 		o.organisation = organisation
 		o.save()
@@ -2462,6 +2572,8 @@ class PlacingWayManager(models.Manager):
 		if not code:
 			return None
 
+		need_save = False
+
 		o = self.take(code, **kwargs)
 		if kwargs.get('state', False) or not o.state:
 			if kwargs.get('name', None):
@@ -2526,6 +2638,8 @@ class PlacingWayExtKeyManager(models.Manager):
 
 		if not updater or not ext_key or not placingway:
 			return None
+
+		need_save = False
 
 		o = self.take(updater, ext_key, placingway)
 		o.placingway = placingway
@@ -2626,6 +2740,8 @@ class PlanPositionChangeReasonManager(models.Manager):
 		if not name:
 			return None
 
+		need_save = False
+
 		o = self.take(name, **kwargs)
 		if kwargs.get('state', True) or not o.state:
 			if kwargs.get('description', None):
@@ -2684,6 +2800,8 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 
 		if not updater or not ext_key or not planpositionchangereason:
 			return None
+
+		need_save = False
 
 		o = self.take(updater, ext_key, planpositionchangereason)
 		o.planpositionchangereason = planpositionchangereason
@@ -2750,6 +2868,8 @@ class ContractModificationReasonManager(models.Manager):
 
 		if not code:
 			return None
+
+		need_save = False
 
 		o = self.take(code, **kwargs)
 		o.name  = kwargs.get('name', None)
@@ -2860,6 +2980,8 @@ class PlanManager(models.Manager):
 		if not number or not version:
 			return None
 
+		need_save = False
+
 		o = self.take(number, version, **kwargs)
 		o.year           = kwargs.get('year',           None)
 		o.description    = kwargs.get('description',    None)
@@ -2940,6 +3062,8 @@ class PlanExtKeyManager(models.Manager):
 
 		if not updater or not ext_key or not plan:
 			return None
+
+		need_save = False
 
 		o = self.take(updater, ext_key, plan)
 		o.plan = plan
@@ -3046,6 +3170,8 @@ class PlanPositionManager(models.Manager):
 
 		if not plan or not number:
 			return None
+
+		need_save = False
 
 		o = self.take(plan, number, **kwargs)
 		o.name            = kwargs.get('name',            None)
@@ -3178,6 +3304,8 @@ class PurchaseManager(models.Manager):
 
 		if not number:
 			return None
+
+		need_save = False
 
 		o = self.take(number, **kwargs)
 		o.name                   = kwargs.get('name',                   None)
@@ -3342,6 +3470,8 @@ class LotManager(models.Manager):
 		if not purchase:
 			return None
 
+		need_save = False
+
 		o = self.take(purchase, number = None, **kwargs)
 		o.name           = kwargs.get('name',           None)
 		o.finance_source = kwargs.get('finance_source', None)
@@ -3433,6 +3563,8 @@ class ContractManager(models.Manager):
 
 		if not purchase:
 			return None
+
+		need_save = False
 
 		o = self.take(purchase, customer, number, **kwargs)
 		o.currency  = kwargs.get('currency',  None)
