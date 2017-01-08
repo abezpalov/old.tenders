@@ -395,9 +395,16 @@ class OKEIGroupManager(models.Manager):
 
 		o = self.take(code, **kwargs)
 
-		o.name  = kwargs.get('name',  None)
-		o.state = kwargs.get('state', True)
-		o.save()
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -464,24 +471,44 @@ class OKEIManager(models.Manager):
 
 		o = self.take(code, **kwargs)
 
-		if kwargs.get('name', None):
+		if kwargs.get('name', None) and o.name != kwargs.get('name', None):
 			o.name = kwargs.get('name', None)
-		if kwargs.get('section', None):
+			need_save = True
+
+		if kwargs.get('section', None) and o.section != kwargs.get('section', None):
 			o.section = kwargs.get('section', None)
-		if kwargs.get('group', None):
+			need_save = True
+
+		if kwargs.get('group', None) and o.group != kwargs.get('group', None):
 			o.group = kwargs.get('group', None)
-		if kwargs.get('local_name', None):
+			need_save = True
+
+		if kwargs.get('local_name', None) and o.local_name != kwargs.get('local_name', None):
 			o.local_name = kwargs.get('local_name', None)
-		if kwargs.get('international_name', None):
+			need_save = True
+
+		if kwargs.get('international_name', None) and o.international_name != kwargs.get('international_name', None):
 			o.international_name = kwargs.get('international_name', None)
-		if kwargs.get('symbol', None):
+			need_save = True
+
+		if kwargs.get('symbol', None) and o.symbol != kwargs.get('symbol', None):
 			o.symbol = kwargs.get('symbol', None)
-		if kwargs.get('local_symbol', None):
+			need_save = True
+
+		if kwargs.get('local_symbol', None) and o.local_symbol != kwargs.get('local_symbol', None):
 			o.local_symbol = kwargs.get('local_symbol', None)
-		if kwargs.get('international_symbol', None):
+			need_save = True
+
+		if kwargs.get('international_symbol', None) and o.international_symbol != kwargs.get('international_symbol', None):
 			o.international_symbol = kwargs.get('international_symbol', None)
-		o.state = kwargs.get('state', True)
-		o.save()
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -545,8 +572,13 @@ class OKEIExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okei)
-		o.okei = okei
-		o.save()
+
+		if o.okei != okei:
+			o.okei = okei
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -602,10 +634,21 @@ class KOSGUManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name   = kwargs.get('name',   None)
-		o.parent = kwargs.get('parent', None)
-		o.state  = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state',  True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -658,11 +701,23 @@ class OKOPFManager(models.Manager):
 
 		o = self.take(code, **kwargs)
 
-		o.full_name     = kwargs.get('full_name',     None)
-		o.singular_name = kwargs.get('singular_name', None)
-		o.parent        = kwargs.get('parent',        None)
-		o.state         = kwargs.get('state',         True)
-		o.save()
+		if o.full_name != kwargs.get('full_name', None):
+			o.full_name = kwargs.get('full_name', None)
+			need_save = True
+
+		if o.singular_name != kwargs.get('singular_name', None):
+			o.singular_name = kwargs.get('singular_name', None)
+			need_save = True
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -718,10 +773,21 @@ class OKDPManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name     = kwargs.get('name',   None)
-		o.parent   = kwargs.get('parent', None)
-		o.state    = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			nedd_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_Save = True
+
+		if o.state != kwargs.get('state',  True):
+			o.state = kwargs.get('state',  True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -778,8 +844,13 @@ class OKDPExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okdp)
-		o.okdp = okdp
-		o.save()
+
+		if o.okdp != okdp:
+			o.okdp = okdp
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -835,10 +906,21 @@ class OKPDManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name     = kwargs.get('name',   None)
-		o.parent   = kwargs.get('parent', None)
-		o.state    = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -895,8 +977,13 @@ class OKPDExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okpd)
-		o.okpd = okpd
-		o.save()
+
+		if o.okpd != okpd:
+			o.okpd = okpd
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1128,10 +1215,21 @@ class OKATOManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name     = kwargs.get('name',   None)
-		o.parent   = kwargs.get('parent', None)
-		o.state    = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
