@@ -143,7 +143,7 @@ class Runner(tenders.runner.Runner):
 					parse = essence['parser']
 					parse(tree)
 
-				source.complite()
+				source.complite(updater = self.updater)
 
 		return True
 

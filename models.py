@@ -33,8 +33,11 @@ class Updater(models.Model):
 	alias    = models.CharField(max_length = 50, unique = True)
 	login    = models.TextField(null = True, default = None)
 	password = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
 	updated  = models.DateTimeField(default = timezone.now)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = UpdaterManager()
 
@@ -74,7 +77,10 @@ class Source(models.Model):
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	url   = models.CharField(max_length = 2048, unique = True)
-	state = models.BooleanField(default = False, db_index = True)
+
+	state       = models.BooleanField(default = False, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = SourceManager()
 
@@ -88,12 +94,17 @@ class Source(models.Model):
 			return False
 
 
-	def complite(self):
+	def complite(self, updater = None):
 
 		from project.models import Log
 
+		if updater:
+			subject = 'tenders.updater.{}'.format(updater.alias)
+		else:
+			subject = 'source.complite'
+
 		Log.objects.add(
-			subject     = 'source.complite',
+			subject     = subject,
 			channel     = 'info',
 			title       = 'complite',
 			description = self.url)
@@ -142,7 +153,10 @@ class Region(models.Model):
 	alias     = models.CharField(max_length = 50, unique = True)
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
-	state     = models.BooleanField(default = False, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects   = RegionManager()
 
@@ -206,6 +220,7 @@ class CountryManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -219,7 +234,10 @@ class Country(models.Model):
 	code      = models.CharField(max_length = 10, unique = True)
 	full_name = models.TextField(null = True, default = None)
 	name      = models.TextField(null = True, default = None)
-	state     = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects   = CountryManager()
 
@@ -278,6 +296,7 @@ class CurrencyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -290,7 +309,10 @@ class Currency(models.Model):
 	code         = models.CharField(max_length = 10, unique = True)
 	digital_code = models.CharField(max_length = 10, unique = True)
 	name         = models.TextField(null = True, default = None)
-	state        = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects      = CurrencyManager()
 
@@ -341,6 +363,7 @@ class OKEISectionManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -353,7 +376,10 @@ class OKEISection(models.Model):
 
 	code     = models.CharField(max_length = 10, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKEISectionManager()
 
@@ -404,6 +430,7 @@ class OKEIGroupManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -416,7 +443,10 @@ class OKEIGroup(models.Model):
 
 	code    = models.CharField(max_length = 10, unique = True)
 	name    = models.TextField(null = True, default = None)
-	state   = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKEIGroupManager()
 
@@ -508,6 +538,7 @@ class OKEIManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -527,7 +558,10 @@ class OKEI(models.Model):
 	symbol               = models.TextField(null = True, default = None)
 	local_symbol         = models.TextField(null = True, default = None)
 	international_symbol = models.TextField(null = True, default = None)
-	state                = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects              = OKEIManager()
 
@@ -578,6 +612,7 @@ class OKEIExtKeyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -591,6 +626,10 @@ class OKEIExtKey(models.Model):
 	okei     = models.ForeignKey(OKEI,    related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKEIExtKeyManager()
 
@@ -648,6 +687,7 @@ class KOSGUManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -661,7 +701,10 @@ class KOSGU(models.Model):
 
 	code        = models.CharField(max_length = 10, unique = True)
 	name        = models.TextField(null = True, default = None)
+
 	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects     = KOSGUManager()
 
@@ -717,6 +760,7 @@ class OKOPFManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -731,7 +775,10 @@ class OKOPF(models.Model):
 	code          = models.CharField(max_length = 10, unique = True)
 	full_name     = models.TextField(null = True, default = None)
 	singular_name = models.TextField(null = True, default = None)
-	state         = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects       = OKOPFManager()
 
@@ -787,6 +834,7 @@ class OKDPManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -800,7 +848,10 @@ class OKDP(models.Model):
 
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKDPManager()
 
@@ -850,6 +901,7 @@ class OKDPExtKeyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -863,6 +915,10 @@ class OKDPExtKey(models.Model):
 	okdp     = models.ForeignKey(OKDP,    related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKDPExtKeyManager()
 
@@ -920,6 +976,7 @@ class OKPDManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -933,7 +990,10 @@ class OKPD(models.Model):
 
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKPDManager()
 
@@ -983,6 +1043,7 @@ class OKPDExtKeyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -996,6 +1057,10 @@ class OKPDExtKey(models.Model):
 	okpd     = models.ForeignKey(OKPD,    related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKPDExtKeyManager()
 
@@ -1053,6 +1118,7 @@ class OKPD2Manager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1066,7 +1132,10 @@ class OKPD2(models.Model):
 
 	code     = models.CharField(max_length = 50, null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKPD2Manager()
 
@@ -1117,6 +1186,7 @@ class OKPD2ExtKeyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1130,6 +1200,10 @@ class OKPD2ExtKey(models.Model):
 	okpd2    = models.ForeignKey(OKPD2,   related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKPD2ExtKeyManager()
 
@@ -1187,6 +1261,7 @@ class OKTMOManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1200,7 +1275,10 @@ class OKTMO(models.Model):
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKTMOManager()
 
@@ -1256,6 +1334,7 @@ class OKATOManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1269,7 +1348,10 @@ class OKATO(models.Model):
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKATOManager()
 
@@ -1320,6 +1402,7 @@ class OKATOExtKeyManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1333,6 +1416,10 @@ class OKATOExtKey(models.Model):
 	okato    = models.ForeignKey(OKATO,   related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKATOExtKeyManager()
 
@@ -1379,6 +1466,7 @@ class OKVEDSectionManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1390,7 +1478,10 @@ class OKVEDSection(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	name     = models.TextField(unique = True)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKVEDSectionManager()
 
@@ -1436,6 +1527,7 @@ class OKVEDSubSectionManager(models.Manager):
 			need_save = True
 
 		if need_save:
+			o.modified = timezone.now()
 			o.save()
 
 		return o
@@ -1447,7 +1539,10 @@ class OKVEDSubSection(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	name     = models.TextField(unique = True)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKVEDSubSectionManager()
 
@@ -1499,11 +1594,25 @@ class OKVEDManager(models.Manager):
 			o.section = kwargs.get('section', None)
 			need_save = True
 
-		o.subsection = kwargs.get('subsection', None)
-		o.parent     = kwargs.get('parent',     None)
-		o.name       = kwargs.get('name',       None)
-		o.state      = kwargs.get('state',      True)
-		o.save()
+		if o.subsection != kwargs.get('subsection', None):
+			o.subsection = kwargs.get('subsection', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1518,7 +1627,10 @@ class OKVED(models.Model):
 
 	code       = models.CharField(max_length = 100, null = True, default = None, db_index = True)
 	name       = models.TextField(null = True, default = None)
-	state      = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKVEDManager()
 
@@ -1563,8 +1675,14 @@ class OKVEDExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okved)
-		o.okved = okved
-		o.save()
+
+		if o.okved != okved:
+			o.okved = okved
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1577,6 +1695,10 @@ class OKVEDExtKey(models.Model):
 	okved    = models.ForeignKey(OKVED,   related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKVEDExtKeyManager()
 
@@ -1618,8 +1740,15 @@ class OKVED2SectionManager(models.Manager):
 		need_save = False
 
 		o = self.take(name, **kwargs)
-		o.state = kwargs.get('state', True)
-		o.save()
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
+
 
 		return o
 
@@ -1630,7 +1759,10 @@ class OKVED2Section(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	name     = models.TextField(unique = True)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKVED2SectionManager()
 
@@ -1677,12 +1809,30 @@ class OKVED2Manager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.section    = kwargs.get('section', None)
-		o.parent     = kwargs.get('parent',  None)
-		o.name       = kwargs.get('name',    None)
-		o.comment    = kwargs.get('comment', None)
-		o.state      = kwargs.get('state',   True)
-		o.save()
+
+		if o.section != kwargs.get('section', None):
+			o.section = kwargs.get('section', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.comment != kwargs.get('comment', None):
+			o.comment = kwargs.get('comment', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1697,7 +1847,10 @@ class OKVED2(models.Model):
 	code    = models.CharField(max_length = 100, null = True, default = None, unique = True)
 	name    = models.TextField(null = True, default = None)
 	comment = models.TextField(null = True, default = None)
-	state   = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKVED2Manager()
 
@@ -1742,8 +1895,14 @@ class OKVED2ExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okved2)
-		o.okved2 = okved2
-		o.save()
+
+		if o.okved2 != okved2:
+			o.okved2 = okved2
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1756,6 +1915,10 @@ class OKVED2ExtKey(models.Model):
 	okved2   = models.ForeignKey(OKVED2,  related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OKVED2ExtKeyManager()
 
@@ -1798,9 +1961,18 @@ class BudgetManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name  = kwargs.get('name',  None)
-		o.state = kwargs.get('state', True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1812,7 +1984,10 @@ class Budget(models.Model):
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = BudgetManager()
 
@@ -1855,7 +2030,10 @@ class SubsystemType(models.Model):
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = SubsystemTypeManager()
 
@@ -1900,10 +2078,22 @@ class BudgetTypeManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name           = kwargs.get('name',           None)
-		o.subsystem_type = kwargs.get('subsystem_type', None)
-		o.state          = kwargs.get('state',          True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.subsystem_type != kwargs.get('subsystem_type', None):
+			o.subsystem_type = kwargs.get('subsystem_type', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -1915,7 +2105,10 @@ class BudgetType(models.Model):
 
 	code           = models.CharField(max_length = 20, unique = True)
 	name           = models.TextField(null = True, default = None)
-	state          = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = BudgetTypeManager()
 
@@ -2005,7 +2198,10 @@ class OKOGU(models.Model):
 
 	code    = models.CharField(max_length = 20, unique = True)
 	name    = models.TextField(null = True, default = None)
-	state   = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = OKOGUManager()
 
@@ -2049,6 +2245,10 @@ class Attachment(models.Model):
 	size        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
 
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
+
 	objects = AttachmentManager()
 
 	def __str__(self):
@@ -2082,7 +2282,10 @@ class Address(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	address  = models.TextField(unique = True)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = AddressManager()
 
@@ -2119,7 +2322,10 @@ class Email(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	email    = models.TextField(unique = True)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = EmailManager()
 
@@ -2156,7 +2362,10 @@ class Phone(models.Model):
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
 	phone = models.TextField(unique = True)
-	state = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = PhoneManager()
 
@@ -2273,7 +2482,10 @@ class OrganisationRole(models.Model):
 
 	code     = models.CharField(max_length = 20, unique = True)
 	name     = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OrganisationRoleManager()
 
@@ -2310,9 +2522,19 @@ class OrganisationTypeManager(models.Manager):
 		need_save = False
 
 		o = self.take(code = code)
-		o.name        = kwargs.get('name', None)
-		o.description = kwargs.get('description', None)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.description != kwargs.get('description', None):
+			o.description = kwargs.get('description', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
+
 		return o
 
 
@@ -2324,6 +2546,10 @@ class OrganisationType(models.Model):
 	code        = models.CharField(max_length = 20, unique = True)
 	name        = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects     = OrganisationTypeManager()
 
@@ -2369,7 +2595,10 @@ class Person(models.Model):
 	last_name   = models.TextField(null = True, default = None, db_index = True)
 	position    = models.TextField(null = True, default = None)
 	description = models.TextField(null = True, default = None)
+
 	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = PersonManager()
 
@@ -2565,7 +2794,9 @@ class OrganisationManager(models.Manager):
 				o.name = kwargs.get('full_name', None)
 				need_save = True
 
-		o.save()
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -2595,8 +2826,11 @@ class Organisation(models.Model):
 	kpp               = models.CharField(max_length = 20, null = True, default = None, db_index = True)
 	ogrn              = models.CharField(max_length = 20, null = True, default = None)
 	okpo              = models.CharField(max_length = 20, null = True, default = None)
-	state             = models.BooleanField(default = False, db_index = True)
 	register          = models.BooleanField(default = False, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 # TODO сотрудники
 #           = models.ManyToManyField(Account, through = 'OrganisationToAccount', through_fields = ('organisation', 'account'))
@@ -2649,16 +2883,20 @@ class OrganisationExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, organisation)
-		o.organisation = organisation
-		o.save()
+
+		if o.organisation != organisation:
+			o.organisation = organisation
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
 	def get_organisation(self, updater, ext_key):
 
-		ext_key = self.take(
-			updater = updater,
-			ext_key = ext_key)
+		ext_key = self.take(updater = updater, ext_key = ext_key)
 
 		if ext_key:
 			return ext_key.organisation
@@ -2674,6 +2912,10 @@ class OrganisationExtKey(models.Model):
 	organisation = models.ForeignKey(Organisation,   related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = OrganisationExtKeyManager()
 
@@ -2722,15 +2964,28 @@ class PlacingWayManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
+
 		if kwargs.get('state', False) or not o.state:
-			if kwargs.get('name', None):
+
+			if kwargs.get('name', None) and o.name != kwargs.get('name', None):
 				o.name = kwargs.get('name', None)
-			if kwargs.get('type_code', None):
+				need_save = True
+
+			if kwargs.get('type_code', None) and o.type_code != kwargs.get('type_code', None):
 				o.type_code = kwargs.get('type_code', None)
-			if kwargs.get('subsystem_type', None):
+				need_save = True
+
+			if kwargs.get('subsystem_type', None) and o.subsystem_type != kwargs.get('subsystem_type', None):
 				o.subsystem_type = kwargs.get('subsystem_type', None)
-			o.state = kwargs.get('state', False)
-		o.save()
+				need_save = True
+
+			if o.state != kwargs.get('state', False):
+				o.state = kwargs.get('state', False)
+				need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -2744,7 +2999,10 @@ class PlacingWay(models.Model):
 	code           = models.TextField(null = True, default = None, unique = True)
 	name           = models.TextField(null = True, default = None)
 	type_code      = models.CharField(max_length = 20, null = True, default = None)
-	state          = models.BooleanField(default = False, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = PlacingWayManager()
 
@@ -2789,8 +3047,13 @@ class PlacingWayExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, placingway)
-		o.placingway = placingway
-		o.save()
+
+		if o.placingway != placingway:
+			o.placingway = placingway
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -2803,6 +3066,10 @@ class PlacingWayExtKey(models.Model):
 	placingway = models.ForeignKey(PlacingWay, related_name='+', on_delete = models.CASCADE)
 
 	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects  = PlacingWayExtKeyManager()
 
@@ -2846,7 +3113,10 @@ class ETP(models.Model):
 	code     = models.TextField(null = True, default = None, unique = True)
 	name     = models.TextField(null = True, default = None)
 	url      = models.TextField(null = True, default = None)
-	state    = models.BooleanField(default = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = ETPManager()
 
@@ -2890,11 +3160,20 @@ class PlanPositionChangeReasonManager(models.Manager):
 		need_save = False
 
 		o = self.take(name, **kwargs)
+
 		if kwargs.get('state', True) or not o.state:
-			if kwargs.get('description', None):
+
+			if kwargs.get('description', None) and o.description != kwargs.get('description', None):
 				o.description = kwargs.get('description', None)
-			o.state = kwargs.get('state', True)
-		o.save()
+				need_save = True
+
+			if o.state != kwargs.get('state', True):
+				o.state = kwargs.get('state', True)
+				need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -2906,7 +3185,10 @@ class PlanPositionChangeReason(models.Model):
 
 	name        = models.TextField(null = True, default = None, unique = True)
 	description = models.TextField(null = True, default = None)
-	state       = models.BooleanField(default = False, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects     = PlanPositionChangeReasonManager()
 
@@ -2951,8 +3233,14 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, planpositionchangereason)
-		o.planpositionchangereason = planpositionchangereason
-		o.save()
+
+		if o.planpositionchangereason != planpositionchangereason:
+			o.planpositionchangereason = planpositionchangereason
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -2977,6 +3265,10 @@ class PlanPositionChangeReasonExtKey(models.Model):
 	planpositionchangereason = models.ForeignKey(PlanPositionChangeReason, related_name='+', on_delete = models.CASCADE)
 
 	ext_key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = PlanPositionChangeReasonExtKeyManager()
 
@@ -3019,9 +3311,18 @@ class ContractModificationReasonManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name  = kwargs.get('name', None)
-		o.state = kwargs.get('state', True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3033,7 +3334,10 @@ class ContractModificationReason(models.Model):
 
 	code        = models.TextField(unique = True)
 	name        = models.TextField(null = True, default = None)
+
 	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects     = ContractModificationReasonManager()
 
@@ -3130,18 +3434,54 @@ class PlanManager(models.Manager):
 		need_save = False
 
 		o = self.take(number, version, **kwargs)
-		o.year           = kwargs.get('year',           None)
-		o.description    = kwargs.get('description',    None)
-		o.url            = kwargs.get('url',            None)
-		o.region         = kwargs.get('region',         None)
-		o.owner          = kwargs.get('owner',          None)
-		o.customer       = kwargs.get('customer',       None)
-		o.contact_person = kwargs.get('contact_person', None)
-		o.state          = kwargs.get('state',          True)
-		o.created        = kwargs.get('created',        None)
-		o.confirmed      = kwargs.get('confirmed',      None)
-		o.published      = kwargs.get('published',      None)
-		o.save()
+
+		if o.year != kwargs.get('year', None):
+			o.year = kwargs.get('year', None)
+			need_save = True
+
+		if o.description != kwargs.get('description', None):
+			o.description = kwargs.get('description', None)
+			need_save = True
+
+		if o.url != kwargs.get('url', None):
+			o.url = kwargs.get('url', None)
+			need_save = True
+
+		if o.region != kwargs.get('region', None):
+			o.region = kwargs.get('region', None)
+			need_save = True
+
+		if o.owner != kwargs.get('owner', None):
+			o.owner = kwargs.get('owner', None)
+			need_save = True
+
+		if o.customer != kwargs.get('customer', None):
+			o.customer = kwargs.get('customer', None)
+			need_save = True
+
+		if o.contact_person != kwargs.get('contact_person', None):
+			o.contact_person = kwargs.get('contact_person', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if o.created != kwargs.get('created', timezone.now()):
+			o.created = kwargs.get('created', timezone.now())
+			need_save = True
+
+		if o.confirmed != kwargs.get('confirmed', None):
+			o.confirmed = kwargs.get('confirmed', None)
+			need_save = True
+
+		if o.published != kwargs.get('published', None):
+			o.published = kwargs.get('published', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		self.filter(number = o.number, version__lt = o.version).update(state = False)
 
@@ -3163,11 +3503,12 @@ class Plan(models.Model):
 	version        = models.IntegerField(null = True, default = None, db_index = True)
 	description    = models.TextField(null = True, default = None)
 	url            = models.TextField(null = True, default = None, db_index = True)
-
-	state          = models.BooleanField(default = True, db_index = True)
-	created        = models.DateTimeField(null = True, default = None)
 	confirmed      = models.DateTimeField(null = True, default = None)
 	published      = models.DateTimeField(null = True, default = None)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 
 	objects        = PlanManager()
@@ -3213,8 +3554,14 @@ class PlanExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, plan)
-		o.plan = plan
-		o.save()
+
+		if o.plan != plan:
+			o.plan = plan
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3227,6 +3574,10 @@ class PlanExtKey(models.Model):
 	plan = models.ForeignKey(Plan, related_name='+', on_delete = models.CASCADE)
 
 	ext_key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = PlanExtKeyManager()
 
@@ -3271,6 +3622,10 @@ class Product(models.Model):
 	okpd2 = models.ForeignKey(OKPD2, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	name  = models.TextField(null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = ProductManager()
 
@@ -3321,16 +3676,46 @@ class PlanPositionManager(models.Manager):
 		need_save = False
 
 		o = self.take(plan, number, **kwargs)
-		o.name            = kwargs.get('name',            None)
-		o.purchase_month  = kwargs.get('purchase_month',  None)
-		o.purchase_year   = kwargs.get('purchase_year',   None)
-		o.execution_month = kwargs.get('execution_month', None)
-		o.execution_year  = kwargs.get('execution_year',  None)
-		o.max_price       = kwargs.get('max_price',       None)
-		o.currency        = kwargs.get('currency',        None)
-		o.placing_way     = kwargs.get('placing_way',     None)
-		o.change_reason   = kwargs.get('change_reason',   None)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.purchase_month != kwargs.get('purchase_month', None):
+			o.purchase_month = kwargs.get('purchase_month', None)
+			need_save = True
+
+		if o.purchase_year != kwargs.get('purchase_year', None):
+			o.purchase_year = kwargs.get('purchase_year', None)
+			need_save = True
+
+		if o.execution_month != kwargs.get('execution_month', None):
+			o.execution_month = kwargs.get('execution_month', None)
+			need_save = True
+
+		if o.execution_year != kwargs.get('execution_year', None):
+			o.execution_year = kwargs.get('execution_year', None)
+			need_save = True
+
+		if o.max_price != kwargs.get('max_price', None):
+			o.max_price = kwargs.get('max_price', None)
+			need_save = True
+
+		if o.currency != kwargs.get('currency', None):
+			o.currency = kwargs.get('currency', None)
+			need_save = True
+
+		if o.placing_way != kwargs.get('placing_way', None):
+			o.placing_way = kwargs.get('placing_way', None)
+			need_save = True
+
+		if o.change_reason != kwargs.get('change_reason', None):
+			o.change_reason = kwargs.get('change_reason', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3356,6 +3741,10 @@ class PlanPosition(models.Model):
 	okveds2  = models.ManyToManyField(OKVED2,  through = 'PlanPositionToOKVED2',  through_fields = ('plan_position', 'okved2'))
 	products = models.ManyToManyField(Product, through = 'PlanPositionToProduct', through_fields = ('plan_position', 'product'))
 
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
+
 	objects = PlanPositionManager()
 
 	def __str__(self):
@@ -3371,6 +3760,10 @@ class PlanPositionToOKVED(models.Model):
 	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
 	okved         = models.ForeignKey(OKVED,        related_name='+', on_delete = models.CASCADE)
 
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
+
 	class Meta:
 		db_table = 'tenders_planposition_to_okved'
 
@@ -3381,6 +3774,10 @@ class PlanPositionToOKVED2(models.Model):
 	id            = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	plan_position = models.ForeignKey(PlanPosition, related_name='+', on_delete = models.CASCADE)
 	okved2        = models.ForeignKey(OKVED2,       related_name='+', on_delete = models.CASCADE)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	class Meta:
 		db_table = 'tenders_planposition_to_okved2'
@@ -3398,6 +3795,10 @@ class PlanPositionToProduct(models.Model):
 	quantity      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	price         = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	total         = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	def __str__(self):
 		return "{} {}".format(self.product, self.quantity)
@@ -3455,28 +3856,94 @@ class PurchaseManager(models.Manager):
 		need_save = False
 
 		o = self.take(number, **kwargs)
-		o.name                   = kwargs.get('name',                   None)
-		o.url                    = kwargs.get('url',                    None)
-		o.published              = kwargs.get('published',              None)
-		o.region                 = kwargs.get('region',                 None)
-		o.responsible            = kwargs.get('responsible',            None)
-		o.specialised            = kwargs.get('specialised',            None)
-		o.contact_person         = kwargs.get('contact_person',         None)
-		o.placing_way            = kwargs.get('placing_way',            None)
-		o.grant_start_time       = kwargs.get('grant_start_time',       None)
-		o.grant_end_time         = kwargs.get('grant_end_time',         None)
-		o.collecting_start_time  = kwargs.get('collecting_start_time',  None)
-		o.collecting_end_time    = kwargs.get('collecting_end_time',    None)
-		o.opening_time           = kwargs.get('opening_time',           None)
-		o.prequalification_time  = kwargs.get('prequalification_time',  None)
-		o.scoring_time           = kwargs.get('scoring_time',           None)
-		o.grant_place            = kwargs.get('grant_place',            None)
-		o.collecting_place       = kwargs.get('collecting_place',       None)
-		o.opening_place          = kwargs.get('opening_place',          None)
-		o.prequalification_place = kwargs.get('prequalification_place', None)
-		o.scoring_place          = kwargs.get('scoring_place',          None)
-		o.etp                    = kwargs.get('etp',                    None)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.url != kwargs.get('url', None):
+			o.url = kwargs.get('url', None)
+			need_save = True
+
+		if o.published != kwargs.get('published', None):
+			o.published = kwargs.get('published', None)
+			need_save = True
+
+		if o.region != kwargs.get('region', None):
+			o.region = kwargs.get('region', None)
+			need_save = True
+
+		if o.responsible != kwargs.get('responsible', None):
+			o.responsible = kwargs.get('responsible', None)
+			need_save = True
+
+		if o.specialised != kwargs.get('specialised', None):
+			o.specialised = kwargs.get('specialised', None)
+			need_save = True
+
+		if o.contact_person != kwargs.get('contact_person', None):
+			o.contact_person = kwargs.get('contact_person', None)
+			need_save = True
+
+		if o.placing_way != kwargs.get('placing_way', None):
+			o.placing_way = kwargs.get('placing_way', None)
+			need_save = True
+
+		if o.grant_start_time != kwargs.get('grant_start_time', None):
+			o.grant_start_time = kwargs.get('grant_start_time', None)
+			need_save = True
+
+		if o.grant_end_time != kwargs.get('grant_end_time', None):
+			o.grant_end_time = kwargs.get('grant_end_time', None)
+			need_save = True
+
+		if o.collecting_start_time != kwargs.get('collecting_start_time', None):
+			o.collecting_start_time = kwargs.get('collecting_start_time', None)
+			need_save = True
+
+		if o.collecting_end_time != kwargs.get('collecting_end_time', None):
+			o.collecting_end_time = kwargs.get('collecting_end_time', None)
+			need_save = True
+
+		if o.opening_time != kwargs.get('opening_time', None):
+			o.opening_time = kwargs.get('opening_time', None)
+			need_save = True
+
+		if o.prequalification_time != kwargs.get('prequalification_time', None):
+			o.prequalification_time = kwargs.get('prequalification_time', None)
+			need_save = True
+
+		if o.scoring_time != kwargs.get('scoring_time', None):
+			o.scoring_time = kwargs.get('scoring_time', None)
+			need_save = True
+
+		if o.grant_place != kwargs.get('grant_place', None):
+			o.grant_place = kwargs.get('grant_place', None)
+			need_save = True
+
+		if o.collecting_place != kwargs.get('collecting_place', None):
+			o.collecting_place = kwargs.get('collecting_place', None)
+			need_save = True
+
+		if o.opening_place != kwargs.get('opening_place', None):
+			o.opening_place = kwargs.get('opening_place', None)
+			need_save = True
+
+		if o.prequalification_place != kwargs.get('prequalification_place', None):
+			o.prequalification_place = kwargs.get('prequalification_place', None)
+			need_save = True
+
+		if o.scoring_place != kwargs.get('scoring_place', None):
+			o.scoring_place = kwargs.get('scoring_place', None)
+			need_save = True
+
+		if o.etp != kwargs.get('etp', None):
+			o.etp = kwargs.get('etp', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3508,7 +3975,10 @@ class Purchase(models.Model):
 	opening_time           = models.DateTimeField(null = True, default = None, db_index = True)
 	prequalification_time  = models.DateTimeField(null = True, default = None, db_index = True)
 	scoring_time           = models.DateTimeField(null = True, default = None, db_index = True)
-	state                  = models.BooleanField(default = True, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	attachments = models.ManyToManyField(Attachment, through = 'PurchaseToAttachment', through_fields = ('purchase', 'attachment'))
 
@@ -3531,6 +4001,10 @@ class PurchaseToAttachment(models.Model):
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	purchase   = models.ForeignKey(Purchase,   related_name='+', on_delete = models.CASCADE)
 	attachment = models.ForeignKey(Attachment, related_name='+', on_delete = models.CASCADE)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	class Meta:
 		db_table = 'tenders_purchase_to_attachment'
@@ -3572,6 +4046,10 @@ class Notification(models.Model):
 
 	code     = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 	url      = models.TextField(null = True, default = None)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = NotificationManager()
 
@@ -3620,11 +4098,26 @@ class LotManager(models.Manager):
 		need_save = False
 
 		o = self.take(purchase, number = None, **kwargs)
-		o.name           = kwargs.get('name',           None)
-		o.finance_source = kwargs.get('finance_source', None)
-		o.max_price      = kwargs.get('max_price',      None)
-		o.currency       = kwargs.get('currency',       None)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.finance_source != kwargs.get('finance_source', None):
+			o.finance_source = kwargs.get('finance_source', None)
+			need_save = True
+
+		if o.max_price != kwargs.get('max_price', None):
+			o.max_price = kwargs.get('max_price', None)
+			need_save = True
+
+		if o.currency != kwargs.get('currency', None):
+			o.currency = kwargs.get('currency', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3644,7 +4137,9 @@ class Lot(models.Model):
 	products       = models.ManyToManyField(Product,      through = 'LotToProduct',  through_fields = ('lot', 'product'))
 	customers      = models.ManyToManyField(Organisation, through = 'LotToCustomer', through_fields = ('lot', 'customer'))
 
-	state          = models.BooleanField(default = True, db_index = True)
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects        = LotManager()
 
@@ -3669,7 +4164,9 @@ class LotToProduct(models.Model):
 	price    = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	total    = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 
-	created  = models.DateTimeField(default = timezone.now)
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	class Meta:
 		db_table = 'tenders_lot_to_product'
@@ -3681,6 +4178,10 @@ class LotToCustomer(models.Model):
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	lot      = models.ForeignKey(Lot,          related_name='+', on_delete = models.CASCADE)
 	customer = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	class Meta:
 		db_table = 'tenders_lot_to_customer'
@@ -3720,12 +4221,26 @@ class ContractManager(models.Manager):
 		need_save = False
 
 		o = self.take(purchase, customer, number, **kwargs)
-		o.currency  = kwargs.get('currency',  None)
-		o.price     = kwargs.get('price',     None)
-		o.price_rub = kwargs.get('price_rub', None)
-		o.sign_date = kwargs.get('sign_date', None)
 
-		o.save()
+		if o.currency != kwargs.get('currency', None):
+			o.currency = kwargs.get('currency', None)
+			need_save = True
+
+		if o.price != kwargs.get('price', None):
+			o.price = kwargs.get('price', None)
+			need_save = True
+
+		if o.price_rub != kwargs.get('price_rub', None):
+			o.price_rub = kwargs.get('price_rub', None)
+			need_save = True
+
+		if o.sign_date != kwargs.get('sign_date', None):
+			o.sign_date = kwargs.get('sign_date', None)
+			need_save = True
+
+		if need_save:
+			o.modified = timezone.now()
+			o.save()
 
 		return o
 
@@ -3742,6 +4257,10 @@ class Contract(models.Model):
 	price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	price_rub  = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	sign_date  = models.DateField(null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
 	objects = ContractManager()
 
