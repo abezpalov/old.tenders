@@ -33,7 +33,6 @@ class Runner(tenders.runner.Runner):
 		self.essences = [
 			{'category' : 'nsiOkdp',           'parser' : self.parse_okdp},
 			{'category' : 'nsiOkato',          'parser' : self.parse_okato},
-
 			{'category' : 'nsiOkei',           'parser' : self.parse_okei},
 
 
@@ -161,22 +160,12 @@ class Runner(tenders.runner.Runner):
 
 			parent = OKDP.objects.take(code = self.get_text(element, './nsiOkdpData/parentCode'))
 
-			okdp = OKDP.objects.update(
+			okdp = OKDP.objects.write(
 				code = self.get_text(element, './nsiOkdpData/code'),
 				name = self.get_text(element, './nsiOkdpData/name'),
 				parent        = parent,
 				state         = True)
 			print("ОКДП: {}.".format(okdp))
-
-			ext_key = OKDPExtKey.objects.update(
-				updater = self.updater,
-				ext_key = self.get_text(element, './guid'),
-				okdp = okdp)
-
-			ext_key = OKDPExtKey.objects.update(
-				updater = self.updater,
-				ext_key = self.get_text(element, './nsiOkdpData/guid'),
-				okdp = okdp)
 
 		return True
 
@@ -189,17 +178,12 @@ class Runner(tenders.runner.Runner):
 
 			parent = OKATO.objects.take(code = self.get_text(element, './nsiOkatoData/parentCode'))
 
-			okato = OKATO.objects.update(
+			okato = OKATO.objects.write(
 				code = self.get_text(element, './nsiOkatoData/code'),
 				name = self.get_text(element, './nsiOkatoData/name'),
 				parent        = parent,
 				state         = True)
 			print("ОКАТО: {}.".format(okato))
-
-			ext_key = OKATOExtKey.objects.update(
-				updater = self.updater,
-				ext_key = self.get_text(element, './guid'),
-				okato   = okato)
 
 		return True
 
@@ -220,18 +204,13 @@ class Runner(tenders.runner.Runner):
 				name  = self.get_text(element, './nsiOkeiData/group/name'),
 				state = True)
 
-			okei = OKEI.objects.update(
+			okei = OKEI.objects.write(
 				code    = self.get_text(element, './nsiOkeiData/code'),
 				section = section,
 				group   = group,
 				name    = self.get_text(element, './nsiOkeiData/name'),
 				symbol  = self.get_text(element, './nsiOkeiData/symbol'))
 			print("Единица измерения: {}.".format(okei))
-
-			ext_key = OKEIExtKey.objects.update(
-				updater = self.updater,
-				ext_key = self.get_text(element, './guid'),
-				okei    = okei)
 
 		return True
 

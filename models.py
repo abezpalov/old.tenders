@@ -181,7 +181,7 @@ class CountryManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -256,7 +256,7 @@ class CurrencyManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -323,7 +323,7 @@ class OKEISectionManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -386,7 +386,7 @@ class OKEIGroupManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -462,7 +462,7 @@ class OKEIManager(models.Manager):
 
 		return o
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -564,7 +564,7 @@ class OKEIExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okei):
+	def write(self, updater, ext_key, okei):
 
 		if not updater or not ext_key or not okei:
 			return None
@@ -626,7 +626,7 @@ class KOSGUManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -692,7 +692,7 @@ class OKOPFManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -765,7 +765,7 @@ class OKDPManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -836,7 +836,7 @@ class OKDPExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okdp):
+	def write(self, updater, ext_key, okdp):
 
 		if not updater or not ext_key or not okdp:
 			return None
@@ -898,7 +898,7 @@ class OKPDManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -969,7 +969,7 @@ class OKPDExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okpd):
+	def write(self, updater, ext_key, okpd):
 
 		if not updater or not ext_key or not okpd:
 			return None
@@ -1031,7 +1031,7 @@ class OKPD2Manager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1103,7 +1103,7 @@ class OKPD2ExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okpd2):
+	def write(self, updater, ext_key, okpd2):
 
 		if not updater or not ext_key or not okpd2:
 			return None
@@ -1165,7 +1165,7 @@ class OKTMOManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1234,7 +1234,7 @@ class OKATOManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1306,7 +1306,7 @@ class OKATOExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okato):
+	def write(self, updater, ext_key, okato):
 
 		if not updater or not ext_key or not okato:
 			return None
@@ -1365,7 +1365,7 @@ class OKVEDSectionManager(models.Manager):
 
 		return o
 
-	def update(self, name, **kwargs):
+	def write(self, name, **kwargs):
 
 		if not name:
 			return None
@@ -1422,7 +1422,7 @@ class OKVEDSubSectionManager(models.Manager):
 		return o
 
 
-	def update(self, name, **kwargs):
+	def write(self, name, **kwargs):
 
 		if not name:
 			return None
@@ -1482,7 +1482,7 @@ class OKVEDManager(models.Manager):
 
 		return o
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1555,7 +1555,7 @@ class OKVEDExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okved):
+	def write(self, updater, ext_key, okved):
 
 		if not updater or not ext_key or not okved:
 			return None
@@ -1610,7 +1610,7 @@ class OKVED2SectionManager(models.Manager):
 		return o
 
 
-	def update(self, name, state = True):
+	def write(self, name, state = True):
 
 		if not name:
 			return None
@@ -1669,7 +1669,7 @@ class OKVED2Manager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1734,7 +1734,7 @@ class OKVED2ExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, okved2):
+	def write(self, updater, ext_key, okved2):
 
 		if not updater or not ext_key or not okved2:
 			return None
@@ -1790,7 +1790,7 @@ class BudgetManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1892,7 +1892,7 @@ class BudgetTypeManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -1946,7 +1946,7 @@ class BudgetType(models.Model):
 #		return o
 
 
-#	def update(self, code, **kwargs):
+#	def write(self, code, **kwargs):
 #		if not code:
 #			return None
 #		o = self.take(code, **kwargs)
@@ -2302,7 +2302,7 @@ class OrganisationTypeManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -2470,7 +2470,7 @@ class OrganisationManager(models.Manager):
 		return o
 
 
-	def update(self, inn, kpp = None, **kwargs):
+	def write(self, inn, kpp = None, **kwargs):
 
 		if not inn:
 			return None
@@ -2641,7 +2641,7 @@ class OrganisationExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, organisation):
+	def write(self, updater, ext_key, organisation):
 
 		if not updater or not ext_key or not organisation:
 			return None
@@ -2714,7 +2714,7 @@ class PlacingWayManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -2781,7 +2781,7 @@ class PlacingWayExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, placingway):
+	def write(self, updater, ext_key, placingway):
 
 		if not updater or not ext_key or not placingway:
 			return None
@@ -2882,7 +2882,7 @@ class PlanPositionChangeReasonManager(models.Manager):
 		return o
 
 
-	def update(self, name, **kwargs):
+	def write(self, name, **kwargs):
 
 		if not name:
 			return None
@@ -2943,7 +2943,7 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, planpositionchangereason):
+	def write(self, updater, ext_key, planpositionchangereason):
 
 		if not updater or not ext_key or not planpositionchangereason:
 			return None
@@ -3011,7 +3011,7 @@ class ContractModificationReasonManager(models.Manager):
 		return o
 
 
-	def update(self, code, **kwargs):
+	def write(self, code, **kwargs):
 
 		if not code:
 			return None
@@ -3060,7 +3060,7 @@ class ContractModificationReason(models.Model):
 #			o.save()
 #		return o
 
-#	def update(self, code, **kwargs):
+#	def write(self, code, **kwargs):
 #		if not code:
 #			return None
 #		o = self.take(code, **kwargs)
@@ -3122,7 +3122,7 @@ class PlanManager(models.Manager):
 		return o
 
 
-	def update(self, number, version, **kwargs):
+	def write(self, number, version, **kwargs):
 
 		if not number or not version:
 			return None
@@ -3205,7 +3205,7 @@ class PlanExtKeyManager(models.Manager):
 		return o
 
 
-	def update(self, updater, ext_key, plan):
+	def write(self, updater, ext_key, plan):
 
 		if not updater or not ext_key or not plan:
 			return None
@@ -3313,7 +3313,7 @@ class PlanPositionManager(models.Manager):
 		return o
 
 
-	def update(self, plan, number, **kwargs):
+	def write(self, plan, number, **kwargs):
 
 		if not plan or not number:
 			return None
@@ -3447,7 +3447,7 @@ class PurchaseManager(models.Manager):
 		return o
 
 
-	def update(self, number, **kwargs):
+	def write(self, number, **kwargs):
 
 		if not number:
 			return None
@@ -3515,8 +3515,8 @@ class Purchase(models.Model):
 	objects = PurchaseManager()
 
 	def cancel(self):
-		self.state    = False
-		self.save()
+		self.update(state = False)
+		Lot.objects.filter(purchase = self).update(state = False)
 
 	def __str__(self):
 		return "{} {}".format(self.region, self.number)
@@ -3612,7 +3612,7 @@ class LotManager(models.Manager):
 		return o
 
 
-	def update(self, purchase, number = None, **kwargs):
+	def write(self, purchase, number = None, **kwargs):
 
 		if not purchase:
 			return None
@@ -3632,22 +3632,28 @@ class LotManager(models.Manager):
 
 class Lot(models.Model):
 
-	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-	purchase = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
-	currency = models.ForeignKey(Currency, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	id             = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	purchase       = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	currency       = models.ForeignKey(Currency, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
 	number         = models.IntegerField(null = True, default = None, db_index = True)
 	name           = models.TextField(null = True, default = None)
 	finance_source = models.TextField(null = True, default = None)
 	max_price      = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 
-	products  = models.ManyToManyField(Product,      through = 'LotToProduct',  through_fields = ('lot', 'product'))
-	customers = models.ManyToManyField(Organisation, through = 'LotToCustomer', through_fields = ('lot', 'customer'))
+	products       = models.ManyToManyField(Product,      through = 'LotToProduct',  through_fields = ('lot', 'product'))
+	customers      = models.ManyToManyField(Organisation, through = 'LotToCustomer', through_fields = ('lot', 'customer'))
 
-	objects = LotManager()
+	state          = models.BooleanField(default = True, db_index = True)
+
+	objects        = LotManager()
 
 	def __str__(self):
 		return "Lot: {}".format(self.id)
+
+
+	def cancel(self):
+		self.update(state = False)
 
 
 
@@ -3706,7 +3712,7 @@ class ContractManager(models.Manager):
 		return o
 
 
-	def update(self, purchase, number = None, **kwargs):
+	def write(self, purchase, number = None, **kwargs):
 
 		if not purchase:
 			return None
