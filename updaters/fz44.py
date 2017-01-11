@@ -84,7 +84,7 @@ class Runner(tenders.runner.Runner):
 
 		self.region_essences = [
 			{'category' : 'plangraphs',    'parser' : self.parse_plan},
-#			{'category' : 'notifications', 'parser' : self.parse_notification},
+			{'category' : 'notifications', 'parser' : self.parse_notification},
 		]
 
 
@@ -792,42 +792,46 @@ class Runner(tenders.runner.Runner):
 
 		# Новая закупка
 		for element in tree.xpath('//fcsNotificationZK'):
-			print('fcsNotificationZK')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationEP'):
-			print('fcsNotificationEP')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationEF'):
-			print('fcsNotificationEF')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationOK'):
-			print('fcsNotificationOK')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationZP'):
-			print('fcsNotificationZP')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationOKOU'):
-			print('fcsNotificationOKOU')
-			ok = self.parse_notification_get_universal(element, region)
+			ok = self.parse_notification_tender(element, region)
+
+		for element in tree.xpath('//fcsNotificationISO'):
+			ok = self.parse_notification_tender(element, region)
+
+		for element in tree.xpath('//fcsNotificationISM'):
+			ok = self.parse_notification_tender(element, region)
+
+		for element in tree.xpath('//fcsNotificationPO'):
+			ok = self.parse_notification_tender(element, region)
+
+		# Изменение лота
+		for element in tree.xpath('//fcsNotificationLotChange'):
+			ok = self.parse_notification_tender(element, region)
 
 		# Продление закупки
 		for element in tree.xpath('//fcsPurchaseProlongationZK'):
-			print('fcsPurchaseProlongationZK')
 			ok = self.parse_notification_prolongation(element, region)
 
 		# Отмена закупки
 		for element in tree.xpath('//fcsNotificationCancel'):
-			print('fcsNotificationCancel')
 			ok = self.parse_notification_cancel(element, region)
 
 		# Подписание контракта
 		for element in tree.xpath('//fcsContractSign'):
-			print('fcsContractSign')
 			self.parse_notification_sign(element, region)
 
 
@@ -842,7 +846,7 @@ class Runner(tenders.runner.Runner):
 			exit()
 
 
-
+	# TODO Need test!
 	def parse_notification_sign(self, element, region):
 
 
@@ -881,21 +885,21 @@ class Runner(tenders.runner.Runner):
 
 
 
-		pass
+		return False
 
 
 	def parse_notification_prolongation(self, element, region):
 
 		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
-#		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
-#		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
-#		purchase.collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
+		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
+		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
+		purchase.collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
 
 		purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
 		purchase.opening_time           = self.get_datetime(element, './openingProlongationDate')
-#		purchase.prequalification_time  = self.get_datetime(element, './'),
-#		purchase.scoring_time           = self.get_datetime(element, './'),
+		purchase.prequalification_time  = self.get_datetime(element, './'),
+		purchase.scoring_time           = self.get_datetime(element, './'),
 		purchase.save()
 
 		print('{} - prolongated'.format(purchase))
@@ -914,7 +918,8 @@ class Runner(tenders.runner.Runner):
 		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
 		notification = Notification.objects.take(
-			oos_id   = self.get_int(element, './id'),
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 		purchase.cancel()
@@ -923,7 +928,7 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
-	def parse_notification_get_universal(self, element, region):
+	def parse_notification_tender(self, element, region):
 
 #		print(self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
 #		print(self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
@@ -935,8 +940,6 @@ class Runner(tenders.runner.Runner):
 		specialised = OrganisationExtKey.objects.get_organisation(
 			updater = self.updater,
 			ext_key = self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
-
-
 
 		# TODO TEST
 		import xml.etree.ElementTree as ET
@@ -1069,8 +1072,9 @@ class Runner(tenders.runner.Runner):
 				lot.customers.clear()
 				for c in l.xpath('./customerRequirements/customerRequirement/customer'):
 
-					customer = Organisation.objects.take(
-						oos_number = self.get_text(c, './regNum'))
+					customer = OrganisationExtKey.objects.get_organisation(
+						updater = self.updater,
+						ext_key = self.get_text(c, './regNum'))
 
 					link = LotToCustomer()
 					link.lot      = lot

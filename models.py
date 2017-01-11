@@ -504,7 +504,7 @@ class OKEIManager(models.Manager):
 			need_save = True
 
 		if o.state != kwargs.get('state', True):
-			o.state = kwargs.get('state', True)
+			o.state = True
 			need_save = True
 
 		if need_save:
@@ -1039,10 +1039,21 @@ class OKPD2Manager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name   = kwargs.get('name',   None)
-		o.parent = kwargs.get('parent', None)
-		o.state  = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1100,8 +1111,13 @@ class OKPD2ExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okpd2)
-		o.okpd2 = okpd2
-		o.save()
+
+		if o.okpd2 != okpd2:
+			o.okpd2 = okpd2
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1157,10 +1173,21 @@ class OKTMOManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.name     = kwargs.get('name',   None)
-		o.parent   = kwargs.get('parent', None)
-		o.state    = kwargs.get('state',  True)
-		o.save()
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.parent != kwargs.get('parent', None):
+			o.parent = kwargs.get('parent', None)
+			need_save = True
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1287,8 +1314,13 @@ class OKATOExtKeyManager(models.Manager):
 		need_save = False
 
 		o = self.take(updater, ext_key, okato)
-		o.okato = okato
-		o.save()
+
+		if o.okato != okato:
+			o.okato = okato
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1341,8 +1373,13 @@ class OKVEDSectionManager(models.Manager):
 		need_save = False
 
 		o = self.take(name, **kwargs)
-		o.state = kwargs.get('state', True)
-		o.save()
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1393,8 +1430,13 @@ class OKVEDSubSectionManager(models.Manager):
 		need_save = False
 
 		o = self.take(name, **kwargs)
-		o.state = kwargs.get('state', True)
-		o.save()
+
+		if o.state != kwargs.get('state', True):
+			o.state = kwargs.get('state', True)
+			need_save = True
+
+		if need_save:
+			o.save()
 
 		return o
 
@@ -1448,8 +1490,15 @@ class OKVEDManager(models.Manager):
 		need_save = False
 
 		o = self.take(code, **kwargs)
-		o.code       = code[:100]
-		o.section    = kwargs.get('section',    None)
+
+		if o.code != code[:100]:
+			o.code = code[:100]
+			need_save = True
+
+		if o.section != kwargs.get('section', None):
+			o.section = kwargs.get('section', None)
+			need_save = True
+
 		o.subsection = kwargs.get('subsection', None)
 		o.parent     = kwargs.get('parent',     None)
 		o.name       = kwargs.get('name',       None)

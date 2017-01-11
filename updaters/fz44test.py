@@ -114,7 +114,7 @@ class Runner(tenders.updaters.fz44.Runner):
 					parse = essence['parser']
 					parse(tree, region)
 
-#				source.complite()
+				source.complite()
 
 		return True
 
