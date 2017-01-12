@@ -792,50 +792,50 @@ class Runner(tenders.runner.Runner):
 
 		# Новая закупка
 		for element in tree.xpath('//fcsNotificationZK'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationEP'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationEF'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationOK'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationZP'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationOKOU'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationISO'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationISM'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationPO'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationZakKOU'):
-			ok = self.parse_notification_tender(element, region)
+			self.parse_notification_tender(element, region)
 
 		# Изменение лота
 		for element in tree.xpath('//fcsNotificationLotChange'):
-			ok = self.parse_notification_lot_change(element, region)
+			self.parse_notification_lot_change(element, region)
 
 		# Продление закупки
 		for element in tree.xpath('//fcsPurchaseProlongationZK'):
-			ok = self.parse_notification_tender_prolongation(element, region)
+			self.parse_notification_tender_prolongation(element, region)
 
 		# Отмена закупки
 		for element in tree.xpath('//fcsNotificationCancel'):
-			ok = self.parse_notification_tender_cancel(element, region)
+			self.parse_notification_tender_cancel(element, region)
 
 		# Отмена лота
 		for element in tree.xpath('//fcsNotificationLotCancel'):
-			ok = self.parse_notification_lot_cancel(element, region)
+			self.parse_notification_lot_cancel(element, region)
 
 		# Подписание контракта
 		for element in tree.xpath('//fcsContractSign'):
