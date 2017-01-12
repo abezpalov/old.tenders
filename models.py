@@ -154,7 +154,7 @@ class Region(models.Model):
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 
-	state       = models.BooleanField(default = True, db_index = True)
+	state       = models.BooleanField(default = False, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
