@@ -98,34 +98,43 @@ class Runner(tenders.runner.Runner):
 		print('Обновляем справочники')
 		for essence in self.essences:
 
-			print(essence['category'])
+			print('\n\n'.format(essence['category']))
+
 			# Проверяем не вышло ли время
 			if self.is_time_up():
 				return True
 
 			self.update_essence(essence)
 
+
 		print('Обновляем данные с регионов')
-		for region in self.get_ftp_catalog(self.url, self.categories['regions']):
 
-			if (not region in self.black_list) and (not '.'in region):
-				try:
-					self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
-					region = Region.objects.take(
-						alias = region,
-						name = region,
-						full_name = region)
-					print(region)
+		for essence in self.region_essences:
+
+			print('\n\n'.format(essence['category']))
+
+			for region in self.get_ftp_catalog(self.url, self.categories['regions']):
+
+				if (not region in self.black_list) and (not '.'in region):
+					try:
+						self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
+						region = Region.objects.take(
+							alias = region,
+							name = region,
+							full_name = region)
+						print(region)
 	
-				except Exception:
-					continue
+					except Exception:
+						continue
 
-				if region.state:
+					if region.state:
 
-					for essence in self.region_essences:
-						if self.is_time_up():
-							return True
-						self.update_region_essence(region, essence)
+						for essence in self.region_essences:
+
+							if self.is_time_up():
+								return True
+
+							self.update_region_essence(region, essence)
 
 
 
