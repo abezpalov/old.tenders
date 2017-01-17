@@ -10,7 +10,7 @@ class Runner(tenders.runner.Runner):
 	name  = 'Zakupki.gov.ru FZ223'
 	alias = 'fz223'
 
-	black_list = []
+	black_list = ['archive', 'undefined']
 
 	categories = {
 		'essences' : 'out/nsi',

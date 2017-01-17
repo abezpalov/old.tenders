@@ -2564,7 +2564,7 @@ class OrganisationType(models.Model):
 class PersonManager(models.Manager):
 
 
-	def take(self, first_name, middle_name, last_name, email, **kwargs):
+	def take(self, first_name, middle_name, last_name, email = None, **kwargs):
 
 		try:
 			o = self.get(first_name = first_name, middle_name = middle_name, last_name = last_name, email = email)
@@ -3821,28 +3821,7 @@ class PurchaseManager(models.Manager):
 
 		except Exception:
 			o = Purchase()
-			o.number                 = number
-			o.name                   = kwargs.get('name',                   None)
-			o.url                    = kwargs.get('url',                    None)
-			o.published              = kwargs.get('published',              None)
-			o.region                 = kwargs.get('region',                 None)
-			o.responsible            = kwargs.get('responsible',            None)
-			o.specialised            = kwargs.get('specialised',            None)
-			o.contact_person         = kwargs.get('contact_person',         None)
-			o.placing_way            = kwargs.get('placing_way',            None)
-			o.grant_start_time       = kwargs.get('grant_start_time',       None)
-			o.grant_end_time         = kwargs.get('grant_end_time',         None)
-			o.collecting_start_time  = kwargs.get('collecting_start_time',  None)
-			o.collecting_end_time    = kwargs.get('collecting_end_time',    None)
-			o.opening_time           = kwargs.get('opening_time',           None)
-			o.prequalification_time  = kwargs.get('prequalification_time',  None)
-			o.scoring_time           = kwargs.get('scoring_time',           None)
-			o.grant_place            = kwargs.get('grant_place',            None)
-			o.collecting_place       = kwargs.get('collecting_place',       None)
-			o.opening_place          = kwargs.get('opening_place',          None)
-			o.prequalification_place = kwargs.get('prequalification_place', None)
-			o.scoring_place          = kwargs.get('scoring_place',          None)
-			o.etp                    = kwargs.get('etp',                    None)
+			o.number = number
 			o.save()
 
 		return o
@@ -3857,17 +3836,6 @@ class PurchaseManager(models.Manager):
 
 		o = self.take(number, **kwargs)
 
-		if o.name != kwargs.get('name', None):
-			o.name = kwargs.get('name', None)
-			need_save = True
-
-		if o.url != kwargs.get('url', None):
-			o.url = kwargs.get('url', None)
-			need_save = True
-
-		if o.published != kwargs.get('published', None):
-			o.published = kwargs.get('published', None)
-			need_save = True
 
 		if o.region != kwargs.get('region', None):
 			o.region = kwargs.get('region', None)
@@ -3887,6 +3855,74 @@ class PurchaseManager(models.Manager):
 
 		if o.placing_way != kwargs.get('placing_way', None):
 			o.placing_way = kwargs.get('placing_way', None)
+			need_save = True
+
+		if o.grant_place != kwargs.get('grant_place', None):
+			o.grant_place = kwargs.get('grant_place', None)
+			need_save = True
+
+		if o.collecting_place != kwargs.get('collecting_place', None):
+			o.collecting_place = kwargs.get('collecting_place', None)
+			need_save = True
+
+		if o.opening_place != kwargs.get('opening_place', None):
+			o.opening_place = kwargs.get('opening_place', None)
+			need_save = True
+
+		if o.final_opening_place != kwargs.get('final_opening_place', None):
+			o.final_opening_place = kwargs.get('final_opening_place', None)
+			need_save = True
+
+		if o.prequalification_place != kwargs.get('prequalification_place', None):
+			o.prequalification_place = kwargs.get('prequalification_place', None)
+			need_save = True
+
+		if o.selecting_place != kwargs.get('selecting_place', None):
+			o.selecting_place = kwargs.get('selecting_place', None)
+			need_save = True
+
+		if o.scoring_place != kwargs.get('scoring_place', None):
+			o.scoring_place = kwargs.get('scoring_place', None)
+			need_save = True
+
+		if o.collecting_st1_place != kwargs.get('collecting_st1_place', None):
+			o.collecting_st1_place = kwargs.get('collecting_st1_place', None)
+			need_save = True
+
+		if o.opening_st1_place != kwargs.get('opening_st1_place', None):
+			o.opening_st1_place = kwargs.get('opening_st1_place', None)
+			need_save = True
+
+		if o.scoring_st1_place != kwargs.get('scoring_st1_place', None):
+			o.scoring_st1_place = kwargs.get('scoring_st1_place', None)
+			need_save = True
+
+		if o.collecting_st2_place != kwargs.get('collecting_st2_place', None):
+			o.collecting_st2_place = kwargs.get('collecting_st2_place', None)
+			need_save = True
+
+		if o.opening_st2_place != kwargs.get('opening_st2_place', None):
+			o.opening_st2_place = kwargs.get('opening_st2_place', None)
+			need_save = True
+
+		if o.scoring_st2_place != kwargs.get('scoring_st2_place', None):
+			o.scoring_st2_place = kwargs.get('scoring_st2_place', None)
+			need_save = True
+
+		if o.etp != kwargs.get('etp', None):
+			o.etp = kwargs.get('etp', None)
+			need_save = True
+
+		if o.name != kwargs.get('name', None):
+			o.name = kwargs.get('name', None)
+			need_save = True
+
+		if o.url != kwargs.get('url', None):
+			o.url = kwargs.get('url', None)
+			need_save = True
+
+		if o.published != kwargs.get('published', None):
+			o.published = kwargs.get('published', None)
 			need_save = True
 
 		if o.grant_start_time != kwargs.get('grant_start_time', None):
@@ -3909,36 +3945,56 @@ class PurchaseManager(models.Manager):
 			o.opening_time = kwargs.get('opening_time', None)
 			need_save = True
 
+		if o.final_opening_time != kwargs.get('final_opening_time', None):
+			o.final_opening_time = kwargs.get('final_opening_time', None)
+			need_save = True
+
 		if o.prequalification_time != kwargs.get('prequalification_time', None):
 			o.prequalification_time = kwargs.get('prequalification_time', None)
+			need_save = True
+
+		if o.selecting_time != kwargs.get('selecting_time', None):
+			o.selecting_time = kwargs.get('selecting_time', None)
 			need_save = True
 
 		if o.scoring_time != kwargs.get('scoring_time', None):
 			o.scoring_time = kwargs.get('scoring_time', None)
 			need_save = True
 
-		if o.grant_place != kwargs.get('grant_place', None):
-			o.grant_place = kwargs.get('grant_place', None)
+		if o.bidding_time != kwargs.get('bidding_time', None):
+			o.bidding_time = kwargs.get('bidding_time', None)
 			need_save = True
 
-		if o.collecting_place != kwargs.get('collecting_place', None):
-			o.collecting_place = kwargs.get('collecting_place', None)
+		if o.collecting_st1_start_time != kwargs.get('collecting_st1_start_time', None):
+			o.collecting_st1_start_time = kwargs.get('collecting_st1_start_time', None)
 			need_save = True
 
-		if o.opening_place != kwargs.get('opening_place', None):
-			o.opening_place = kwargs.get('opening_place', None)
+		if o.collecting_st1_end_time != kwargs.get('collecting_st1_end_time', None):
+			o.collecting_st1_end_time = kwargs.get('collecting_st1_end_time', None)
 			need_save = True
 
-		if o.prequalification_place != kwargs.get('prequalification_place', None):
-			o.prequalification_place = kwargs.get('prequalification_place', None)
+		if o.opening_st1_time != kwargs.get('opening_st1_time', None):
+			o.opening_st1_time = kwargs.get('opening_st1_time', None)
 			need_save = True
 
-		if o.scoring_place != kwargs.get('scoring_place', None):
-			o.scoring_place = kwargs.get('scoring_place', None)
+		if o.scoring_st1_time != kwargs.get('scoring_st1_time', None):
+			o.scoring_st1_time = kwargs.get('scoring_st1_time', None)
 			need_save = True
 
-		if o.etp != kwargs.get('etp', None):
-			o.etp = kwargs.get('etp', None)
+		if o.collecting_st2_start_time != kwargs.get('collecting_st2_start_time', None):
+			o.collecting_st2_start_time = kwargs.get('collecting_st2_start_time', None)
+			need_save = True
+
+		if o.collecting_st2_end_time != kwargs.get('collecting_st2_end_time', None):
+			o.collecting_st2_end_time = kwargs.get('collecting_st2_end_time', None)
+			need_save = True
+
+		if o.opening_st2_time != kwargs.get('opening_st2_time', None):
+			o.opening_st2_time = kwargs.get('opening_st2_time', None)
+			need_save = True
+
+		if o.scoring_st2_time != kwargs.get('scoring_st2_time', None):
+			o.scoring_st2_time = kwargs.get('scoring_st2_time', None)
 			need_save = True
 
 		if need_save:
@@ -3952,6 +4008,9 @@ class PurchaseManager(models.Manager):
 class Purchase(models.Model):
 
 	id                     = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
+	number                 = models.CharField(max_length = 50, unique = True)
+
 	region                 = models.ForeignKey(Region,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	responsible            = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	specialised            = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE, null = True, default = None)
@@ -3960,11 +4019,19 @@ class Purchase(models.Model):
 	grant_place            = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	collecting_place       = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	opening_place          = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	final_opening_place    = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	prequalification_place = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	selecting_place        = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	scoring_place          = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	bidding_time           = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	collecting_st1_place   = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	opening_st1_place      = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	scoring_st1_place      = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	collecting_st2_place   = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	opening_st2_place      = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	scoring_st2_place      = models.ForeignKey(Address,      related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	etp                    = models.ForeignKey(ETP,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
-	number                 = models.CharField(max_length = 50, unique = True)
 	name                   = models.TextField(null = True, default = None)
 	url                    = models.TextField(null = True, default = None)
 	published              = models.DateTimeField(null = True, default = None, db_index = True)
@@ -3973,8 +4040,20 @@ class Purchase(models.Model):
 	collecting_start_time  = models.DateTimeField(null = True, default = None, db_index = True)
 	collecting_end_time    = models.DateTimeField(null = True, default = None, db_index = True)
 	opening_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	final_opening_time     = models.DateTimeField(null = True, default = None, db_index = True)
 	prequalification_time  = models.DateTimeField(null = True, default = None, db_index = True)
+	selecting_time         = models.DateTimeField(null = True, default = None, db_index = True)
 	scoring_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	bidding_time           = models.DateTimeField(null = True, default = None, db_index = True)
+
+	collecting_st1_start_time  = models.DateTimeField(null = True, default = None, db_index = True)
+	collecting_st1_end_time    = models.DateTimeField(null = True, default = None, db_index = True)
+	opening_st1_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	scoring_st1_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	collecting_st2_start_time  = models.DateTimeField(null = True, default = None, db_index = True)
+	collecting_st2_end_time    = models.DateTimeField(null = True, default = None, db_index = True)
+	opening_st2_time           = models.DateTimeField(null = True, default = None, db_index = True)
+	scoring_st2_time           = models.DateTimeField(null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
@@ -3985,7 +4064,10 @@ class Purchase(models.Model):
 	objects = PurchaseManager()
 
 	def cancel(self):
-		self.update(state = False)
+
+		self.state = False
+		self.save()
+
 		Lot.objects.filter(purchase = self).update(state = False)
 
 	def __str__(self):
@@ -4258,22 +4340,55 @@ class Contract(models.Model):
 	price_rub  = models.DecimalField(max_digits = 20, decimal_places = 2, null = True, default = None)
 	sign_date  = models.DateField(null = True, default = None, db_index = True)
 
+	state      = models.BooleanField(default = True, db_index = True)
+	created    = models.DateTimeField(default = timezone.now, db_index = True)
+	modified   = models.DateTimeField(default = timezone.now, db_index = True)
+
+	suppliers  = models.ManyToManyField(Organisation, through = 'ContractToSupplier', through_fields = ('contract', 'supplier'))
+
+	objects    = ContractManager()
+
+	def __str__(self):
+		return "{} {} {}".format(self.number, self.price, self.currency)
+
+
+class ContractToSupplierManager(models.Manager):
+
+	def take(self, contract, supplier, **kwargs):
+
+		if not contract or not supplier:
+			return None
+
+		try:
+			link = self.get(contract = contract, supplier = supplier)
+
+		except Exception:
+			link = ContractToSupplier()
+			link.contract = contract
+			link.supplier = supplier
+			link.contact  = kwargs.get('contact', None)
+			link.save()
+
+		return link
+
+
+class ContractToSupplier(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	contract = models.ForeignKey(Contract,     related_name='+', on_delete = models.CASCADE)
+	supplier = models.ForeignKey(Organisation, related_name='+', on_delete = models.CASCADE)
+	contact  = models.ForeignKey(Person,       related_name='+', on_delete = models.CASCADE, null = True, default = None)
+
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects = ContractManager()
+	objects    = ContractToSupplierManager()
 
 	def __str__(self):
-		return "{} {} RUB".format(self.id, self.price_rub)
+		return "{} | {} | {}".format(self.contract, self.supplier, self.contact)
 
-
-
-
-
-
-
-
-
+	class Meta:
+		db_table = 'tenders_contract_to_supplier'
 
 

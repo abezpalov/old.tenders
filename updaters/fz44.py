@@ -790,24 +790,39 @@ class Runner(tenders.runner.Runner):
 #		print(ET.tostring(tree.getroot(), encoding = 'unicode'))
 		ok = False
 
-		# Новая закупка
+
+
+		# Запрос котировок
 		for element in tree.xpath('//fcsNotificationZK'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
+		# Запрос котировок в целях оказания гуманитарной помощи либо ..
+		for element in tree.xpath('//fcsNotificationZKBI'):
+			ok = self.parse_notification_tender(element, region)
+
+		# Закупка у единственного поставщика (подрядчика, исполнителя)
 		for element in tree.xpath('//fcsNotificationEP'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
+		# Электронный аукцион
 		for element in tree.xpath('//fcsNotificationEF'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
+		# Открытый конкурс
 		for element in tree.xpath('//fcsNotificationOK'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
-		for element in tree.xpath('//fcsNotificationZP'):
-			self.parse_notification_tender(element, region)
+		# Двухэтапный конкурс
+		for element in tree.xpath('//fcsNotificationOKD'):
+			ok = self.parse_notification_tender(element, region)
 
+		# Конкурс с ограниченным участием
 		for element in tree.xpath('//fcsNotificationOKOU'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
+
+		# Запрос предложений
+		for element in tree.xpath('//fcsNotificationZP'):
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationISO'):
 			self.parse_notification_tender(element, region)
@@ -815,104 +830,99 @@ class Runner(tenders.runner.Runner):
 		for element in tree.xpath('//fcsNotificationISM'):
 			self.parse_notification_tender(element, region)
 
+		# Предварительный отбор
 		for element in tree.xpath('//fcsNotificationPO'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		for element in tree.xpath('//fcsNotificationZakKOU'):
 			self.parse_notification_tender(element, region)
 
 		# Изменение лота
 		for element in tree.xpath('//fcsNotificationLotChange'):
-			self.parse_notification_lot_change(element, region)
+			ok = self.parse_notification_lot_change(element, region)
 
 		# Продление закупки
 		for element in tree.xpath('//fcsPurchaseProlongationZK'):
-			self.parse_notification_tender_prolongation(element, region)
+			ok = self.parse_notification_tender_prolongation(element, region)
 
 		# Отмена закупки
 		for element in tree.xpath('//fcsNotificationCancel'):
-			self.parse_notification_tender_cancel(element, region)
+			ok = self.parse_notification_tender_cancel(element, region)
 
-		# Отмена лота
 		for element in tree.xpath('//fcsNotificationLotCancel'):
 			self.parse_notification_lot_cancel(element, region)
 
 		# Подписание контракта
 		for element in tree.xpath('//fcsContractSign'):
-			self.parse_notification_sign(element, region)
-
-
-
-
-
-
-
+			ok = self.parse_notification_sign(element, region)
 
 		if not ok:
 			print(ET.tostring(tree.getroot(), encoding = 'unicode'))
 			exit()
 
 
-	# TODO Need test!
 	def parse_notification_sign(self, element, region):
 
+		purchase = Purchase.objects.take(
+			number = self.get_text(element, './foundation/order/purchaseNumber'),
+			region = region)
+		print('{} - contract sign'.format(purchase))
 
-		purchase = Purchase.objects.take(number = self.get_text(element, './foundation/order/purchaseNumber'))
-		print('purchase_number: {}'.format(self.get_text(element, './foundation/order/purchaseNumber')))
-		print('Purchase: {}'.format(purchase))
-
-		customer = Organisation.objects.take(oos_number = self.get_text(element, './customer/regNum'))
-		print('Customer: {}.'.format(customer))
+		customer = OrganisationExtKey.objects.get_organisation(
+			updater = self.updater,
+			ext_key = self.get_text(element, './customer/regNum'))
 
 		currency = Currency.objects.take(code = self.get_text(element, './currency/code'))
-		print('Currency: {}'.format(currency))
 
 		contract = Contract.objects.take(
 			purchase   = purchase,
 			customer   = customer,
-			number     = self.get_text(element, './number'),
 			currency   = currency,
-			price      = self.get_text(element, './price'),
-			price_rub  = self.get_text(element, './priceRUR'),
+			number     = self.get_text(element, './number'),
+			price      = self.get_float(element, './price'),
+			price_rub  = self.get_float(element, './priceRUR'),
 			sign_date  = self.get_text(element, './signDate'))
 
+		contract.suppliers.clear()
+		for s in element.xpath('.//supplier'):
 
-		print('purchase: {}'.format(purchase))
-		print('customer: {}'.format(customer))
-		print('number: {}'.format(self.get_text(element, './number')))
-		print('Contract: {}'.format(contract))
+			supplier = Organisation.objects.take(
+				inn = self.get_text(s, './inn'),
+				kpp = self.get_text(s, './kpp'),
+				full_name = self.get_text(s, './organizationName'))
 
-		protocol = {}
-#		protocol['number'] = Purchase.objects.take(number = self.get_text(element, './order/foundationProtocolNumber'))
-		
+			contact = Person.objects.take(
+				first_name  = self.get_text(s, './contactInfo/firstName'),
+				middle_name = self.get_text(s, './contactInfo/middleName'),
+				last_name   = self.get_text(s, './contactInfo/lastName'))
 
+			link = ContractToSupplier.objects.take(
+				contract = contract,
+				supplier = supplier,
+				contact  = contact)
 
-
-
-
-
-
-		return False
+		return True
 
 
 	def parse_notification_tender_prolongation(self, element, region):
 
 		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
-		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
-		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
-		purchase.collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
+#		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
+#		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
+#		purchase.collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
 
 		purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
-		purchase.opening_time           = self.get_datetime(element, './openingProlongationDate')
-		purchase.prequalification_time  = self.get_datetime(element, './'),
-		purchase.scoring_time           = self.get_datetime(element, './'),
+#		purchase.opening_time           = self.get_datetime(element, './openingProlongationDate')
+#		purchase.prequalification_time  = self.get_datetime(element, './'),
+#		purchase.scoring_time           = self.get_datetime(element, './'),
 		purchase.save()
 
 		print('{} - prolongated'.format(purchase))
 
 		notification = Notification.objects.take(
-			id       = self.get_int(element, './id'),
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 
@@ -993,6 +1003,7 @@ class Runner(tenders.runner.Runner):
 		if not responsible:
 			print(ET.tostring(element, encoding = 'unicode'))
 			print('Ответственного нет!!!')
+			exit()
 
 		email = Email.objects.take(email = self.get_text(element, './purchaseResponsible/responsibleInfo/contactEMail'))
 		phone = Phone.objects.take(phone = self.get_text(element, './purchaseResponsible/responsibleInfo/contactPhone'))
@@ -1005,12 +1016,6 @@ class Runner(tenders.runner.Runner):
 			phon        = phone)
 
 		placing_way = PlacingWay.objects.take(code = self.get_text(element, './placingWay/code'))
-
-		grant_place            = Address.objects.take(address = self.get_text(element, './purchaseDocumentation/grantPlace'))
-		collecting_place       = Address.objects.take(address = self.get_text(element, './procedureInfo/collecting/place'))
-		opening_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/opening/place'))
-		prequalification_place = Address.objects.take(address = self.get_text(element, './procedureInfo/prequalification/place'))
-		scoring_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/scoring/place'))
 
 		etp = ETP.objects.take(
 			code = self.get_text(element, './ETP/code'),
@@ -1027,19 +1032,47 @@ class Runner(tenders.runner.Runner):
 			specialised            = specialised,
 			contact_person         = contact_person,
 			placing_way            = placing_way,
+
+			grant_place            = Address.objects.take(address = self.get_text(element, './purchaseDocumentation/grantPlace')),
+			collecting_place       = Address.objects.take(address = self.get_text(element, './procedureInfo/collecting/place')),
+			opening_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/opening/place')),
+			final_opening_place    = Address.objects.take(address = self.get_text(element, './procedureInfo/finalOpening/place')),
+			prequalification_place = Address.objects.take(address = self.get_text(element, './procedureInfo/prequalification/place')),
+			selecting_place        = Address.objects.take(address = self.get_text(element, './procedureInfo/selecting/place')),
+			scoring_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/scoring/place')),
+
+			collecting_st1_place   = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/collecting/place')),
+			opening_st1_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/opening/place')),
+			scoring_st1_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/scoring/place')),
+
+			collecting_st2_place   = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/collecting/place')),
+			opening_st2_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/opening/place')),
+			scoring_st2_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/scoring/place')),
+
+			etp                    = etp,
+
 			grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
 			grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
+
 			collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
 			collecting_end_time    = self.get_datetime(element, './procedureInfo/collecting/endDate'),
 			opening_time           = self.get_datetime(element, './procedureInfo/opening/date'),
+			final_opening_time     = self.get_datetime(element, './procedureInfo/finalOpening/date'),
 			prequalification_time  = self.get_datetime(element, './procedureInfo/prequalification/date'),
+			selecting_time         = self.get_datetime(element, './procedureInfo/selecting/date'),
 			scoring_time           = self.get_datetime(element, './procedureInfo/scoring/date'),
-			grant_place            = grant_place,
-			collecting_place       = collecting_place,
-			opening_place          = opening_place,
-			prequalification_place = prequalification_place,
-			scoring_place          = scoring_place,
-			etp                    = etp)
+			bidding_time           = self.get_datetime(element, './procedureInfo/bidding/date'),
+
+			collecting_st1_start_time  = self.get_datetime(element, './procedureInfo/stageOne/collecting/startDate'),
+			collecting_st1_end_time    = self.get_datetime(element, './procedureInfo/stageOne/collecting/endDate'),
+			opening_st1_time           = self.get_datetime(element, './procedureInfo/stageOne/opening/date'),
+			scoring_st1_time           = self.get_datetime(element, './procedureInfo/stageOne/scoring/date'),
+			collecting_st2_start_time  = self.get_datetime(element, './procedureInfo/stageTwo/collecting/startDate'),
+			collecting_st2_end_time    = self.get_datetime(element, './procedureInfo/stageTwo/collecting/endDate'),
+			opening_st2_time           = self.get_datetime(element, './procedureInfo/stageTwo/opening/date'),
+			scoring_st2_time           = self.get_datetime(element, './procedureInfo/stageTwo/scoring/date'))
+
+
 		print('{} - added'.format(purchase))
 
 		notification = Notification.objects.take(
@@ -1071,6 +1104,7 @@ class Runner(tenders.runner.Runner):
 		# TODO ??
 			#plan_number     = self.get_text(l, './customerRequirements/tenderPlanInfo/planNumber')
 			#position_number = self.get_text(l, './customerRequirements/tenderPlanInfo/positionNumber')
+
 			if self.get_int(l, './lotNumber'):
 				number = self.get_int(l, './lotNumber')
 			else:
@@ -1173,6 +1207,19 @@ class Runner(tenders.runner.Runner):
 			name = self.get_text(element, './ETP/name'),
 			url  = self.get_text(element, './ETP/url'))
 
+		ok = False
+
+		for info in element.xpath('//procedureOKInfo'):
+
+			collecting_start_time  = self.get_datetime(info, './procedureInfo/collecting/startDate'),
+			collecting_end_time    = self.get_datetime(info, './procedureInfo/collecting/endDate'),
+			opening_time           = self.get_datetime(info, './procedureInfo/opening/date'),
+			scoring_time           = self.get_datetime(info, './procedureInfo/scoring/date'),
+			ok = True
+
+		if not ok:
+			return False
+
 		purchase = Purchase.objects.write(
 			number                 = self.get_text(element, './purchaseNumber'),
 			name                   = self.get_text(element, './purchaseObjectInfo'),
@@ -1183,19 +1230,46 @@ class Runner(tenders.runner.Runner):
 			specialised            = specialised,
 			contact_person         = contact_person,
 			placing_way            = placing_way,
+
+			grant_place            = Address.objects.take(address = self.get_text(element, './purchaseDocumentation/grantPlace')),
+			collecting_place       = Address.objects.take(address = self.get_text(element, './procedureInfo/collecting/place')),
+			opening_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/opening/place')),
+			final_opening_place    = Address.objects.take(address = self.get_text(element, './procedureInfo/finalOpening/place')),
+			prequalification_place = Address.objects.take(address = self.get_text(element, './procedureInfo/prequalification/place')),
+			selecting_place        = Address.objects.take(address = self.get_text(element, './procedureInfo/selecting/place')),
+			scoring_place          = Address.objects.take(address = self.get_text(element, './procedureInfo/scoring/place')),
+
+			collecting_st1_place   = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/collecting/place')),
+			opening_st1_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/opening/place')),
+			scoring_st1_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageOne/scoring/place')),
+
+			collecting_st2_place   = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/collecting/place')),
+			opening_st2_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/opening/place')),
+			scoring_st2_place      = Address.objects.take(address = self.get_text(element, './procedureInfo/stageTwo/scoring/place')),
+
+			etp                    = etp,
+
 			grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
 			grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
+
 			collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
 			collecting_end_time    = self.get_datetime(element, './procedureInfo/collecting/endDate'),
 			opening_time           = self.get_datetime(element, './procedureInfo/opening/date'),
+			final_opening_time     = self.get_datetime(element, './procedureInfo/finalOpening/date'),
 			prequalification_time  = self.get_datetime(element, './procedureInfo/prequalification/date'),
+			selecting_time         = self.get_datetime(element, './procedureInfo/selecting/date'),
 			scoring_time           = self.get_datetime(element, './procedureInfo/scoring/date'),
-			grant_place            = grant_place,
-			collecting_place       = collecting_place,
-			opening_place          = opening_place,
-			prequalification_place = prequalification_place,
-			scoring_place          = scoring_place,
-			etp                    = etp)
+			bidding_time           = self.get_datetime(element, './procedureInfo/bidding/date'),
+
+			collecting_st1_start_time  = self.get_datetime(element, './procedureInfo/stageOne/collecting/startDate'),
+			collecting_st1_end_time    = self.get_datetime(element, './procedureInfo/stageOne/collecting/endDate'),
+			opening_st1_time           = self.get_datetime(element, './procedureInfo/stageOne/opening/date'),
+			scoring_st1_time           = self.get_datetime(element, './procedureInfo/stageOne/scoring/date'),
+			collecting_st2_start_time  = self.get_datetime(element, './procedureInfo/stageTwo/collecting/startDate'),
+			collecting_st2_end_time    = self.get_datetime(element, './procedureInfo/stageTwo/collecting/endDate'),
+			opening_st2_time           = self.get_datetime(element, './procedureInfo/stageTwo/opening/date'),
+			scoring_st2_time           = self.get_datetime(element, './procedureInfo/stageTwo/scoring/date'))
+
 		print('{} - edited'.format(purchase))
 
 		notification = Notification.objects.take(
@@ -1284,7 +1358,6 @@ class Runner(tenders.runner.Runner):
 					link.save()
 
 		return True
-
 
 
 	def get_text(self, element, query):
