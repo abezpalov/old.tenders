@@ -1337,10 +1337,10 @@ class Runner(tenders.runner.Runner):
 				size        = self.get_text(a, './fileSize'),
 				description = self.get_text(a, './docDescription'))
 
-			link = PurchaseToAttachment()
-			link.purchase   = purchase
-			link.attachment = attachment
-			link.save()
+			link = PurchaseToAttachment.objects.write(
+				purchase   = purchase,
+				attachment = attachment,
+				doc_type   = None)
 
 
 		for n, l in enumerate(element.xpath('.//lot')):

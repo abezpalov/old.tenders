@@ -4158,7 +4158,7 @@ class PurchaseToAttachment(models.Model):
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	purchase   = models.ForeignKey(Purchase,   related_name='+', on_delete = models.CASCADE)
 	attachment = models.ForeignKey(Attachment, related_name='+', on_delete = models.CASCADE)
-	doc_type   = models.ForeignKey(DocType,    related_name='+', on_delete = models.CASCADE)
+	doc_type   = models.ForeignKey(DocType,    related_name='+', on_delete = models.CASCADE, null = True, default = False)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
