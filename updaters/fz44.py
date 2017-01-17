@@ -845,6 +845,10 @@ class Runner(tenders.runner.Runner):
 		for element in tree.xpath('//fcsPurchaseProlongationZK'):
 			ok = self.parse_notification_tender_prolongation(element, region)
 
+		# Продление срока рассмотрения заявок
+		for element in tree.xpath('//fcsPurchaseProlongationOK'):
+			ok = self.parse_notification_tender_prolongation(element, region)
+
 		# Отмена закупки
 		for element in tree.xpath('//fcsNotificationCancel'):
 			ok = self.parse_notification_tender_cancel(element, region)
@@ -855,6 +859,14 @@ class Runner(tenders.runner.Runner):
 		# Подписание контракта
 		for element in tree.xpath('//fcsContractSign'):
 			ok = self.parse_notification_sign(element, region)
+
+		# Добавление документа
+		for element in tree.xpath('//fcsPurchaseDocument'):
+			ok = self.parse_notification_document(element, region)
+
+		# Добавление ответа
+		for element in tree.xpath('//fcsClarification'):
+			ok = self.parse_notification_document(element, region)
 
 		if not ok:
 			print(ET.tostring(tree.getroot(), encoding = 'unicode'))
@@ -904,19 +916,60 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
+	def parse_notification_document(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+		print('{} - document added'.format(purchase))
+
+		doc_type = DocType.objects.take(
+			code = self.get_text(element, './docType/code'),
+			name = self.get_text(element, './docType/name'))
+
+		doc_type.code = self.get_text(element, './docType/code')
+
+		if doc_type.code == 'RD': # Разъяснения положений документации об электронном аукционе
+
+			for a in element.xpath('.//attachments/attachment'):
+
+				attachment = Attachment.objects.take(
+					url         = self.get_text(a, './url'),
+					name        = self.get_text(a, './fileName'),
+					size        = self.get_text(a, './fileSize'),
+					description = self.get_text(a, './docDescription'))
+
+				link = PurchaseToAttachment.objects.write(
+					purchase   = purchase,
+					attachment = attachment,
+					doc_type   = doc_type)
+
+		else:
+			return False
+
+		notification = Notification.objects.take(
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
+			url      = self.get_text(element, './printForm/url'),
+			purchase = purchase)
+
+		return True
+
+
+
+
 	def parse_notification_tender_prolongation(self, element, region):
 
 		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
 
-#		purchase.grant_start_time       = self.get_datetime(element, './purchaseDocumentation/grantStartDate'),
-#		purchase.grant_end_time         = self.get_datetime(element, './purchaseDocumentation/grantEndDate'),
-#		purchase.collecting_start_time  = self.get_datetime(element, './procedureInfo/collecting/startDate'),
+		doc_type = self.get_text(element, './docType/code')
 
-		purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
-#		purchase.opening_time           = self.get_datetime(element, './openingProlongationDate')
-#		purchase.prequalification_time  = self.get_datetime(element, './'),
-#		purchase.scoring_time           = self.get_datetime(element, './'),
-		purchase.save()
+		if doc_type == 'IPP':
+			purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
+			purchase.save()
+		elif doc_type == 'UP':
+			purchase.scoring_time    = self.get_datetime(element, './scoringProlongationDate')
+			purchase.save()
+		else:
+			return False
 
 		print('{} - prolongated'.format(purchase))
 
@@ -1081,7 +1134,6 @@ class Runner(tenders.runner.Runner):
 			url      = self.get_text(element, './printForm/url'),
 			purchase = purchase)
 
-		purchase.attachments.clear()
 		for a in element.xpath('.//attachments/attachment'):
 
 			attachment = Attachment.objects.take(
@@ -1090,11 +1142,10 @@ class Runner(tenders.runner.Runner):
 				size        = self.get_text(a, './fileSize'),
 				description = self.get_text(a, './docDescription'))
 
-			link = PurchaseToAttachment()
-			link.purchase   = purchase
-			link.attachment = attachment
-			link.save()
-
+			link = PurchaseToAttachment.objects.write(
+				purchase   = purchase,
+				attachment = attachment,
+				doc_type   = None)
 
 		for n, l in enumerate(element.xpath('.//lot')):
 

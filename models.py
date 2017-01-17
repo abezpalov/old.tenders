@@ -4077,16 +4077,94 @@ class Purchase(models.Model):
 		ordering = ['number']
 
 
+class DocTypeManager(models.Manager):
+
+
+	def take(self, code, **kwargs):
+
+		if not code:
+			return None
+
+		try:
+			o = self.get(code = code)
+
+		except Exception:
+			o = DocType()
+			o.code = code
+			o.name = kwargs.get('name', None)
+			o.save()
+
+		return o
+
+
+
+class DocType(models.Model):
+
+	id   = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	code = models.CharField(max_length = 50, db_index = True)
+	name = models.TextField(null = True, default = None)
+
+	state    = models.BooleanField(default = True, db_index = True)
+	created  = models.DateTimeField(default = timezone.now, db_index = True)
+	modified = models.DateTimeField(default = timezone.now, db_index = True)
+
+	objects = DocTypeManager()
+
+
+
+class PurchaseToAttachmentManager(models.Manager):
+
+	def take(self, purchase, attachment, doc_type = None, **kwargs):
+
+		if not purchase or not attachment:
+			return None
+
+		try:
+			o = self.get(purchase = purchase, attachment = attachment)
+
+		except Exception:
+			o = DocType()
+			o.purchase   = purchase
+			o.attachment = attachment
+			o.doc_type   = doc_type
+			o.save()
+
+		return o
+
+
+
+	def write(self, purchase, attachment, doc_type = None, **kwargs):
+
+		if not purchase or not attachment:
+			return None
+
+		need_save = False
+
+		o = self.take(purchase, attachment, doc_type, **kwargs)
+
+		if o.doc_type != kwargs.get('doc_type', None):
+			o.doc_type = kwargs.get('doc_type', None)
+			need_save = True
+
+		if need_save:
+			o.save()
+
+		return o
+
+
 
 class PurchaseToAttachment(models.Model):
 
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	purchase   = models.ForeignKey(Purchase,   related_name='+', on_delete = models.CASCADE)
 	attachment = models.ForeignKey(Attachment, related_name='+', on_delete = models.CASCADE)
+	doc_type   = models.ForeignKey(DocType,    related_name='+', on_delete = models.CASCADE)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
+
+	objects = PurchaseToAttachmentManager()
 
 	class Meta:
 		db_table = 'tenders_purchase_to_attachment'
