@@ -73,27 +73,32 @@ class Runner(tenders.runner.Runner):
 
 			self.update_essence(essence)
 
-		# Обновляем данные с регионов
-		for region in self.get_ftp_catalog(self.url, self.categories['regions']):
 
-			if (not region in self.black_list) and (not '.'in region):
-				try:
-					self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
-					region = Region.objects.take(
-						alias = region,
-						name = region,
-						full_name = region)
-					print(region)
+		print('Обновляем данные с регионов')
+
+		for essence in self.region_essences:
+
+			for region_key in self.get_ftp_catalog(self.url, self.categories['regions']):
+
+				if (not region_key in self.black_list) and (not '.'in region_key):
+					try:
+						self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
+						region = Region.objects.get_by_key(
+							updater = updater,
+							ext_key = region_key)
+						print(region)
 	
-				except Exception:
-					continue
+					except Exception:
+						continue
 
-				if region.state:
+					if region and region.state:
 
-					for essence in self.region_essences:
-						self.update_region_essence(region, essence)
+						for essence in self.region_essences:
 
+							if self.is_time_up():
+								return True
 
+							self.update_region_essence(region, essence)
 
 		print("Завершил за {}.".format(timezone.now() - self.start_time))
 		return True
@@ -170,7 +175,6 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
-
 	def parse_okato(self, tree):
 		'Парсит ОКАТО (классификация населённых пунктов'
 
@@ -186,7 +190,6 @@ class Runner(tenders.runner.Runner):
 			print("ОКАТО: {}.".format(okato))
 
 		return True
-
 
 
 	def parse_okei(self, tree):
@@ -213,6 +216,96 @@ class Runner(tenders.runner.Runner):
 			print("Единица измерения: {}.".format(okei))
 
 		return True
+
+
+	def parse_organisation(self, tree):
+
+		for element in tree.xpath('.//nsiOrganizationData'):
+
+			legal_address   = Address.objects.take(address = self.get_text(element, './mainInfo/legalAddress'))
+			postal_address  = Address.objects.take(address = self.get_text(element, './mainInfo/postalAddress'))
+
+			email = Email.objects.take(email = self.get_text(element, './contactInfo/email'))
+			phone = Phone.objects.take(phone = self.get_text(element, './contactInfo/phone'))
+			website = URL.objects.take(url = self.get_text(element, './contactInfo/website'))
+
+
+
+
+
+			contact_person = Person.objects.take(
+				first_name  = self.get_text(element, './contactPerson/firstName'),
+				middle_name = self.get_text(element, './contactPerson/middleName'),
+				last_name   = self.get_text(element, './contactPerson/lastName'),
+				email       = email,
+				phone       = phone,
+				website     = website)
+
+			ext_key = OrganisationExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './headAgency/regNum'))
+			if ext_key:
+				head_agency = ext_key.organisation
+			else:
+				head_agency = None
+
+			ext_key = OrganisationExtKey.objects.take(
+				updater = self.updater,
+				ext_key = self.get_text(element, './orderingAgency/regNum'))
+			if ext_key:
+				ordering_agency = ext_key.organisation
+			else:
+				ordering_agency = None
+
+			okopf = OKOPF.objects.take(
+				code      = self.get_text(element, './OKOPF/code'),
+				full_name = self.get_text(element, './OKOPF/fullName'))
+
+			okogu = OKOGU.objects.take(
+				code = self.get_text(element, './OKOGU/code'),
+				name = self.get_text(element, './OKOGU/name'))
+
+			organisation_role = OrganisationRole.objects.take(
+				code = self.get_text(element, './organizationRole'))
+
+			organisation_type = OrganisationType.objects.take(
+				code = self.get_text(element, './organizationType/code'),
+				name = self.get_text(element, './organizationType/name'))
+
+			oktmo = OKTMO.objects.take(
+				code = self.get_text(element, './OKTMO/code'))
+
+			organisation = Organisation.objects.write(
+				inn               = self.get_text(element, './INN'),
+				kpp               = self.get_text(element, './KPP'),
+				short_name        = self.get_text(element, './shortName'),
+				full_name         = self.get_text(element, './fullName'),
+				ogrn              = self.get_text(element, './OGRN'),
+				okpo              = self.get_text(element, './OKPO'),
+				factual_address   = factual_address,
+				postal_address    = postal_address,
+				email             = email,
+				phone             = phone,
+				fax               = fax,
+				website           = website,
+				contact_person    = contact_person,
+				head_agency       = head_agency,
+				ordering_agency   = ordering_agency,
+				okopf             = okopf,
+				okogu             = okogu,
+				organisation_role = organisation_role,
+				organisation_type = organisation_type,
+				oktmo             = oktmo,
+				state             = self.get_bool(element, './actual'),
+				register          = self.get_bool(element, './register'))
+
+			ext_key = OrganisationExtKey.objects.write(
+				updater = self.updater,
+				ext_key = self.get_text(element, './regNumber'),
+				organisation = organisation)
+			print('Организация: {}'.format(organisation))
+
+
 
 
 

@@ -1,0 +1,59 @@
+<export>
+    <fcsNotificationISM schemeVersion="1.0">
+        <id>71971</id>
+        <purchaseNumber>0301200035114000011</purchaseNumber>
+        <docPublishDate>2014-02-06T18:36:02.138+06:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/ism44/view/common-info.html?noticeId=71971</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=71971</url>
+        </printForm>
+        <purchaseObjectInfo>Оказание услуг по организации горячего лечебного питания пациентам ГБУЗ РПБ № 2 МЗ РБ</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03012000351</regNum>
+                <fullName>государственное бюджетное учреждение здравоохранения Республиканская психиатрическая больница № 2 Министерства здравоохранения Республики Башкортостан</fullName>
+                <postAddress>Российская Федерация, 453104, Башкортостан Респ, Стерлитамак г, Лесная, 18, -</postAddress>
+                <factAddress>Российская Федерация, 453104, Башкортостан Респ, Стерлитамакский р-н, Стерлитамак г, Лесная, 18, -</factAddress>
+                <INN>0268019510</INN>
+                <KPP>026801001</KPP>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+        </purchaseResponsible>
+        <placingWay>
+            <code>OKU44I</code>
+            <name>Конкурс с ограниченным участием</name>
+        </placingWay>
+        <procedureInfo>
+            <collectingEndDate>2014-02-27T11:00:00+04:00</collectingEndDate>
+        </procedureInfo>
+        <lots>
+            <lot>
+                <lotNumber>1</lotNumber>
+                <maxPrice>17379543.7</maxPrice>
+                <currency>
+                    <code>RUB</code>
+                    <name>Российский рубль</name>
+                </currency>
+                <OKPD>
+                    <code>55.52.13.140</code>
+                    <name>Услуги по организации питания и обслуживанию участников конференций, семинаров, совещаний и т.п.</name>
+                </OKPD>
+            </lot>
+        </lots>
+        <attachments>
+            <attachment>
+                <publishedContentId>F1BB36A01F9900E8E043AC1107257D45</publishedContentId>
+                <fileName>извещение.doc</fileName>
+                <docDescription>извещение</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F1BB36A01F9900E8E043AC1107257D45</url>
+            </attachment>
+            <attachment>
+                <publishedContentId>F1B9EAE732D6005AE043AC110725AB5B</publishedContentId>
+                <fileName>конкурсная документация.doc</fileName>
+                <docDescription>конкурсная документация</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F1B9EAE732D6005AE043AC110725AB5B</url>
+            </attachment>
+        </attachments>
+    </fcsNotificationISM>
+</export>
+

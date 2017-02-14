@@ -1,0 +1,165 @@
+<export>
+    <fcsProtocolZKBI schemeVersion="4.4">
+        <id>828760</id>
+        <purchaseNumber>0142300006014000001</purchaseNumber>
+        <docPublishDate>2014-08-12T11:20:50.264+04:00</docPublishDate>
+        <docNumber>П1</docNumber>
+        <href>http://zakupki.gov.ru/epz/order/notice/zkb44/view/documents.html?regNumber=0142300006014000001</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?structuredProtocolID=828760</url>
+            <signature type="CAdES-BES">TUlJTWR3WUpLb1pJaHZjTkFRY0NvSUlNYURDQ0RHUUNBUUV4RERBS0JnWXFoUU1DQWdrRkFEQUxCZ2txaGtpRzl3MEJCd0dnZ2daN01JSUdkekNDQmlhZ0F3SUJBZ0lES28zTk1BZ0dCaXFGQXdJQ0F6Q0NBa014SVRBZkJna3Foa2lHOXcwQkNRRVdFblYxWTE5bWEwQnliM05yWVhwdVlTNXlkVEVpTUNBR0ExVUVDUXdaMFlQUXV5NGcwSmpRdTlHTTBMalF2ZEM2MExBZzBMUXVOekVaTUJjR0ExVUVCd3dRMExNdUlOQ2MwTDdSZ2RDNjBMTFFzREdCb2pDQm53WUpLb1pJaHZjTkFRa0NESUdSMEpUUXNOQzkwTDNSaTlDNUlOR0IwTFhSZ05HQzBMalJoTkM0MExyUXNOR0NJTkMrMFlMUXV0R0EwWXZSZ3RDKzBMUFF2aURRdXRDNzBZN1JoOUN3SU5DNDBZSFF2OUMrMEx2UmpOQzMwWVBRdGRHQzBZSFJqeURSZ2RDK0lOR0IwWURRdGRDMDBZSFJndEN5MEw3UXZDRFFvZENhMEpmUW1DRFFtdEdBMExqUXY5R0MwTDRnMEovUmdOQytJRU5UVURFTE1Ba0dBMVVFQmhNQ1VsVXhjakJ3QmdOVkJBc01hZENqMEwvUmdOQ3cwTExRdTlDMTBMM1F1TkMxSU5HQTBMWFF0dEM0MEx6UXNDRFJnZEMxMExyUmdOQzEwWUxRdmRDKzBZSFJndEM0SU5DNElOQ3gwTFhRdDlDKzBML1FzTkdCMEwzUXZ0R0IwWUxRdUNEUXVOQzkwWVRRdnRHQTBMelFzTkdHMExqUXVERTRNRFlHQTFVRUNnd3YwS1RRdGRDMDBMWFJnTkN3MEx2UmpOQzkwTDdRdFNEUXV0Q3cwTGZRdmRDdzBZZlF0ZEM1MFlIUmd0Q3kwTDR4ZnpCOUJnTlZCQU1NZHRDajBML1F2dEM3MEwzUXZ0QzgwTDdSaDlDMTBMM1F2ZEdMMExrZzBZUFF0TkMrMFlIUmd0QyswTExRdGRHQTBZL1JqdEdKMExqUXVTRFJodEMxMEwzUmd0R0FJTkNrMExYUXROQzEwWURRc05DNzBZelF2ZEMrMExQUXZpRFF1dEN3MExmUXZkQ3cwWWZRdGRDNTBZSFJndEN5MExBd0hoY05NVFF3TnpFMU1URTBNRFEyV2hjTk1UVXdOekUxTVRFME1EUTJXakNDQVlBeEZEQVNCZ05WQkFVVEN6QTBNRGsyTWpZeU1UUTJNU1V3SXdZSktvWklodmNOQVFrQkZoWnpjQzV6ZEM1eVlXTm9aV2xyWVVCdFlXbHNMbkoxTVFzd0NRWURWUVFHRXdKU1ZURXFNQ2dHQTFVRUNBd2gwS0hRc05DODBMRFJnTkdCMExyUXNOR1BJTkMrMExIUXU5Q3cwWUhSZ3RHTU1TUXdJZ1lEVlFRSERCdlFvZEdDMExEUmdOQ3cwWThnMEtEUXNOR0gwTFhRdWRDNjBMQXhSakJFQmdOVkJBb01QZENRMExUUXZOQzQwTDNRdU5HQjBZTFJnTkN3MFliUXVOR1BJTkdCTHRDL0xpRFFvZEdDMExEUmdOQ3cwWThnMEtEUXNOR0gwTFhRdWRDNjBMQXhKREFpQmdOVkJDb01HOUNlMEx2UmpOQ3owTEFnMEpqUXN0Q3cwTDNRdnRDeTBMM1FzREVaTUJjR0ExVUVCQXdRMEtIUmd0R0QwTHZRdXRDKzBMTFFzREVpTUNBR0ExVUVEQXdaMExqUXZkR0IwTC9RdGRDNjBZTFF2dEdBSU5DZjBKTFFvekUxTURNR0ExVUVBd3dzMEtIUmd0R0QwTHZRdXRDKzBMTFFzQ0RRbnRDNzBZelFzOUN3SU5DWTBMTFFzTkM5MEw3UXN0QzkwTEF3WXpBY0JnWXFoUU1DQWhNd0VnWUhLb1VEQWdJa0FBWUhLb1VEQWdJZUFRTkRBQVJBNmhPRVkxRW51TkRJOEhXRGg0MTFzK2JTWmZkZXFnWUtQa0ovcnExbWI0MTZVRkRZci9NUWUzblM0VmM1YkJ1K1FRaWg1M25WZndjS2FKRExCcExGVUtPQ0FiNHdnZ0c2TUF3R0ExVWRFd0VCL3dRQ01BQXdHQVlEVlIwZ0JCRXdEekFOQmdzcWhRTURQWjdYTmdFQ0FqQ0J3QVlEVlIwUkJJRzRNSUcxb0JJR0ExVUVES0FMRXdrM01UVXhNelU1TWppZ0dBWUlLb1VEQTRFREFRR2dEQk1LTmpNeU5UQXpPREkzTUtBWkJnb3FoUU1EUFo3WE5nRUhvQXNUQ1RZek1qVXdNVEF3TWFBYkJnb3FoUU1EUFo3WE5nRUZvQTBUQ3pBeE5ESXpNREF3TURZd29BMEdCeXFGQXdIZ09RR2dBaE1Bb0E4R0NTcUdTSWIzRFFFSkZLQUNFd0NnRUFZS0tvVURBejJlMXpZQkNLQUNFd0NnR0FZRktvVURaQUdnRHhNTk1UQTFOak15TlRBMU5EZ3dONFlCTURBT0JnTlZIUThCQWY4RUJBTUNBK2d3UXdZRFZSMGxCRHd3T2dZSUt3WUJCUVVIQXdJR0RpcUZBd005bnRjMkFRWURCQUVCQmc0cWhRTURQWjdYTmdFR0F3UUJBZ1lPS29VREF6MmUxellCQmdNRUFRUXdId1lEVlIwakJCZ3dGb0FVWjUzN2IrOVpPdk1MSVNrN2cxakRGZzBRdzZJd09BWURWUjBmQkRFd0x6QXRvQ3VnS1lZbmFIUjBjRG92TDJOeWJDNXliM05yWVhwdVlTNXlkUzlqY213dlRFRlRWRjl1WlhjdVkzSnNNQjBHQTFVZERnUVdCQlFRcWsycVUvNkp6dEVkdjdnYmxrb3pUSnU2WWpBSUJnWXFoUU1DQWdNRFFRQkhuOEJRc3BjWkxrZWNkTFJoeXVCb0NaZnBwaUx4MFlrUmV0YysvYzNBcjFaaC92TFlQZExFS3NjRjdHSk5RZERpeWp1c2x1Z05zV3Y5b2QwMnNCZnVNWUlGd3pDQ0JiOENBUUV3Z2dKTU1JSUNRekVoTUI4R0NTcUdTSWIzRFFFSkFSWVNkWFZqWDJaclFISnZjMnRoZW01aExuSjFNU0l3SUFZRFZRUUpEQm5SZzlDN0xpRFFtTkM3MFl6UXVOQzkwTHJRc0NEUXRDNDNNUmt3RndZRFZRUUhEQkRRc3k0ZzBKelF2dEdCMExyUXN0Q3dNWUdpTUlHZkJna3Foa2lHOXcwQkNRSU1nWkhRbE5DdzBMM1F2ZEdMMExrZzBZSFF0ZEdBMFlMUXVOR0UwTGpRdXRDdzBZSWcwTDdSZ3RDNjBZRFJpOUdDMEw3UXM5QytJTkM2MEx2Ump0R0gwTEFnMExqUmdkQy8wTDdRdTlHTTBMZlJnOUMxMFlMUmdkR1BJTkdCMEw0ZzBZSFJnTkMxMExUUmdkR0MwTExRdnRDOElOQ2gwSnJRbDlDWUlOQ2EwWURRdU5DLzBZTFF2aURRbjlHQTBMNGdRMU5RTVFzd0NRWURWUVFHRXdKU1ZURnlNSEFHQTFVRUN3eHAwS1BRdjlHQTBMRFFzdEM3MExYUXZkQzQwTFVnMFlEUXRkQzIwTGpRdk5Dd0lOR0IwTFhRdXRHQTBMWFJndEM5MEw3UmdkR0MwTGdnMExnZzBMSFF0ZEMzMEw3UXY5Q3cwWUhRdmRDKzBZSFJndEM0SU5DNDBMM1JoTkMrMFlEUXZOQ3cwWWJRdU5DNE1UZ3dOZ1lEVlFRS0RDL1FwTkMxMExUUXRkR0EwTERRdTlHTTBMM1F2dEMxSU5DNjBMRFF0OUM5MExEUmg5QzEwTG5SZ2RHQzBMTFF2akYvTUgwR0ExVUVBd3gyMEtQUXY5QyswTHZRdmRDKzBMelF2dEdIMExYUXZkQzkwWXZRdVNEUmc5QzAwTDdSZ2RHQzBMN1FzdEMxMFlEUmo5R08wWW5RdU5DNUlOR0cwTFhRdmRHQzBZQWcwS1RRdGRDMDBMWFJnTkN3MEx2UmpOQzkwTDdRczlDK0lOQzYwTERRdDlDOTBMRFJoOUMxMExuUmdkR0MwTExRc0FJREtvM05NQW9HQmlxRkF3SUNDUVVBb0lJRERqQVlCZ2txaGtpRzl3MEJDUU14Q3dZSktvWklodmNOQVFjQk1Cd0dDU3FHU0liM0RRRUpCVEVQRncweE5EQTRNVEl3TnpJd05UUmFNQzhHQ1NxR1NJYjNEUUVKQkRFaUJDQzlINktZZ3JPMENFODFvNHdRZUtPUW9rdGNzUWtnY2RHQU1QTjJ2YkoxakRDQ0FxRUdDeXFHU0liM0RRRUpFQUl2TVlJQ2tEQ0NBb3d3Z2dLSU1JSUNoREFJQmdZcWhRTUNBZ2tFSU9nRWxOSVBOcWxxWUoyZEpJQnA2QjArVTZUakpqdXR4Slo5N2U0ZGVxM2dNSUlDVkRDQ0FrdWtnZ0pITUlJQ1F6RWhNQjhHQ1NxR1NJYjNEUUVKQVJZU2RYVmpYMlpyUUhKdmMydGhlbTVoTG5KMU1TSXdJQVlEVlFRSkRCblJnOUM3TGlEUW1OQzcwWXpRdU5DOTBMclFzQ0RRdEM0M01Sa3dGd1lEVlFRSERCRFFzeTRnMEp6UXZ0R0IwTHJRc3RDd01ZR2lNSUdmQmdrcWhraUc5dzBCQ1FJTWdaSFFsTkN3MEwzUXZkR0wwTGtnMFlIUXRkR0EwWUxRdU5HRTBMalF1dEN3MFlJZzBMN1JndEM2MFlEUmk5R0MwTDdRczlDK0lOQzYwTHZSanRHSDBMQWcwTGpSZ2RDLzBMN1F1OUdNMExmUmc5QzEwWUxSZ2RHUElOR0IwTDRnMFlIUmdOQzEwTFRSZ2RHQzBMTFF2dEM4SU5DaDBKclFsOUNZSU5DYTBZRFF1TkMvMFlMUXZpRFFuOUdBMEw0Z1ExTlFNUXN3Q1FZRFZRUUdFd0pTVlRGeU1IQUdBMVVFQ3d4cDBLUFF2OUdBMExEUXN0QzcwTFhRdmRDNDBMVWcwWURRdGRDMjBMalF2TkN3SU5HQjBMWFF1dEdBMExYUmd0QzkwTDdSZ2RHQzBMZ2cwTGdnMExIUXRkQzMwTDdRdjlDdzBZSFF2ZEMrMFlIUmd0QzRJTkM0MEwzUmhOQyswWURRdk5DdzBZYlF1TkM0TVRnd05nWURWUVFLREMvUXBOQzEwTFRRdGRHQTBMRFF1OUdNMEwzUXZ0QzFJTkM2MExEUXQ5QzkwTERSaDlDMTBMblJnZEdDMExMUXZqRi9NSDBHQTFVRUF3eDIwS1BRdjlDKzBMdlF2ZEMrMEx6UXZ0R0gwTFhRdmRDOTBZdlF1U0RSZzlDMDBMN1JnZEdDMEw3UXN0QzEwWURSajlHTzBZblF1TkM1SU5HRzBMWFF2ZEdDMFlBZzBLVFF0ZEMwMExYUmdOQ3cwTHZSak5DOTBMN1FzOUMrSU5DNjBMRFF0OUM5MExEUmg5QzEwTG5SZ2RHQzBMTFFzQUlES28zTk1Bb0dCaXFGQXdJQ0V3VUFCRURZZk9pNjZqWEw2ZVk0a3Y5RmZmWHlnYmk3Y2RxOEtHYXZ3Tmp5a1B2V1FYZVF0dXcrT0h3eUFiOFlTZHlIaEcwbXBKbEp3cWN2SVl4eXhUVXZoSk9H</signature>
+        </printForm>
+        <purchaseObjectInfo>выполнение работ по ликвидации чрезвычайной ситуации в сельском поселении Старая Рачейка (аварийно-восстановительные работы по восстановлению системы водоснабжения).</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>01423000060</regNum>
+                <fullName>Администрация сельского поселения Старая Рачейка муниципального района Сызранский Самарской области</fullName>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 446050, Самарская обл, Сызранский р-н, Старая Рачейка с, Октябрьская, 60, -</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 446050, Самарская обл, Сызранский р-н, Старая Рачейка с, Октябрьская, 60, -</orgFactAddress>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>ZKBGP44</code>
+            <name>Запрос котировок в целях оказания гуманитарной помощи либо ликвидации последствий чрезвычайной ситуации природного или техногенного характера (в соответствии со Статьей 82 Федерального закона № 44-ФЗ)</name>
+        </placingWay>
+        <lot>
+            <maxPrice>63085.1</maxPrice>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <financeSource>бюджет сельского поселения</financeSource>
+            <quantityUndefined>false</quantityUndefined>
+            <customerRequirements>
+                <customerRequirement>
+                    <customer>
+                        <regNum>01423000060</regNum>
+                        <fullName>Администрация сельского поселения Старая Рачейка муниципального района Сызранский Самарской области</fullName>
+                    </customer>
+                    <maxPrice>63085.1</maxPrice>
+                    <deliveryPlace>Самарская область, Сызранский район, с. Старая Рачейка</deliveryPlace>
+                    <deliveryTerm>с 11.07.2014.  по 22.07.2014г.</deliveryTerm>
+                    <onesideRejection>в соответствии с муниципальным контрактом</onesideRejection>
+                </customerRequirement>
+            </customerRequirements>
+            <purchaseObjects>
+                <purchaseObject>
+                    <OKPD>
+                        <code>29.12.91.000</code>
+                        <name>Услуги по монтажу насосов и компрессоров</name>
+                    </OKPD>
+                    <name>аварийно-восстановительные работы по восстановлению системы водоснабжения</name>
+                    <OKEI>
+                        <code>383</code>
+                        <nationalCode>РУБ</nationalCode>
+                    </OKEI>
+                    <price>63085.1</price>
+                    <quantity>
+                        <value>1</value>
+                    </quantity>
+                    <sum>63085.1</sum>
+                </purchaseObject>
+                <totalSum>63085.1</totalSum>
+            </purchaseObjects>
+            <requirements>
+                <requirement>
+                    <code>8632410</code>
+                    <name>Единые требования к участникам (в соответствии  с пунктом 1 части 1 Статьи 31 Федерального закона № 44-ФЗ)</name>
+                </requirement>
+            </requirements>
+            <restrictInfo>в соответствии с муниципальным контрактом</restrictInfo>
+            <noPublicDiscussion>false</noPublicDiscussion>
+        </lot>
+        <protocolLot>
+
+            <execution>
+                <place>Российская Федерация, Самарская область, Сызранский район, с. Старая Рачейка, ул. Октябрьская,60</place>
+                <openingDate>2014-07-10T00:00:00+04:00</openingDate>
+                <scoringDate>2014-07-10T00:00:00+04:00</scoringDate>
+                <signDate>2014-07-10T00:00:00+04:00</signDate>
+            </execution>
+
+            <comission>
+                <commissionName>единая комиссия по определению поставщиков</commissionName>
+                <commissionMembers>
+                    <commissionMember>
+                        <memberNumber>1</memberNumber>
+                        <lastName>Прокопьев </lastName>
+                        <firstName>Владимир</firstName>
+                        <middleName>Петрович</middleName>
+                        <role>
+                            <id>27</id>
+                            <name>Председатель комиссии</name>
+                            <rightVote>true</rightVote>
+                        </role>
+                    </commissionMember>
+                    <commissionMember>
+                        <memberNumber>2</memberNumber>
+                        <lastName>Астафурова </lastName>
+                        <firstName>Людмила</firstName>
+                        <middleName>Павловна</middleName>
+                        <role>
+                            <id>28</id>
+                            <name>Член комиссии</name>
+                            <rightVote>true</rightVote>
+                        </role>
+                    </commissionMember>
+                    <commissionMember>
+                        <memberNumber>3</memberNumber>
+                        <lastName>Стулкова</lastName>
+                        <firstName>Ольга</firstName>
+                        <middleName>Ивановна</middleName>
+                        <role>
+                            <id>29</id>
+                            <name>Секретарь комиссии</name>
+                            <rightVote>true</rightVote>
+                        </role>
+                    </commissionMember>
+                    <spelledMembersCount>три</spelledMembersCount>
+                </commissionMembers>
+                <competent>true</competent>
+            </comission>
+
+            <applications>
+                <application>
+                    <journalNumber>1</journalNumber>
+                    <appDate>2014-07-09T11:00:00+04:00</appDate>
+                    <appParticipant>
+                        <participantType>U</participantType>
+                        <inn>6325020466</inn>
+                        <kpp>632501001</kpp>
+                        <legalForm>
+                            <code>12165</code>
+                            <singularName>Общество с ограниченной ответственностью</singularName>
+                        </legalForm>
+                        <organizationName>Общество с ограниченной ответственностью "Управляющая компания "Рачейка"</organizationName>
+                        <postAddress>446050, РФ, Самарская область, Сызранский район, с. Старая Рачейка, ул. Октябрьская, д.60</postAddress>
+                    </appParticipant>
+                    <price>63085.1</price>
+                    <spelledPrice>шестьдесят три тысячи восемьдесят пять рублей десять копеек</spelledPrice>
+                    <procent>100</procent>
+                    <admittedInfo>
+                        <resultType>WIN_OFFER</resultType>
+                        <appRating>1</appRating>
+                    </admittedInfo>
+                    <correspondencies>
+                        <correspondence>
+                            <compatible>false</compatible>
+                            <requirement>
+                                <code>8632410</code>
+                                <name>Единые требования к участникам (в соответствии  с пунктом 1 части 1 Статьи 31 Федерального закона № 44-ФЗ)</name>
+                            </requirement>
+                        </correspondence>
+                    </correspondencies>
+                    <overallValue>0.0</overallValue>
+                </application>
+
+            </applications>
+        </protocolLot>
+        <attachments />
+    </fcsProtocolZKBI>
+</export>
+

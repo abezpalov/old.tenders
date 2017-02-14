@@ -1,0 +1,156 @@
+<export>
+    <fcsNotificationEF schemeVersion="1.0">
+        <id>1494</id>
+        <purchaseNumber>0342100026514000928</purchaseNumber>
+        <docPublishDate>2014-01-10T14:15:30.565+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/ea44/view/common-info.html?noticeId=1494</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=1494</url>
+        </printForm>
+        <purchaseObjectInfo>Поставка бензина и дизельного топлива для нужд ФКУ "ГБ МСЭ по Самарской области" Минтруда России</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03421000265</regNum>
+                <fullName>Федеральное казенное учреждение "Главное бюро медико-социальной экспертизы по Самарской области" Министерства труда и социальной защиты Российской Федерации</fullName>
+                <postAddress>Российская Федерация, 443099, Самарская обл, Самара г, Фрунзе, 113, -</postAddress>
+                <factAddress>Российская Федерация, 443099, Самарская обл, Самара г, Фрунзе, 113, -</factAddress>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 443099, Самарская обл, Самара г, Фрунзе, 113, -</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 443099, Самарская обл, Самара г, Фрунзе, 113, -</orgFactAddress>
+                <contactPerson>
+                    <lastName>Алексеева</lastName>
+                    <firstName>Алена</firstName>
+                    <middleName>Викторовна</middleName>
+                </contactPerson>
+                <contactEMail>ljnlksv@rambler.ru</contactEMail>
+                <contactPhone>7-846-3321047</contactPhone>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>EA44</code>
+            <name>Электронный аукцион</name>
+        </placingWay>
+        <ETP>
+            <code>ETP_SBAST</code>
+            <name>ЗАО «Сбербанк-АСТ»</name>
+            <url>oos_interaction@sberbank-ast.ru</url>
+        </ETP>
+        <procedureInfo>
+            <collecting>
+                <startDate>2014-01-11T08:30:00+04:00</startDate>
+                <place>Направляется участником аукциона оператору электронной площадки</place>
+                <order>В соответствии со ст. 66 ФЗ № 44 от 05.04.2013г. "О КОНТРАКТНОЙ СИСТЕМЕ В СФЕРЕ ЗАКУПОК ТОВАРОВ, РАБОТ, УСЛУГ ДЛЯ ОБЕСПЕЧЕНИЯ ГОСУДАРСТВЕННЫХ И МУНИЦИПАЛЬНЫХ НУЖД"</order>
+                <endDate>2014-01-18T09:00:00+04:00</endDate>
+            </collecting>
+            <scoring>
+                <date>2014-01-21T00:00:00+04:00</date>
+            </scoring>
+            <bidding>
+                <date>2014-01-24T00:00:00+04:00</date>
+            </bidding>
+        </procedureInfo>
+        <lot>
+            <maxPrice>968142.5</maxPrice>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <financeSource>Федеральный бюджет</financeSource>
+            <quantityUndefined>false</quantityUndefined>
+            <customerRequirements>
+                <customerRequirement>
+                    <customer>
+                        <regNum>03421000265</regNum>
+                    </customer>
+                    <maxPrice>968142.5</maxPrice>
+                    <deliveryPlace>443099, г. Самара, ул. Фрунзе д. 113</deliveryPlace>
+                    <deliveryTerm>до 30.04.2014г.</deliveryTerm>
+                    <applicationGuarantee>
+                        <amount>9681.43</amount>
+                        <part>1.0</part>
+                        <procedureInfo>Денежные средства вносятся на лицевой счет 05421А75380</procedureInfo>
+                        <settlementAccount>40302810000001000006</settlementAccount>
+                        <personalAccount>05421А75380</personalAccount>
+                        <bik>043601001</bik>
+                    </applicationGuarantee>
+                    <contractGuarantee>
+                        <amount>48407.13</amount>
+                        <part>5.0</part>
+                        <procedureInfo>Денежные средства вносятся на лицевой счет 05421А75380</procedureInfo>
+                        <settlementAccount>40302810000001000006</settlementAccount>
+                        <personalAccount>05421А75380</personalAccount>
+                        <bik>043601001</bik>
+                    </contractGuarantee>
+                </customerRequirement>
+            </customerRequirements>
+            <purchaseObjects>
+                <purchaseObject>
+                    <OKPD>
+                        <code>23.20.11.230</code>
+                        <name>Топливо автомобильное для бензиновых двигателей с октановым числом не менее 95, но менее 98 </name>
+                    </OKPD>
+                    <name>Автомобильный бензин АИ-95</name>
+                    <OKEI>
+                        <code>112</code>
+                        <nationalCode>Л; ДМ3</nationalCode>
+                    </OKEI>
+                    <price>34.3</price>
+                    <quantity>
+                        <value>14000.0</value>
+                    </quantity>
+                    <sum>480200</sum>
+                </purchaseObject>
+                <purchaseObject>
+                    <OKPD>
+                        <code>23.20.15.221</code>
+                        <name>Топливо дизельное зимнее с содержанием серы не более 2000 мг/кг</name>
+                    </OKPD>
+                    <name>Дизельное топливо</name>
+                    <OKEI>
+                        <code>112</code>
+                        <nationalCode>Л; ДМ3</nationalCode>
+                    </OKEI>
+                    <price>34.53</price>
+                    <quantity>
+                        <value>8500.0</value>
+                    </quantity>
+                    <sum>293505</sum>
+                </purchaseObject>
+                <purchaseObject>
+                    <OKPD>
+                        <code>23.20.11.220</code>
+                        <name>Топливо автомобильное для бензиновых двигателей с октановым числом более 80, но менее 95</name>
+                    </OKPD>
+                    <name>Автомобильный бензин АИ-92</name>
+                    <OKEI>
+                        <code>112</code>
+                        <nationalCode>Л; ДМ3</nationalCode>
+                    </OKEI>
+                    <price>31.11</price>
+                    <quantity>
+                        <value>6250.0</value>
+                    </quantity>
+                    <sum>194437.5</sum>
+                </purchaseObject>
+                <totalSum>968142.5</totalSum>
+            </purchaseObjects>
+            <requirements>
+                <requirement>
+                    <code>8361040</code>
+                    <name>Единые требования к участникам (в соответствии  с частью 1 Статьи 31 Федерального закона № 44-ФЗ)</name>
+                </requirement>
+            </requirements>
+            <restrictInfo>Ограничения не установлены</restrictInfo>
+        </lot>
+        <attachments>
+            <attachment>
+                <fileName>Бензин АУКЦИОН.doc</fileName>
+                <docDescription>Бензин АУКЦИОН</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=EF978AA6F3B0008CE043AC1107252749</url>
+            </attachment>
+        </attachments>
+    </fcsNotificationEF>
+</export>
+

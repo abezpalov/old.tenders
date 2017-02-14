@@ -4,366 +4,518 @@ from django.template import RequestContext, loader
 import math
 
 
-# Updater
-
 def updaters(request):
 	"Представление: список загрузчиков."
 
-	# Импортируем
 	from tenders.models import Updater
 
-	# Проверяем права доступа
 	if request.user.has_perm('tenders.add_updater')\
 	or request.user.has_perm('tenders.change_updater')\
 	or request.user.has_perm('tenders.delete_updater'):
 
-		# Получаем список
 		updaters = Updater.objects.select_related().all().order_by('name')
 
 	return render(request, 'tenders/updaters.html', locals())
 
 
-def ajaxGetUpdater(request):
-	"AJAX-представление: Get Updater."
-
-	# Импортируем
-	import json
-	from tenders.models import Updater
-
-	# Проверяем тип запроса
-	if (not request.is_ajax()) or (request.method != 'POST'):
-		return HttpResponse(status=400)
-
-	# Проверяем права доступа
-	if not request.user.has_perm('tenders.change_updater'):
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка 403: отказано в доступе.'}
-		return HttpResponse(json.dumps(result), 'application/javascript')
-
-	# Получаем объект
-	try:
-		updater = Updater.objects.get(id = request.POST.get('updater_id'))
-
-		result = {
-			'status':           'success',
-			'message':          'Данные загрузчика получены.',
-			'updater_id':       updater.id,
-			'updater_name':     updater.name,
-			'updater_alias':    updater.alias,
-			'updater_login':    updater.login,
-			'updater_password': updater.password,
-			'updater_state':    updater.state}
-
-	except Updater.DoesNotExist:
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка: загрузчик отсутствует в базе.'}
-
-	return HttpResponse(json.dumps(result), 'application/javascript')
-
-
-def ajaxSaveUpdater(request):
-	"AJAX-представление: Save Updater."
-
-	# Импортируем
-	import json
-	import unidecode
-	from django.utils import timezone
-	from tenders.models import Updater
-
-	# Проверяем тип запроса
-	if (not request.is_ajax()) or (request.method != 'POST'):
-		return HttpResponse(status = 400)
-
-	# Проверяем права доступа
-	try:
-		updater = Updater.objects.select_related().get(id = request.POST.get('updater_id'))
-		if not request.user.has_perm('tenders.change_updater'):
-			return HttpResponse(status = 403)
-	except Updater.DoesNotExist:
-		updater = Updater()
-		if not request.user.has_perm('tenders.add_updater'):
-			return HttpResponse(status = 403)
-		updater.created = timezone.now()
-
-	# name
-	if not request.POST.get('updater_name').strip():
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка: отсутствует наименование загрузчика.'}
-		return HttpResponse(json.dumps(result), 'application/javascript')
-	updater.name   = request.POST.get('updater_name').strip()[:100]
-
-	# alias
-	if request.POST.get('updater_alias').strip():
-		updater.alias = unidecode.unidecode(request.POST.get('updater_alias')).strip()[:100]
-	else:
-		updater.alias = unidecode.unidecode(request.POST.get('updater_name')).strip()[:100]
-
-	# login
-	if request.POST.get('updater_login').strip():
-		updater.login = request.POST.get('updater_login').strip()
-	else:
-		updater.login = ''
-
-	# password
-	if request.POST.get('updater_password').strip():
-		updater.password = request.POST.get('updater_password').strip()
-	else:
-		updater.password = ''
-
-	# state
-	if request.POST.get('updater_state') == 'true':
-		updater.state = True
-	else:
-		updater.state = False
-
-	# modified
-	updater.modified = timezone.now()
-
-	# Сохраняем
-	updater.save()
-
-	# Возвращаем ответ
-	result = {
-		'status': 'success',
-		'message': 'Загрузчик {} сохранён.'.format(updater.name)}
-
-	return HttpResponse(json.dumps(result), 'application/javascript')
-
-
-def ajaxSwitchUpdaterState(request):
-	"AJAX-представление: Switch Updater State."
-
-	# Импортируем
-	import json
-	from datetime import datetime
-	from tenders.models import Updater
-
-	# Проверяем тип запроса
-	if (not request.is_ajax()) or (request.method != 'POST'):
-		return HttpResponse(status=400)
-
-	# Проверяем права доступа
-	if not request.user.has_perm('tenders.change_updater'):
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка 403: отказано в доступе.'}
-		return HttpResponse(json.dumps(result), 'application/javascript')
-
-	# Проверяем корректность вводных данных
-	if not request.POST.get('updater_id') or not request.POST.get('updater_state'):
-		result = {'status': 'warning', 'message': 'Пожалуй, вводные данные не корректны.'}
-	else:
-		try:
-			updater = Updater.objects.select_related().get(id=request.POST.get('updater_id'))
-			if request.POST.get('updater_state') == 'true':
-				updater.state = True
-			else:
-				updater.state = False
-			updater.save()
-			result = {'status': 'success', 'message': 'Статус загрузчика {} изменен на {}.'.format(updater.name, updater.state)}
-		except Updater.DoesNotExist:
-			result = {'status': 'alert', 'message': 'Загрузчик с идентификатором {} отсутствует в базе.'.format(request.POST.get('updater_id'))}
-
-	# Возвращаем ответ
-	return HttpResponse(json.dumps(result), 'application/javascript')
-
-
-# TODO Source
-
-
-# TODO Country
-
-
-# Region
-
 
 def regions(request):
-	"Представление: список загрузчиков."
+	"Представление: список регионов."
 
-	# Импортируем
-	from tenders.models import Region, Country
+	from tenders.models import Region
 
-	# Проверяем права доступа
 	if request.user.has_perm('tenders.add_region')\
 	or request.user.has_perm('tenders.change_region')\
 	or request.user.has_perm('tenders.delete_region'):
 
-		# Получаем списки объектов
-		regions   = Region.objects.select_related().all()
-		countries = Country.objects.select_related().all()
+		regions = Region.objects.all()
 
 	return render(request, 'tenders/regions.html', locals())
 
 
-def ajaxGetRegion(request):
-	"AJAX-представление: Get Region."
+
+def regionkeys(request, updater_selected = 'all', region_selected = 'all'):
+	"Представление: список синонимов (внешних ключей) регионов."
+
+	from tenders.models import RegionKey, Region, Updater
+
+	if updater_selected != 'all':
+		updater_selected = int(updater_selected)
+	if region_selected != 'all':
+		region_selected = int(region_selected)
+
+	if request.user.has_perm('tenders.add_regionkey')\
+	or request.user.has_perm('tenders.change_regionkey')\
+	or request.user.has_perm('tenders.delete_regionkey'):
+
+		regionkeys = RegionKey.objects.select_related().all()
+
+		if updater_selected and updater_selected != 'all':
+			regionkeys = regionkey.filter(updater = updater_selected)
+		if not updater_selected:
+			regionkeys = regionkeys.filter(updater = None)
+
+		if region_selected and region_selected != 'all':
+			regionkeys = regionkeys.filter(region = region_selected)
+		if not vendor_selected:
+			regionkeys = regionkeys.filter(region = None)
+
+		updaters = Updater.objects.all()
+		regions = Region.objects.all()
+
+	return render(request, 'tenders/regionkeys.html', locals())
+
+
+
+def essences(request):
+	"Представление: список справочников."
 
 	# Импортируем
-	import json
-	from tenders.models import Region
+	# TODO from tenders.models import Essence
 
-	# Проверяем тип запроса
+	# Получаем количество объектов
+	# TODO essences = Essence.objects.select_related().all()
+
+	return render(request, 'tenders/essences.html', locals())
+
+
+
+def ajax_get(request, *args, **kwargs):
+	"AJAX-представление: Get Object."
+
+	import json
+	import tenders.models
+
+	model = tenders.models.models[kwargs['model_name']]
+
 	if (not request.is_ajax()) or (request.method != 'POST'):
 		return HttpResponse(status=400)
 
-	# Проверяем права доступа
-	if not request.user.has_perm('tenders.change_region')\
-	and not request.user.has_perm('tenders.delete_region'):
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка 403: отказано в доступе.'}
-		return HttpResponse(json.dumps(result), 'application/javascript')
+	if not request.user.has_perm('tenders.change_{}'.format(kwargs['model_name']))\
+	or not request.user.has_perm('tenders.delete_{}'.format(kwargs['model_name'])):
+		return HttpResponse(status = 403)
 
-	# Получаем объект
 	try:
-		r = Region.objects.select_related().get(id = request.POST.get('region_id'))
-
-		region = {}
-		region['id']        = r.id
-		region['name']      = r.name
-		region['full_name'] = r.full_name
-		region['alias']     = r.alias
-		region['state']     = r.state
-
-		if r.country:
-			region['country'] = {}
-			region['country']['id']    = r.country.id
-			region['country']['name']  = r.counry.name
-			region['country']['alias'] = r.counry.alias
-			region['country']['state'] = r.counry.state
-		else:
-			region['country'] = {}
-			region['country']['id'] = 0
-			region['country']['name']  = ''
-			region['country']['alias'] = ''
-			region['country']['state'] = ''
+		m = model.objects.get(id = request.POST.get('id'))
 
 		result = {
-			'status':  'success',
-			'message': 'Данные региона получены.',
-			'region':  region}
+			'status'             : 'success',
+			kwargs['model_name'] : m.get_dicted()}
 
-	except Region.DoesNotExist:
+	except model.DoesNotExist:
 		result = {
-			'status': 'alert',
-			'message': 'Ошибка: регион отсутствует в базе.'}
+			'status'  : 'alert',
+			'message' : 'Ошибка: объект отсутствует в базе.',
+			'id'      : request.POST.get('id')}
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-def ajaxSaveRegion(request):
-	"AJAX-представление: Save Region."
+def ajax_save(request, *args, **kwargs):
+	"AJAX-представление: Save Object."
 
-	# Импортируем
 	import json
-	import unidecode
 	from django.utils import timezone
-	from tenders.models import Region, Country
+	import tenders.models
 
-	# Проверяем тип запроса
+	model = tenders.models.models[kwargs['model_name']]
+
+	result = {
+		'status' : 'success',
+		'reload' : False}
+
 	if (not request.is_ajax()) or (request.method != 'POST'):
 		return HttpResponse(status = 400)
 
-	# Проверяем права доступа
 	try:
-		region = Region.objects.get(id = request.POST.get('region_id'))
-		if not request.user.has_perm('tenders.change_region'):
+		o = model.objects.get(id = request.POST.get('id'))
+		if not request.user.has_perm('tenders.change_{}'.format(kwargs['model_name'])):
 			return HttpResponse(status = 403)
-	except Region.DoesNotExist:
-		region = Region()
-		if not request.user.has_perm('tenders.add_region'):
+	except model.DoesNotExist:
+		o = model()
+		result['reload'] = True
+		if not request.user.has_perm('tenders.add_{}'.format(kwargs['model_name'])):
 			return HttpResponse(status = 403)
-		region.created = timezone.now()
+		o.created = timezone.now()
 
-	# name
-	if not request.POST.get('region_name').strip():
-		result = {
-			'status': 'alert',
-			'message': 'Ошибка: отсутствует наименование.'}
-		return HttpResponse(json.dumps(result), 'application/javascript')
-	region.name   = request.POST.get('region_name').strip()[:100]
+	for key in request.POST:
 
-	# full_name
-	if request.POST.get('region_full_name').strip():
-		region.full_name = request.POST.get('region_full_name').strip()[:100]
-	else:
-		region.full_name = request.POST.get('region_name').strip()[:100]
+		if key == 'name':
+			if request.POST.get('name', '').strip():
+				o.name = request.POST.get('name').strip()
+			else:
+				break
 
-	# alias
-	if request.POST.get('region_alias').strip():
-		region.alias = unidecode.unidecode(request.POST.get('region_alias')).strip()[:100]
-	else:
-		region.alias = unidecode.unidecode(request.POST.get('region_name')).strip()[:100]
+			if request.POST.get('alias', '').strip():
+				o.alias = fix_alias(request.POST.get('alias'), model_name = kwargs['model_name'])
+			else:
+				o.alias = fix_alias(request.POST.get(key))
 
-	# country
-	try:
-		region.country = Country.objects.get(id = request.POST.get('region_country_id'))
-	except Country.DoesNotExist:
-		region.country = None
+			if request.POST.get('name_search', '').strip():
+				o.name_search = request.POST.get('name_search')[:512]
+			else:
+				o.name_search = request.POST.get(key)[:512]
 
-	# state
-	if request.POST.get('region_state') == 'true':
-		region.state = True
-	else:
-		region.state = False
+			if request.POST.get('full_name', '').strip():
+				o.full_name = request.POST.get('full_name').strip()
+			else:
+				o.name = request.POST.get(key)[:512]
 
-	# modified
-	region.modified = timezone.now()
+			if request.POST.get('name_short', '').strip():
+				o.name_short = request.POST.get('name_short')[:100]
+			else:
+				o.name_short = request.POST.get(key)[:100]
 
-	# Сохраняем
-	region.save()
+			if request.POST.get('name_short_xml', '').strip():
+				o.name_short_xml = request.POST.get('name_short_xml')[:100]
+			else:
+				o.name_short_xml = request.POST.get(key)[:100]
 
-	# Возвращаем ответ
-	result = {
-		'status': 'success',
-		'message': 'Регион {} сохранён.'.format(region.name)}
+		elif key == 'article':
+			o.article = request.POST.get('article', '').strip()[:100]
+
+		elif key == 'description':
+			o.description = request.POST.get(key, '').strip()
+
+		elif key == 'login':
+			o.login = request.POST.get(key, '').strip()
+
+		elif key == 'password':
+			o.password = request.POST.get(key, '').strip()
+
+		elif key == 'state':
+			if 'true' == request.POST.get(key, 'true'):
+				o.state = True
+			else:
+				o.state = False
+
+		elif key == 'delivery_time_min':
+			try:
+				o.delivery_time_min = int(request.POST.get(key, 0))
+			except Exception:
+				o.delivery_time_min = 0
+
+		elif key == 'delivery_time_max':
+			try:
+				o.delivery_time_max = int(request.POST.get(key, 0))
+			except Exception:
+				o.delivery_time_max = 0
+
+		elif key == 'order':
+			try:
+				o.order = int(request.POST.get(key, 0))
+			except Exception:
+				o.order = 0
+
+		elif key == 'rate':
+			try:
+				o.rate = float(request.POST.get(key).strip().replace(',', '.').replace(' ', ''))
+			except Exception:
+				o.rate = 1.0
+
+		elif key == 'quantity' and kwargs['model_name'] == 'currency':
+			try:
+				o.quantity = float(request.POST.get(key).strip().replace(',', '.').replace(' ', ''))
+			except Exception:
+				o.quantity = 1.0
+
+		elif key == 'multiplier':
+			try:
+				o.multiplier = float(request.POST.get(key).strip().replace(',', '.').replace(' ', ''))
+			except Exception:
+				o.multiplier = 1.0
+
+		elif key == 'updater_id':
+			try:
+				m = catalog.models.models['updater']
+				o.updater = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.updater = None
+
+		elif key == 'unit_id':
+			try:
+				m = catalog.models.models['unit']
+				o.unit = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.unit = None
+
+		elif key == 'distributor_id':
+			try:
+				m = catalog.models.models['distributor']
+				o.distributor = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.distributor = None
+
+		elif key == 'vendor_id':
+			try:
+				m = catalog.models.models['vendor']
+				o.vendor = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.vendor = None
+
+		elif key == 'category_id':
+
+			old_category = o.category
+
+			try:
+				m = catalog.models.models['category']
+				o.category = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.category = None
+
+			if o.category != old_category:
+				result['reload'] = True
+
+		elif key == 'parent_id' and kwargs['model_name'] == 'category':
+
+			from django.db.models import Max
+
+			old_parent = o.parent
+
+			try:
+				m = catalog.models.models[kwargs['model_name']]
+				o.parent = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.parent = None
+				o.level = 0
+
+			else:
+
+				childs = []
+				childs = m.objects.getCategoryTree(childs, o)
+
+				if o.parent in childs:
+					o.parent = None
+					o.level = 0
+				else:
+					o.level = o.parent.level + 1
+
+			if o.parent != old_parent:
+				result['reload'] = True
+
+			o.order = m.objects.filter(parent = o.parent).aggregate(Max('order'))['order__max']
+
+			if o.order is None:
+				o.order = 0
+			else:
+				o.order += 1
+
+			if o.parent:
+				o.path = "{}{}/".format(o.parent.path, o.id)
+			else:
+				o.path = "/{}/".format(o.id)
+
+		elif key == 'duble_id' and kwargs['model_name'] == 'product':
+			try:
+				m = catalog.models.models[kwargs['model_name']]
+				o.duble = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.duble = None
+
+		elif key == 'parametertype_id':
+			result['parametertype_id'] = request.POST.get(key, '')
+			try:
+				m = catalog.models.models['parametertype']
+				o.parametertype = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.parametertype = None
+
+		elif key == 'parameter_id':
+			try:
+				m = catalog.models.models['parameter']
+				o.parameter = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.parameter = None
+
+		elif key == 'parametervalue_id':
+			try:
+				m = catalog.models.models['parametervalue']
+				o.parametervalue = m.objects.get(id = request.POST.get(key, ''))
+			except Exception:
+				o.parametervalue = None
+
+	o.modified = timezone.now()
+	o.save()
+
+	result[kwargs['model_name']] = o.get_dicted()
 
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
-def ajaxSwitchRegionState(request):
-	"AJAX-представление: Switch Region State."
+def ajax_switch_state(request, *args, **kwargs):
+	"AJAX-представление: Switch State."
 
-	# Импортируем
 	import json
-	from datetime import datetime
-	from tenders.models import Region
+	from django.utils import timezone
+	import catalog.models
 
-	# Проверяем тип запроса
+	model = catalog.models.models[kwargs['model_name']]
+
 	if (not request.is_ajax()) or (request.method != 'POST'):
 		return HttpResponse(status=400)
 
-	# Проверяем права доступа
-	if not request.user.has_perm('tenders.change_region'):
+	if not request.user.has_perm('catalog.change_{}'.format(kwargs['model_name'])):
+		return HttpResponse(status=403)
+
+	try:
+		o = model.objects.get(id = request.POST.get('id'))
+	except Exception:
+		result = {
+			'status'  : 'alert',
+			'message' : 'Объект с идентификатором {} отсутствует в базе.'.format(
+				request.POST.get('id'))}
+		return HttpResponse(json.dumps(result), 'application/javascript')
+	else:
+		if 'true' == request.POST.get('state'):
+			o.state = True
+		else:
+			o.state = False
+		o.modified = timezone.now()
+		o.save()
+
+		result = {
+			'status'             : 'success',
+			kwargs['model_name'] : o.get_dicted()}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajax_delete(request, *args, **kwargs):
+	"AJAX-представление: Delete Object."
+
+	import json
+	import catalog.models
+
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status = 400)
+
+	if not request.user.has_perm('catalog.delete_{}'.format(kwargs['model_name'])):
+		return HttpResponse(status = 403)
+
+	model = catalog.models.models[kwargs['model_name']]
+
+	try:
+		m = model.objects.get(id = request.POST.get('id'))
+	except Exception:
+		result = {
+			'status'  : 'alert',
+			'message' : 'Ошибка: объект отсутствует в базе.',
+			'id'      : request.POST.get('id')}
+	else:
+		m.delete()
+		result = {
+			'status' : 'success',
+			'id'     : request.POST.get('id')}
+
+	return HttpResponse(json.dumps(result), 'application/javascript')
+
+
+def ajax_link_same_foreign(request, *args, **kwargs):
+	"AJAX-представление: Link Model to Same Foreign."
+
+	import json
+	from django.utils import timezone
+	import catalog.models
+
+	if (not request.is_ajax()) or (request.method != 'POST'):
+		return HttpResponse(status=400)
+
+	if not request.user.has_perm('catalog.change_{}'.format(kwargs['model_name']))\
+	or not request.user.has_perm('catalog.add_{}'.format(kwargs['model_name'])):
+		return HttpResponse(status = 403)
+
+	model   = catalog.models.models[kwargs['model_name']]
+	foreign = catalog.models.models[kwargs['foreign_name']]
+
+	try:
+		o = model.objects.get(id = request.POST.get('id'))
+	except Exception:
 		result = {
 			'status': 'alert',
-			'message': 'Ошибка 403: отказано в доступе.'}
+			'message': 'Ошибка: объект отсутствует в базе.'}
 		return HttpResponse(json.dumps(result), 'application/javascript')
 
-	# Проверяем корректность вводных данных
-	try:
-		region = Region.objects.get(id = request.POST.get('region_id'))
-		if request.POST.get('region_state') == 'true':
-			region.state = True
-		else:
-			region.state = False
-		region.save()
-		result = {'status': 'success', 'message': 'Статус региона {} изменен на {}.'.format(region.name, region.state)}
-	except Region.DoesNotExist:
-		result = {'status': 'alert', 'message': 'Загрузчик с идентификатором {} отсутствует в базе.'.format(request.POST.get('region_id'))}
+	name = o.name
 
-	# Возвращаем ответ
+	alias = fix_alias(name)
+
+	try:
+		f = foreign.objects.get(alias = alias)
+	except Exception:
+		f = foreign()
+		f.name = name
+		f.alias = alias
+		f.created = timezone.now()
+		f.modified = timezone.now()
+		if kwargs['foreign_name'] == 'parametervalue':
+			f.order = 0
+			f.parameter = o.parameter
+
+		f.save()
+
+	if kwargs['foreign_name'] == 'vendor':
+		o.vendor   = f
+	elif kwargs['foreign_name'] == 'category':
+		o.category = f
+	elif kwargs['foreign_name'] == 'parameter':
+		o.parameter = f
+	elif kwargs['foreign_name'] == 'parametervalue':
+		o.parametervalue = f
+
+	o.modified = timezone.now()
+	o.save()
+
+	result = {
+		'status'               : 'success',
+		kwargs['model_name']   : o.get_dicted(),
+		kwargs['foreign_name'] : foreign.objects.get_all_dicted()
+	}
+
 	return HttpResponse(json.dumps(result), 'application/javascript')
 
 
 
-# TODO Currency
-# TODO OKEI Section
-# TODO OKEI Group
 
+
+
+def fix_alias(alias, model_name = None):
+
+	import unidecode
+
+	if model_name == 'currency':
+		alias = alias.upper()
+	else:
+		alias = alias.lower()
+
+	alias = unidecode.unidecode(alias)
+
+	alias = alias.replace(' ', '-')
+	alias = alias.replace('&', 'and')
+	alias = alias.replace('\'', '')
+	alias = alias.replace('(', '')
+	alias = alias.replace(')', '')
+
+	alias = alias.strip()[:100]
+
+	return alias
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#########################
+# TODO Need refactoring #
+#########################
 
 # OKEI
 def OKEIs(request):
@@ -1394,13 +1546,4 @@ def ajaxSwitchQueryFilterPublic(request):
 
 
 # Essences
-def essences(request):
-	"Представление: список справочников."
 
-	# Импортируем
-	# TODO from tenders.models import Essence
-
-	# Получаем количество объектов
-	# TODO essences = Essence.objects.select_related().all()
-
-	return render(request, 'tenders/essences.html', locals())

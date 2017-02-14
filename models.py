@@ -127,30 +127,29 @@ class Source(models.Model):
 class RegionManager(models.Manager):
 
 
-	def take(self, alias, **kwargs):
+	def get_all_dicted(self):
+		result = []
+		for o in self.all():
+			result.append(o.get_dicted())
+		return result
 
-		if not alias:
-			return False
+	def get_by_key(self, updater, key):
 
-		try:
-			o = self.get(alias = alias)
+		if not updater or not key:
+			return None
 
-		except Region.DoesNotExist:
-			o = Region()
-			o.alias     = alias[:50]
-			o.name      = kwargs.get('name',      None)
-			o.full_name = kwargs.get('full_name', None)
-			o.save()
+		key = RegionKey.objects.take(updater = updater, key = key)
 
-		return o
-
+		if key:
+			return key.region
+		else:
+			return None
 
 
 class Region(models.Model):
 
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 
-	alias     = models.CharField(max_length = 50, unique = True)
 	name      = models.TextField(null = True, default = None)
 	full_name = models.TextField(null = True, default = None)
 
@@ -160,13 +159,73 @@ class Region(models.Model):
 
 	objects   = RegionManager()
 
-	
+
+	def get_dicted(self):
+
+		result = {}
+
+		result['id']                = str(self.id)
+		result['name']              = self.name
+		result['full_name']         = self.full_name
+		result['state']             = self.state
+		result['created']           = str(self.created)
+		result['modified']          = str(self.modified)
+
+		return result
+
+
 	def __str__(self):
 		return "{}".format(self.name)
 
 
 	class Meta:
 		ordering = ['name']
+
+
+
+class RegionKeyManager(models.Manager):
+
+
+	def take(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		try:
+			o = self.select_related().get(updater = updater, key = key)
+
+		except RegionKey.DoesNotExist:
+
+			o = RegionKey()
+			o.updater = updater
+			o.key = key
+			o.save()
+
+		return o
+
+
+
+class RegionKey(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
+	region   = models.ForeignKey(Region,  related_name='+', on_delete = models.CASCADE)
+
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+
+	state       = models.BooleanField(default = True, db_index = True)
+	created     = models.DateTimeField(default = timezone.now, db_index = True)
+	modified    = models.DateTimeField(default = timezone.now, db_index = True)
+
+	objects  = RegionKeyManager()
+
+	def __str__(self):
+		return "{}".format(self.key)
+
+	class Meta:
+		db_table        = 'tenders_region_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -466,7 +525,7 @@ class OKEIManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKEI.DoesNotExist:
 			o = OKEI()
@@ -573,23 +632,23 @@ class OKEI(models.Model):
 
 
 
-class OKEIExtKeyManager(models.Manager):
+class OKEIKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okei = None):
+	def take(self, updater, key, okei = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKEIExtKey.DoesNotExist:
+		except OKEIKey.DoesNotExist:
 
 			if okei:
-				o = OKEIExtKey()
+				o = OKEIKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okei    = okei
 				o.save()
 			else:
@@ -598,14 +657,14 @@ class OKEIExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okei):
+	def write(self, updater, key, okei):
 
-		if not updater or not ext_key or not okei:
+		if not updater or not key or not okei:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okei)
+		o = self.take(updater, key, okei)
 
 		if o.okei != okei:
 			o.okei = okei
@@ -619,27 +678,27 @@ class OKEIExtKeyManager(models.Manager):
 
 
 
-class OKEIExtKey(models.Model):
+class OKEIKey(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okei     = models.ForeignKey(OKEI,    related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKEIExtKeyManager()
+	objects  = OKEIKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okei_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okei_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -652,7 +711,7 @@ class KOSGUManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except KOSGU.DoesNotExist:
 			o          = KOSGU()
@@ -723,7 +782,7 @@ class OKOPFManager(models.Manager):
 		if not code:
 			return None
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 		except OKOPF.DoesNotExist:
 			o = OKOPF()
 			o.code          = code[:10]
@@ -799,7 +858,7 @@ class OKDPManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKDP.DoesNotExist:
 			o = OKDP()
@@ -840,6 +899,19 @@ class OKDPManager(models.Manager):
 		return o
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OKDPKey.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.okdp
+		else:
+			return None
+
+
 
 class OKDP(models.Model):
 
@@ -862,23 +934,23 @@ class OKDP(models.Model):
 		ordering = ['code']
 
 
-class OKDPExtKeyManager(models.Manager):
+class OKDPKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okdp = None):
+	def take(self, updater, key, okdp = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKDPExtKey.DoesNotExist:
+		except OKDPKey.DoesNotExist:
 
 			if okdp:
-				o = OKDPExtKey()
+				o = OKDPKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okdp    = okdp
 				o.save()
 			else:
@@ -887,14 +959,14 @@ class OKDPExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okdp):
+	def write(self, updater, key, okdp):
 
-		if not updater or not ext_key or not okdp:
+		if not updater or not key or not okdp:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okdp)
+		o = self.take(updater, key, okdp)
 
 		if o.okdp != okdp:
 			o.okdp = okdp
@@ -908,27 +980,27 @@ class OKDPExtKeyManager(models.Manager):
 
 
 
-class OKDPExtKey(models.Model):
+class OKDPKey(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okdp     = models.ForeignKey(OKDP,    related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKDPExtKeyManager()
+	objects  = OKDPKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okdp_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okdp_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -941,7 +1013,7 @@ class OKPDManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKPD.DoesNotExist:
 			o = OKPD()
@@ -983,6 +1055,19 @@ class OKPDManager(models.Manager):
 
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OKPDKey.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.okpd
+		else:
+			return None
+
+
 class OKPD(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
@@ -1004,23 +1089,23 @@ class OKPD(models.Model):
 		ordering = ['code']
 
 
-class OKPDExtKeyManager(models.Manager):
+class OKPDKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okpd = None):
+	def take(self, updater, key, okpd = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKPDExtKey.DoesNotExist:
+		except OKPDKey.DoesNotExist:
 
 			if okpd:
-				o = OKPDExtKey()
+				o = OKPDKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okpd    = okpd
 				o.save()
 			else:
@@ -1029,14 +1114,14 @@ class OKPDExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okpd):
+	def write(self, updater, key, okpd):
 
-		if not updater or not ext_key or not okpd:
+		if not updater or not key or not okpd:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okpd)
+		o = self.take(updater, key, okpd)
 
 		if o.okpd != okpd:
 			o.okpd = okpd
@@ -1050,27 +1135,27 @@ class OKPDExtKeyManager(models.Manager):
 
 
 
-class OKPDExtKey(models.Model):
+class OKPDKey(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okpd     = models.ForeignKey(OKPD,    related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKPDExtKeyManager()
+	objects  = OKPDKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okpd_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okpd_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -1083,7 +1168,7 @@ class OKPD2Manager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKPD2.DoesNotExist:
 			o = OKPD2()
@@ -1124,6 +1209,18 @@ class OKPD2Manager(models.Manager):
 		return o
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OKPD2Key.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.okpd2
+		else:
+			return None
+
 
 class OKPD2(models.Model):
 
@@ -1147,23 +1244,23 @@ class OKPD2(models.Model):
 
 
 
-class OKPD2ExtKeyManager(models.Manager):
+class OKPD2KeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okpd2 = None):
+	def take(self, updater, key, okpd2 = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKPD2ExtKey.DoesNotExist:
+		except OKPD2Key.DoesNotExist:
 
 			if okpd2:
-				o = OKPD2ExtKey()
+				o = OKPD2Key()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okpd2   = okpd2
 				o.save()
 			else:
@@ -1172,14 +1269,14 @@ class OKPD2ExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okpd2):
+	def write(self, updater, key, okpd2):
 
-		if not updater or not ext_key or not okpd2:
+		if not updater or not key or not okpd2:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okpd2)
+		o = self.take(updater, key, okpd2)
 
 		if o.okpd2 != okpd2:
 			o.okpd2 = okpd2
@@ -1193,27 +1290,27 @@ class OKPD2ExtKeyManager(models.Manager):
 
 
 
-class OKPD2ExtKey(models.Model):
+class OKPD2Key(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okpd2    = models.ForeignKey(OKPD2,   related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKPD2ExtKeyManager()
+	objects  = OKPD2KeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okpd2_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okpd2_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -1226,7 +1323,7 @@ class OKTMOManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKTMO.DoesNotExist:
 			o = OKTMO()
@@ -1299,7 +1396,7 @@ class OKATOManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKATO.DoesNotExist:
 			o = OKATO()
@@ -1363,23 +1460,23 @@ class OKATO(models.Model):
 
 
 
-class OKATOExtKeyManager(models.Manager):
+class OKATOKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okato = None):
+	def take(self, updater, key, okato = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKATOExtKey.DoesNotExist:
+		except OKATOKey.DoesNotExist:
 
 			if okato:
-				o = OKATOExtKey()
+				o = OKATOKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okato   = okato
 				o.save()
 			else:
@@ -1388,14 +1485,14 @@ class OKATOExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okato):
+	def write(self, updater, key, okato):
 
-		if not updater or not ext_key or not okato:
+		if not updater or not key or not okato:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okato)
+		o = self.take(updater, key, okato)
 
 		if o.okato != okato:
 			o.okato = okato
@@ -1409,27 +1506,27 @@ class OKATOExtKeyManager(models.Manager):
 
 
 
-class OKATOExtKey(models.Model):
+class OKATOKey(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okato    = models.ForeignKey(OKATO,   related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKATOExtKeyManager()
+	objects  = OKATOKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okato_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okato_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -1563,7 +1660,7 @@ class OKVEDManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKVED.DoesNotExist:
 			o = OKVED()
@@ -1618,6 +1715,19 @@ class OKVEDManager(models.Manager):
 
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OKVEDKey.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.okved
+		else:
+			return None
+
+
 class OKVED(models.Model):
 
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
@@ -1642,23 +1752,23 @@ class OKVED(models.Model):
 
 
 
-class OKVEDExtKeyManager(models.Manager):
+class OKVEDKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okved = None):
+	def take(self, updater, key, okved = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKVEDExtKey.DoesNotExist:
+		except OKVEDKey.DoesNotExist:
 
 			if okved:
-				o = OKVEDExtKey()
+				o = OKVEDKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okved   = okved
 				o.save()
 			else:
@@ -1667,14 +1777,14 @@ class OKVEDExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okved):
+	def write(self, updater, key, okved):
 
-		if not updater or not ext_key or not okved:
+		if not updater or not key or not okved:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okved)
+		o = self.take(updater, key, okved)
 
 		if o.okved != okved:
 			o.okved = okved
@@ -1688,27 +1798,27 @@ class OKVEDExtKeyManager(models.Manager):
 
 
 
-class OKVEDExtKey(models.Model):
+class OKVEDKey(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okved    = models.ForeignKey(OKVED,   related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKVEDExtKeyManager()
+	objects  = OKVEDKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okved_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okved_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -1786,7 +1896,7 @@ class OKVED2Manager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except OKVED2.DoesNotExist:
 			o = OKVED2()
@@ -1837,6 +1947,18 @@ class OKVED2Manager(models.Manager):
 		return o
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OKVED2Key.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.okved2
+		else:
+			return None
+
 
 class OKVED2(models.Model):
 
@@ -1862,23 +1984,23 @@ class OKVED2(models.Model):
 
 
 
-class OKVED2ExtKeyManager(models.Manager):
+class OKVED2KeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, okved2 = None):
+	def take(self, updater, key, okved2 = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OKVED2ExtKey.DoesNotExist:
+		except OKVED2Key.DoesNotExist:
 
 			if okved2:
-				o = OKVED2ExtKey()
+				o = OKVED2Key()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.okved2  = okved2
 				o.save()
 			else:
@@ -1887,14 +2009,14 @@ class OKVED2ExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, okved2):
+	def write(self, updater, key, okved2):
 
-		if not updater or not ext_key or not okved2:
+		if not updater or not key or not okved2:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, okved2)
+		o = self.take(updater, key, okved2)
 
 		if o.okved2 != okved2:
 			o.okved2 = okved2
@@ -1908,27 +2030,27 @@ class OKVED2ExtKeyManager(models.Manager):
 
 
 
-class OKVED2ExtKey(models.Model):
+class OKVED2Key(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater  = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	okved2   = models.ForeignKey(OKVED2,  related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OKVED2ExtKeyManager()
+	objects  = OKVED2KeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_okved2_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_okved2_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -2057,7 +2179,7 @@ class BudgetTypeManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 
 		except BudgetType.DoesNotExist:
 			o = BudgetType()
@@ -2337,6 +2459,46 @@ class Email(models.Model):
 
 
 
+class URLManager(models.Manager):
+
+	def take(self, url, **kwargs):
+
+		if not url:
+			return None
+
+		try:
+			o = self.get(url = url)
+
+		except URL.DoesNotExist:
+			o = URL()
+			o.url = url
+			o.state = kwargs.get('state', True)
+			o.save()
+
+		return o
+
+
+
+class URL(models.Model):
+
+	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
+	url      = models.TextField(unique = True)
+
+	state    = models.BooleanField(default = True, db_index = True)
+	created  = models.DateTimeField(default = timezone.now, db_index = True)
+	modified = models.DateTimeField(default = timezone.now, db_index = True)
+
+	objects  = URLManager()
+
+	def __str__(self):
+		return "{}".format(self.url)
+
+	class Meta:
+		ordering = ['url']
+
+
+
 class PhoneManager(models.Manager):
 
 	def take(self, phone, **kwargs):
@@ -2567,7 +2729,7 @@ class PersonManager(models.Manager):
 	def take(self, first_name, middle_name, last_name, email = None, **kwargs):
 
 		try:
-			o = self.get(first_name = first_name, middle_name = middle_name, last_name = last_name, email = email)
+			o = self.select_related().get(first_name = first_name, middle_name = middle_name, last_name = last_name, email = email)
 		except Exception:
 			o = Person()
 			o.first_name   = first_name
@@ -2613,7 +2775,6 @@ class Person(models.Model):
 
 
 
-
 class OrganisationManager(models.Manager):
 
 
@@ -2623,7 +2784,7 @@ class OrganisationManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(inn = inn, kpp = kpp)
+			o = self.select_related().get(inn = inn, kpp = kpp)
 
 		except Organisation.DoesNotExist:
 			o = Organisation()
@@ -2715,59 +2876,67 @@ class OrganisationManager(models.Manager):
 				o.short_name = kwargs.get('short_name', None)
 				need_save = True
 
-			if kwargs.get('full_name', None):
+			if kwargs.get('full_name', None) and o.full_name != kwargs.get('full_name', None):
 				o.full_name = kwargs.get('full_name', None)
 				need_save = True
 
-			if kwargs.get('ogrn', None):
+			if kwargs.get('ogrn', None) and o.ogrn != kwargs.get('ogrn', None):
 				o.ogrn = kwargs.get('ogrn', None)
 				need_save = True
 
-			if kwargs.get('okpo', None):
+			if kwargs.get('okpo', None) and o.okpo != kwargs.get('okpo', None):
 				o.okpo = kwargs.get('okpo', None)
 				need_save = True
 
-			if kwargs.get('factual_address', None):
+			if kwargs.get('legal_address', None) and o.legal_address != kwargs.get('legal_address', None):
+				o.legal_address = kwargs.get('legal_address', None)
+				need_save = True
+
+			if kwargs.get('factual_address', None) and o.factual_address != kwargs.get('factual_address', None):
 				o.factual_address = kwargs.get('factual_address', None)
 				need_save = True
 
-			if kwargs.get('postal_address', None):
-				o.postal_address = kwargs.get('postal_address',    None)
+			if kwargs.get('postal_address', None) and o.postal_address != kwargs.get('postal_address', None):
+				o.postal_address = kwargs.get('postal_address', None)
 				need_save = True
 
-			if kwargs.get('email', None):
+			if kwargs.get('email', None) and o.email != kwargs.get('email', None):
 				o.email = kwargs.get('email', None)
 				need_save = True
 
-			if kwargs.get('phone', None):
+			if kwargs.get('website', None) and o.website != kwargs.get('website', None):
+				o.website = kwargs.get('website', None)
+				need_save = True
+
+			if kwargs.get('phone', None) and o.phone != kwargs.get('phone', None):
 				o.phone = kwargs.get('phone', None)
 				need_save = True
 
-			if kwargs.get('fax', None):
+			if kwargs.get('fax', None) and o.fax != kwargs.get('fax', None):
 				o.fax = kwargs.get('fax', None)
 				need_save = True
 
-			if kwargs.get('contact_person', None):
+			if kwargs.get('contact_person', None) and o.contact_person != kwargs.get('contact_person', None):
 				o.contact_person = kwargs.get('contact_person', None)
 				need_save = True
 
-			if kwargs.get('head_agency', None):
+			if kwargs.get('head_agency', None) and o.head_agency != kwargs.get('head_agency', None):
 				o.head_agency = kwargs.get('head_agency', None)
 				need_save = True
 
-			if kwargs.get('ordering_agency', None):
+			if kwargs.get('ordering_agency', None) and o.ordering_agency != kwargs.get('ordering_agency', None):
 				o.ordering_agency = kwargs.get('ordering_agency', None)
 				need_save = True
 
-			if kwargs.get('okopf', None):
+			if kwargs.get('okopf', None) and o.okopf != kwargs.get('okopf', None):
 				o.okopf = kwargs.get('okopf', None)
 				need_save = True
 
-			if kwargs.get('okogu', None):
+			if kwargs.get('okogu', None) and o.okogu != kwargs.get('okogu', None):
 				o.okogu = kwargs.get('okogu', None)
 				need_save = True
 
-			if kwargs.get('organisation_role', None):
+			if kwargs.get('organisation_role', None) and o.organisation_role != kwargs.get('organisation_role', None):
 				o.organisation_role = kwargs.get('organisation_role', None)
 				need_save = True
 
@@ -2790,7 +2959,7 @@ class OrganisationManager(models.Manager):
 			if kwargs.get('name', None) and o.name != kwargs.get('name', None):
 				o.name = kwargs.get('name', None)
 				need_save = True
-			elif kwargs.get('full_name', None) and o.name != kwargs.get('full_name', None):
+			elif kwargs.get('full_name', None) and o.name != kwargs.get('full_name', None) and not o.name:
 				o.name = kwargs.get('full_name', None)
 				need_save = True
 
@@ -2801,13 +2970,27 @@ class OrganisationManager(models.Manager):
 		return o
 
 
+	def get_by_key(self, updater, key):
+
+		if not updater or not key:
+			return None
+
+		key = OrganisationKey.objects.take(updater = updater, key = key)
+
+		if key:
+			return key.organisation
+		else:
+			return None
+
 
 class Organisation(models.Model):
 
 	id                = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+	legal_address     = models.ForeignKey(Address,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	factual_address   = models.ForeignKey(Address,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	postal_address    = models.ForeignKey(Address,          related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	email             = models.ForeignKey(Email,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
+	website           = models.ForeignKey(URL,              related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	phone             = models.ForeignKey(Phone,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	fax               = models.ForeignKey(Phone,            related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	contact_person    = models.ForeignKey(Person,           related_name='+', on_delete = models.CASCADE, null = True, default = None)
@@ -2850,23 +3033,23 @@ class Organisation(models.Model):
 
 
 
-class OrganisationExtKeyManager(models.Manager):
+class OrganisationKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, organisation = None):
+	def take(self, updater, key, organisation = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except OrganisationExtKey.DoesNotExist:
+		except OrganisationKey.DoesNotExist:
 
 			if organisation:
-				o = OrganisationExtKey()
+				o = OrganisationKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.organisation  = organisation
 				o.save()
 			else:
@@ -2875,14 +3058,14 @@ class OrganisationExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, organisation):
+	def write(self, updater, key, organisation):
 
-		if not updater or not ext_key or not organisation:
+		if not updater or not key or not organisation:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, organisation)
+		o = self.take(updater, key, organisation)
 
 		if o.organisation != organisation:
 			o.organisation = organisation
@@ -2894,38 +3077,38 @@ class OrganisationExtKeyManager(models.Manager):
 
 		return o
 
-	def get_organisation(self, updater, ext_key):
+	def get_organisation(self, updater, key):
 
-		ext_key = self.take(updater = updater, ext_key = ext_key)
+		key = self.take(updater = updater, key = key)
 
-		if ext_key:
-			return ext_key.organisation
+		if key:
+			return key.organisation
 		else:
 			return None
 
 
 
-class OrganisationExtKey(models.Model):
+class OrganisationKey(models.Model):
 
 	id           = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater      = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	organisation = models.ForeignKey(Organisation,   related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = OrganisationExtKeyManager()
+	objects  = OrganisationKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_organisation_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_organisation_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -2938,7 +3121,7 @@ class PlacingWayManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(code = code)
+			o = self.select_related().get(code = code)
 		except Exception:
 			o = PlacingWay()
 			o.code = code
@@ -3014,23 +3197,23 @@ class PlacingWay(models.Model):
 
 
 
-class PlacingWayExtKeyManager(models.Manager):
+class PlacingWayKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, placingway = None):
+	def take(self, updater, key, placingway = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except PlacingWayExtKey.DoesNotExist:
+		except PlacingWayKey.DoesNotExist:
 
 			if placingway:
-				o = PlacingWayExtKey()
+				o = PlacingWayKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.placingway = placingway
 				o.save()
 			else:
@@ -3039,14 +3222,14 @@ class PlacingWayExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, placingway):
+	def write(self, updater, key, placingway):
 
-		if not updater or not ext_key or not placingway:
+		if not updater or not key or not placingway:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, placingway)
+		o = self.take(updater, key, placingway)
 
 		if o.placingway != placingway:
 			o.placingway = placingway
@@ -3059,27 +3242,27 @@ class PlacingWayExtKeyManager(models.Manager):
 
 
 
-class PlacingWayExtKey(models.Model):
+class PlacingWayKey(models.Model):
 
 	id         = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater    = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	placingway = models.ForeignKey(PlacingWay, related_name='+', on_delete = models.CASCADE)
 
-	ext_key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key  = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects  = PlacingWayExtKeyManager()
+	objects  = PlacingWayKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_placingway_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_placingway_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -3200,23 +3383,23 @@ class PlanPositionChangeReason(models.Model):
 
 
 
-class PlanPositionChangeReasonExtKeyManager(models.Manager):
+class PlanPositionChangeReasonKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, planpositionchangereason = None):
+	def take(self, updater, key, planpositionchangereason = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except PlanPositionChangeReasonExtKey.DoesNotExist:
+		except PlanPositionChangeReasonKey.DoesNotExist:
 
 			if planpositionchangereason:
-				o = PlanPositionChangeReasonExtKey()
+				o = PlanPositionChangeReasonKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.planpositionchangereason = planpositionchangereason
 				o.save()
 			else:
@@ -3225,14 +3408,14 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, planpositionchangereason):
+	def write(self, updater, key, planpositionchangereason):
 
-		if not updater or not ext_key or not planpositionchangereason:
+		if not updater or not key or not planpositionchangereason:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, planpositionchangereason)
+		o = self.take(updater, key, planpositionchangereason)
 
 		if o.planpositionchangereason != planpositionchangereason:
 			o.planpositionchangereason = planpositionchangereason
@@ -3245,40 +3428,40 @@ class PlanPositionChangeReasonExtKeyManager(models.Manager):
 		return o
 
 
-	def get_change_reason(self, updater, ext_key):
+	def get_change_reason(self, updater, key):
 
-		ext_key = self.take(
+		key = self.take(
 			updater = updater,
-			ext_key = ext_key)
+			key = key)
 
-		if ext_key:
-			return ext_key.planpositionchangereason
+		if key:
+			return key.planpositionchangereason
 		else:
 			return None
 
 
 
-class PlanPositionChangeReasonExtKey(models.Model):
+class PlanPositionChangeReasonKey(models.Model):
 
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	planpositionchangereason = models.ForeignKey(PlanPositionChangeReason, related_name='+', on_delete = models.CASCADE)
 
-	ext_key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects = PlanPositionChangeReasonExtKeyManager()
+	objects = PlanPositionChangeReasonKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_planpositionchangereason_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_planpositionchangereason_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -3402,7 +3585,7 @@ class PlanManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(number = number, version = version)
+			o = self.select_related().get(number = number, version = version)
 
 		except Exception:
 			o = Plan()
@@ -3521,23 +3704,23 @@ class Plan(models.Model):
 		unique_together = ('number', 'version')
 
 
-class PlanExtKeyManager(models.Manager):
+class PlanKeyManager(models.Manager):
 
 
-	def take(self, updater, ext_key, plan = None):
+	def take(self, updater, key, plan = None):
 
-		if not updater or not ext_key:
+		if not updater or not key:
 			return None
 
 		try:
-			o = self.get(updater = updater, ext_key = ext_key)
+			o = self.select_related().get(updater = updater, key = key)
 
-		except PlanExtKey.DoesNotExist:
+		except PlanKey.DoesNotExist:
 
 			if plan:
-				o = PlanExtKey()
+				o = PlanKey()
 				o.updater = updater
-				o.ext_key = ext_key
+				o.key = key
 				o.plan = plan
 				o.save()
 			else:
@@ -3546,14 +3729,14 @@ class PlanExtKeyManager(models.Manager):
 		return o
 
 
-	def write(self, updater, ext_key, plan):
+	def write(self, updater, key, plan):
 
-		if not updater or not ext_key or not plan:
+		if not updater or not key or not plan:
 			return None
 
 		need_save = False
 
-		o = self.take(updater, ext_key, plan)
+		o = self.take(updater, key, plan)
 
 		if o.plan != plan:
 			o.plan = plan
@@ -3567,27 +3750,27 @@ class PlanExtKeyManager(models.Manager):
 
 
 
-class PlanExtKey(models.Model):
+class PlanKey(models.Model):
 
 	id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
 	updater = models.ForeignKey(Updater, related_name='+', on_delete = models.CASCADE)
 	plan = models.ForeignKey(Plan, related_name='+', on_delete = models.CASCADE)
 
-	ext_key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
+	key = models.CharField(max_length = 50, null = True, default = None, db_index = True)
 
 	state       = models.BooleanField(default = True, db_index = True)
 	created     = models.DateTimeField(default = timezone.now, db_index = True)
 	modified    = models.DateTimeField(default = timezone.now, db_index = True)
 
-	objects = PlanExtKeyManager()
+	objects = PlanKeyManager()
 
 	def __str__(self):
-		return "{}".format(self.ext_key)
+		return "{}".format(self.key)
 
 	class Meta:
-		db_table        = 'tenders_plan_ext_key'
-		ordering        = ['ext_key']
-		unique_together = ('updater', 'ext_key')
+		db_table        = 'tenders_plan_key'
+		ordering        = ['key']
+		unique_together = ('updater', 'key')
 
 
 
@@ -3600,7 +3783,7 @@ class ProductManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(okdp = okdp, okpd = okpd, okpd2 = okpd2, name = name)
+			o = self.select_related().get(okdp = okdp, okpd = okpd, okpd2 = okpd2, name = name)
 
 		except Exception:
 			o = Product()
@@ -3647,7 +3830,7 @@ class PlanPositionManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(plan = plan, number = number)
+			o = self.select_related().get(plan = plan, number = number)
 
 		except Exception:
 			o = PlanPosition()
@@ -3817,7 +4000,7 @@ class PurchaseManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(number = number)
+			o = self.select_related().get(number = number)
 
 		except Exception:
 			o = Purchase()
@@ -4101,6 +4284,7 @@ class DocTypeManager(models.Manager):
 class DocType(models.Model):
 
 	id   = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+
 	code = models.CharField(max_length = 50, db_index = True)
 	name = models.TextField(null = True, default = None)
 
@@ -4120,7 +4304,7 @@ class PurchaseToAttachmentManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(purchase = purchase, attachment = attachment)
+			o = self.select_related().get(purchase = purchase, attachment = attachment)
 
 		except Exception:
 			o = DocType()
@@ -4183,7 +4367,7 @@ class NotificationManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(updater = updater, code = code)
+			o = self.select_related().get(updater = updater, code = code)
 
 		except Exception:
 			o = Notification()
@@ -4200,7 +4384,6 @@ class NotificationManager(models.Manager):
 class Notification(models.Model):
 
 	id       = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
-
 	updater  = models.ForeignKey(Updater,  related_name='+', on_delete = models.CASCADE, null = True, default = None)
 	purchase = models.ForeignKey(Purchase, related_name='+', on_delete = models.CASCADE, null = True, default = None)
 
@@ -4234,7 +4417,7 @@ class LotManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(purchase = purchase, number = number)
+			o = self.select_related().get(purchase = purchase, number = number)
 
 		except Exception:
 			o = Lot()
@@ -4356,7 +4539,7 @@ class ContractManager(models.Manager):
 			return None
 
 		try:
-			o = self.get(purchase = purchase, customer = customer, number = number)
+			o = self.select_related().get(purchase = purchase, customer = customer, number = number)
 
 		except Exception:
 			o = Contract()
@@ -4438,7 +4621,7 @@ class ContractToSupplierManager(models.Manager):
 			return None
 
 		try:
-			link = self.get(contract = contract, supplier = supplier)
+			link = self.select_related().get(contract = contract, supplier = supplier)
 
 		except Exception:
 			link = ContractToSupplier()
@@ -4470,3 +4653,41 @@ class ContractToSupplier(models.Model):
 		db_table = 'tenders_contract_to_supplier'
 
 
+
+models = {
+	'updater'       : Updater,
+	'source'        : Source,
+	'region'        : Region,
+	'region_key'    : RegionKey,
+	'country'       : Country,
+	'currency'      : Currency,
+	'okei'          : OKEI,
+	'kosgu'         : KOSGU,
+	'okopf'         : OKOPF,
+	'okdp'          : OKDP,
+	'okpd'          : OKPD,
+	'okpd2'         : OKPD2,
+	'oktmo'         : OKTMO,
+	'okato'         : OKATO,
+	'okved'         : OKVED,
+	'okved2'        : OKVED2,
+	'budget'        : Budget,
+	'budget_type'   : BudgetType,
+	'okogu'         : OKOGU,
+	'attachment'    : Attachment,
+	'address'       : Address,
+	'email'         : Email,
+	'url'           : URL,
+	'phone'         : Phone,
+	'person'        : Person,
+	'organisation'  : Organisation,
+	'placing_way'   : PlacingWay,
+	'etp'           : ETP,
+	'plan'          : Plan,
+	'product'       : Product,
+	'plan_position' : PlanPosition,
+	'purchese'      : Purchase,
+	'doc_Type'      : DocType,
+	'notification'  : Notification,
+	'lot'           : Lot,
+	'contract'      : Contract}

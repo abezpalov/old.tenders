@@ -1,0 +1,129 @@
+<export>
+    <fcsNotificationZK schemeVersion="1.0">
+        <id>3098</id>
+        <purchaseNumber>0342300004014002101</purchaseNumber>
+        <docPublishDate>2014-01-13T17:01:53.402+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/zk44/view/common-info.html?noticeId=3098</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=3098</url>
+        </printForm>
+        <purchaseObjectInfo>Оказание услуг по аренде нежилого помещения площадью 58,20 кв.м, находящегося по адресу: 446300, Самарская область, г.о. Отрадный, ул. Ленина, д.61 (здание судмедэкспертизы)
+
+</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03423000040</regNum>
+                <fullName>Государственное бюджетное учреждение здравоохранения Самарской области "Отрадненская городская больница"</fullName>
+                <postAddress>Российская Федерация, 446302, Самарская обл, Отрадный г, Ленина, 61, -</postAddress>
+                <factAddress>Российская Федерация, 446302, Самарская обл, Отрадный г, Ленина, 61, -</factAddress>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 446302, Самарская обл, Отрадный г, Ленина, 61, -</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 446302, Самарская обл, Отрадный г, Ленина, 61, -</orgFactAddress>
+                <contactPerson>
+                    <lastName>Нуянзина</lastName>
+                    <firstName>Людмила</firstName>
+                    <middleName>Владимировна</middleName>
+                </contactPerson>
+                <contactEMail>ogbgov@yandex.ru</contactEMail>
+                <contactPhone>8-846-6140802</contactPhone>
+                <contactFax>8-846-6122217</contactFax>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>ZK44</code>
+            <name>Запрос котировок</name>
+        </placingWay>
+        <contractServiceInfo>отдел организации торгов ГБУЗ СО "Отрадненская городская больница"</contractServiceInfo>
+        <procedureInfo>
+            <collecting>
+                <startDate>2014-01-14T08:00:00+04:00</startDate>
+                <place>446302, Российская Федерация, Самарская область, городской округ Отрадный, ул. Ленина, 61,   Административное здание, 2-й этаж, кабинет 3 в рабочие дни с 8 ч.00 мин. до 17 ч.00 мин. </place>
+                <order>Заявка на участие в запросе котировок подается заказчику в письменной форме в запечатанном конверте, не позволяющем просматривать содержание такой заявки до вскрытия конверта, или в форме электронного документа в срок, указанный в извещении о проведении запроса котировок</order>
+                <endDate>2014-01-17T16:00:00+04:00</endDate>
+                <form>содержится в прикреплённом файле</form>
+            </collecting>
+            <opening>
+                <date>2014-01-20T13:00:00+04:00</date>
+                <place>446302, Российская Федерация, Самарская область, городской округ Отрадный, ул.Ленина, 61, Государственное  бюджетное учреждение здравоохранения Самарской области "ОГБ", кабинет Главного врача</place>
+                <addInfo>Наличие документа, удостоверяюшего личность и доверенности на участие в процедуре вскрытия конвертоа</addInfo>
+            </opening>
+            <contracting>
+                <contractingTerm>Контракт может быть заключен не ранее чем через семь дней с даты размещения в единой информационной системе протокола рассмотрения и оценки заявок на участие в запросе котировок и не позднее чем через двадцать дней с даты подписания указанного протокола</contractingTerm>
+                <evadeConditions>Контракт заключается на условиях, предусмотренных извещением о проведении запроса котировок, по цене, предложенной в заявке на участие в запросе котировок победителя запроса котировок или в заявке на участие в запросе котировок участника запроса котировок, с которым заключается контракт в случае уклонения такого победителя от заключения контракта</evadeConditions>
+            </contracting>
+        </procedureInfo>
+        <lot>
+            <maxPrice>76824</maxPrice>
+            <maxPriceInfo>содержится в прикреплённом файле</maxPriceInfo>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <financeSource>средства арендатора</financeSource>
+            <quantityUndefined>false</quantityUndefined>
+            <customerRequirements>
+                <customerRequirement>
+                    <customer>
+                        <regNum>03423000040</regNum>
+                    </customer>
+                    <maxPrice>76824</maxPrice>
+                    <deliveryPlace>446300, Самарская область, г.о. Отрадный, ул. Ленина, д.61 (здание судмедэкспертизы)</deliveryPlace>
+                    <deliveryTerm>11 месяцев с моментра заключения договора</deliveryTerm>
+                    <onesideRejection> возможен односторонний отказ от исполнения контракта в соответствии с положениями Частей 8 – 26 Статьи 95 Федерального Закона №44-ФЗ
+</onesideRejection>
+                </customerRequirement>
+            </customerRequirements>
+            <purchaseObjects>
+                <purchaseObject>
+                    <OKPD>
+                        <code>70.20.12.000</code>
+                        <name>Услуги по сдаче в аренду (внаем) нежилого недвижимого имущества</name>
+                    </OKPD>
+                    <name>Оказание услуг  по аренде нежилого помещения площадью 58,20 кв.м, находящегося по адресу: 446300, Самарская область, г.о. Отрадный, ул. Ленина, д.61 (здание судмедэкспертизы)</name>
+                    <OKEI>
+                        <code>796</code>
+                        <nationalCode>ШТ</nationalCode>
+                    </OKEI>
+                    <price>76824</price>
+                    <quantity>
+                        <value>1.0</value>
+                    </quantity>
+                    <sum>76824</sum>
+                </purchaseObject>
+                <totalSum>76824</totalSum>
+            </purchaseObjects>
+            <requirements>
+                <requirement>
+                    <code>8361038</code>
+                    <name>Требование об отсутствии в предусмотренном Федеральным законом № 44-ФЗ реестре недобросовестных поставщиков (подрядчиков, исполнителей) информации об участнике запроса котировок, учредителях, о членах коллегиального исполнительного органа, лице, исполняющем функции единоличного исполнительного органа участника запроса котировок (для юридического лица) (в соответствии с Частью 1 Статьи 73 Федерального закона № 44-ФЗ)</name>
+                </requirement>
+            </requirements>
+            <restrictInfo>в соответствии со ст.31 Федерального закона № 44-ФЗ</restrictInfo>
+        </lot>
+        <attachments>
+            <attachment>
+                <fileName>котировочная заявка.xls</fileName>
+                <docDescription>котировочная заявка</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=EFD8AD2006290018E043AC1107250C7D</url>
+            </attachment>
+            <attachment>
+                <fileName>Обоснование цены.doc</fileName>
+                <docDescription>Обоснование цены</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=EFDA2F8518E600D8E043AC110725AC07</url>
+            </attachment>
+            <attachment>
+                <fileName>Проект договора.rtf</fileName>
+                <docDescription>Проект договора</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=EFD8AD20062B0018E043AC1107250C7D</url>
+            </attachment>
+            <attachment>
+                <fileName>Техническое задание.doc</fileName>
+                <docDescription>Техническое задание</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=EFDA2F8518E800D8E043AC110725AC07</url>
+            </attachment>
+        </attachments>
+    </fcsNotificationZK>
+</export>
+

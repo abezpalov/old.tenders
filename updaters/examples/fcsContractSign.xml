@@ -1,0 +1,37 @@
+<export>
+	<fcsContractSign schemeVersion="1.0">
+		<id>3808304</id>
+		<number>0342100014714000002-0001245-01</number>
+		<signDate>2014-03-11</signDate>
+		<foundation>
+			<order>
+				<purchaseNumber>0342100014714000002</purchaseNumber>
+				<foundationProtocolNumber>0342100014714000002-3</foundationProtocolNumber>
+			</order>
+		</foundation>
+		<customer>
+			<regNum>03421000147</regNum>
+			<fullName>федеральное государственное бюджетное учреждение санаторий "Лесное" Министерства здравоохранения Российской Федерации</fullName>
+		</customer>
+		<price>192446.05</price>
+		<currency>
+			<code>RUB</code>
+			<name>Российский рубль</name>
+		</currency>
+		<concludeContractRight>0</concludeContractRight>
+		<protocolDate>2014-02-24</protocolDate>
+		<suppliers>
+			<supplier>
+				<participantType>U</participantType>
+				<inn>6367034929</inn>
+				<kpp>636701001</kpp>
+				<organizationName>Закрытое акционерное общество "ЦМТ Аналитика"</organizationName>
+				<contactInfo>
+					<lastName>Антонов</lastName>
+					<firstName>Валерий</firstName>
+					<middleName>Владимирович</middleName>
+				</contactInfo>
+			</supplier>
+		</suppliers>
+	</fcsContractSign>
+</export>

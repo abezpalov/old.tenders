@@ -1,0 +1,135 @@
+<export>
+    <fcsNotificationPO schemeVersion="1.0">
+        <id>3654</id>
+        <purchaseNumber>0142300001114000001</purchaseNumber>
+        <docPublishDate>2014-01-22T17:59:57.246+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/po44/view/common-info.html?noticeId=3654</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=3654</url>
+        </printForm>
+        <purchaseObjectInfo>Предварительный отбор участников закупки в целях оказания гуманитарной помощи либо ликвидации последствий чрезвычайных ситуаций природного или техногенного характера для муниципальных нужд Администрации Сызранского района на 2014 год</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>01423000011</regNum>
+                <fullName>Муниципальное казенное учреждение управление по строительству, архитектуре, жилищно-коммунальному и дорожному хозяйству администрации Сызранского района Самарской области</fullName>
+                <postAddress>Российская Федерация, 446001, Самарская обл, г.Сызрань, Советская ул, 39</postAddress>
+                <factAddress>Российская Федерация, 446073, Самарская обл, Сызранский р-н, Варламово п, Советская, 14, -</factAddress>
+                <INN>6383005467</INN>
+                <KPP>638301001</KPP>
+            </responsibleOrg>
+            <responsibleRole>RA</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 446001, Самарская обл, г.Сызрань, Советская ул, 39</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 446073, Самарская обл, Сызранский р-н, Варламово п, Советская, 14, -</orgFactAddress>
+                <contactPerson>
+                    <lastName>Маршалов</lastName>
+                    <firstName>Максим</firstName>
+                    <middleName>Игориевич</middleName>
+                </contactPerson>
+                <contactEMail>syztorgi@ya.ru</contactEMail>
+                <contactPhone>7-8464-986061</contactPhone>
+                <contactFax>7-8464-986061</contactFax>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>PO44</code>
+            <name>Предварительный отбор</name>
+        </placingWay>
+        <contractServiceInfo>Ибрагимов Мавлет Шакирчанович</contractServiceInfo>
+        <procedureInfo>
+            <collecting>
+                <startDate>2014-01-23T00:00:00</startDate>
+                <place>Российская Федерация, 446001, Самарская область, г.Сызрань, ул.Советская, 39, кб.10 или на электронный адрес: syztorgi@ya.ru </place>
+                <order>1. Для участия в предварительном отборе каждый желающий и отвечающий требованиям, установленным в извещении о проведении предварительного отбора может подать заявку. 2. Заявки на участие в предварительном отборе представляются в срок и по форме, указанным в извещении о проведении предварительного отбора. 3. Все документы заявки прошиваются. 4. Заявка, документы, относящиеся к заявке, должны быть составлены на русском языке. 5. Заявки на участие в предварительном отборе, поданные по истечении срока подачи таких заявок, не принимаются и не рассматриваются заказчиком. 6. Каждая заявка на участие в предварительном отборе, поданная в срок регистрируется заказчиком. По требованию участника размещения заказа, подавшего такую заявку, заказчик, выдает расписку в получении такой заявки с указанием даты и времени ее получения. </order>
+                <endDate>2014-02-12T00:00:00</endDate>
+                <form>Форма заявки на участие в предварительном отборе приложена в виде отдельного файла к сопроводительной локументации.</form>
+            </collecting>
+            <selecting>
+                <date>2014-02-17T10:00:00</date>
+                <place>Российская Федерация, 446001, Самарская область, г.Сызрань, ул.Советская, 39, кб.10 </place>
+            </selecting>
+            <contracting>
+                <contractingTerm>Контракт может быть заключен не ранее чем через семь дней с даты размещения в единой информационной системе протокола рассмотрения и оценки заявок на участие в запросе котировок и не позднее чем через двадцать дней с даты подписания указанного протокола.</contractingTerm>
+                <evadeConditions>В случае, если победитель запроса котировок не представил заказчику подписанный контракт в срок, указанный в извещении о проведении запроса котировок, такой победитель признается уклонившимся от заключения контракта.</evadeConditions>
+            </contracting>
+        </procedureInfo>
+        <lot>
+            <maxPrice>0</maxPrice>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <financeSource>Бюджет муниципального района Сызранский</financeSource>
+            <beforePay>Необходимо без предварительной оплаты и (или) с отсрочкой платежа осуществить поставки товаров, выполнение работ, оказание услуг в возможно короткий срок.</beforePay>
+            <quantityUndefined>false</quantityUndefined>
+            <customerRequirements>
+                <customerRequirement>
+                    <customer>
+                        <regNum>01423000008</regNum>
+                        <fullName>Администрация Сызранского района</fullName>
+                    </customer>
+                    <maxPrice>0</maxPrice>
+                    <deliveryPlace>Сызранский район в зависимости от места возникновения чрезвычайной ситуации либо угрозы возникновения чрезвычайной ситуации.</deliveryPlace>
+                    <deliveryTerm>В возможно короткий срок без предварительной оплаты и (или) с отсрочкой платежа.</deliveryTerm>
+                    <applicationGuarantee />
+                    <contractGuarantee />
+                </customerRequirement>
+            </customerRequirements>
+            <purchaseObjects>
+                <purchaseObject>
+                    <OKPD>
+                        <code>75.25.12.000</code>
+                        <name>Услуги по обеспечению безопасности в чрезвычайных ситуациях прочие</name>
+                    </OKPD>
+                    <name>Оказание гуманитарной помощи либо ликвидации последствий чрезвычайных ситуаций природного или техногенного характера для муниципальных нужд Администрации Сызранского района на 2014 год. 
+</name>
+                    <OKEI>
+                        <code>642</code>
+                        <nationalCode>ЕД</nationalCode>
+                    </OKEI>
+                    <price>0</price>
+                    <quantity>
+                        <value>0.0</value>
+                    </quantity>
+                    <sum>0</sum>
+                </purchaseObject>
+                <totalSum>0</totalSum>
+            </purchaseObjects>
+            <requirements>
+                <requirement>
+                    <code>8361040</code>
+                    <name>Единые требования к участникам (в соответствии  с частью 1 Статьи 31 Федерального закона № 44-ФЗ)</name>
+                </requirement>
+            </requirements>
+            <restrictInfo>Участник предварительного отбора должен соответствовать требования указанным в документации о предварительном отборе.</restrictInfo>
+        </lot>
+        <attachments>
+            <attachment>
+                <fileName>Документация[1].doc</fileName>
+                <docDescription>Документация[1]</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F02541B89BF50006E043AC11072545DC</url>
+            </attachment>
+            <attachment>
+                <fileName>ПРОЕКТ МУНИЦИПАЛЬНОГО КОНТРАКТА.doc</fileName>
+                <docDescription>ПРОЕКТ МУНИЦИПАЛЬНОГО КОНТРАКТА</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F028D61254190094E043AC1107256F7E</url>
+            </attachment>
+            <attachment>
+                <fileName>Положение  по приемо-сдаточной документации.zip</fileName>
+                <docDescription>Положение  по приемо-сдаточной документации</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F02541B89BFB0006E043AC11072545DC</url>
+            </attachment>
+            <attachment>
+                <fileName>Приложения к муниципальному контракту.xls</fileName>
+                <docDescription>Приложения к муниципальному контракту</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F028E23B0232002EE043AC1107258395</url>
+            </attachment>
+            <attachment>
+                <fileName>Заявка ПО.doc</fileName>
+                <docDescription>Заявка ПО</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F02541B89C070006E043AC11072545DC</url>
+            </attachment>
+        </attachments>
+    </fcsNotificationPO>
+</export>
+

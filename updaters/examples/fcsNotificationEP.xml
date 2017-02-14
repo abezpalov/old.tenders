@@ -1,0 +1,93 @@
+<export>
+    <fcsNotificationEP schemeVersion="1.0">
+        <id>759</id>
+        <purchaseNumber>0342300064014000474</purchaseNumber>
+        <docPublishDate>2014-01-09T13:36:41.893+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru//epz/order/notice/ep44/view/common-info.html?noticeId=759</href>
+        <printForm>
+            <url>http://zakupki.gov.ru//epz/order/notice/printForm/view.html?noticeId=759</url>
+        </printForm>
+        <purchaseObjectInfo>Теплоснабжение</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03423000640</regNum>
+                <fullName>Государственное бюджетное учреждение здравоохранения Самарской области "Красноярская центральная районная больница"</fullName>
+                <postAddress>Российская Федерация, 446370, Самарская обл, Красноярский р-н, Красный Яр с, Больничная, 44, -</postAddress>
+                <factAddress>Российская Федерация, 446370, Самарская обл, Красноярский р-н, Красный Яр с, Больничная, 44, -</factAddress>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 446370, Самарская обл, Красноярский р-н, Красный Яр с, Больничная, 44, -</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 446370, Самарская обл, Красноярский р-н, Красный Яр с, Больничная, 44, -</orgFactAddress>
+                <contactPerson>
+                    <lastName>Потапов</lastName>
+                    <firstName>Николай</firstName>
+                    <middleName>Павлович</middleName>
+                </contactPerson>
+                <contactEMail>kr_tmo@samtel.ru</contactEMail>
+                <contactPhone>7-846-000000</contactPhone>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>EP44</code>
+            <name>Закупка у единственного поставщика (подрядчика, исполнителя)</name>
+        </placingWay>
+        <lot>
+            <maxPrice>87670</maxPrice>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <financeSource>Средства бюджетного учреждения</financeSource>
+            <quantityUndefined>false</quantityUndefined>
+            <customerRequirements>
+                <customerRequirement>
+                    <customer>
+                        <regNum>03423000640</regNum>
+                    </customer>
+                    <maxPrice>87670</maxPrice>
+                    <deliveryPlace>С. Красный Яр, ул. Больничная 44 (Коммунар) </deliveryPlace>
+                    <deliveryTerm>с 01.01.2014 по 31.12.2014 г.</deliveryTerm>
+                </customerRequirement>
+            </customerRequirements>
+            <purchaseObjects>
+                <purchaseObject>
+                    <OKPD>
+                        <code>40.30.10.164</code>
+                        <name>Услуги по распределению пара и горячей воды (тепловой энергии) на производственные и прочие нужды</name>
+                    </OKPD>
+                    <name>Теплоснабжение</name>
+                    <OKEI>
+                        <code>233</code>
+                        <nationalCode>ГИГАКАЛ</nationalCode>
+                    </OKEI>
+                    <price>1809</price>
+                    <quantity>
+                        <value>47.44</value>
+                    </quantity>
+                    <sum>85818.96</sum>
+                </purchaseObject>
+                <purchaseObject>
+                    <OKPD>
+                        <code>40.30.10.164</code>
+                        <name>Услуги по распределению пара и горячей воды (тепловой энергии) на производственные и прочие нужды</name>
+                    </OKPD>
+                    <name>Теплоснабжение</name>
+                    <OKEI>
+                        <code>233</code>
+                        <nationalCode>ГИГАКАЛ</nationalCode>
+                    </OKEI>
+                    <price>1851.04</price>
+                    <quantity>
+                        <value>1.0</value>
+                    </quantity>
+                    <sum>1851.04</sum>
+                </purchaseObject>
+                <totalSum>87670.00</totalSum>
+            </purchaseObjects>
+            <restrictInfo>нет</restrictInfo>
+        </lot>
+        <attachments />
+    </fcsNotificationEP>
+</export>
+

@@ -1,0 +1,69 @@
+<export>
+    <fcsNotificationISO schemeVersion="1.0">
+        <id>70491</id>
+        <purchaseNumber>0301300261314000008</purchaseNumber>
+        <docPublishDate>2014-02-06T14:13:31.935+06:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/is44/view/common-info.html?noticeId=70491</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=70491</url>
+        </printForm>
+        <purchaseObjectInfo>Дератизация</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03013002613</regNum>
+                <fullName>муниципальное общеобразовательное бюджетное учреждение Кутеремская средняя общеобразовательная школа муниципального района Калтасинский район Республики Башкортостан</fullName>
+                <postAddress>Российская Федерация, 452878, Башкортостан Респ, Калтасинский р-н, Кутерем с, ул. Школьная, 1, -</postAddress>
+                <factAddress>Российская Федерация, 452878, Башкортостан Респ, Калтасинский р-н, Кутерем с, ул. Школьная, 1, -</factAddress>
+                <INN>0227002588</INN>
+                <KPP>022701001</KPP>
+            </responsibleOrg>
+            <responsibleRole>CU</responsibleRole>
+        </purchaseResponsible>
+        <placingWay>
+            <code>ZKB44I</code>
+            <name>Запрос котировок без размещения извещения</name>
+        </placingWay>
+        <procedureInfo>
+            <collectingEndDate>2014-02-06T00:00:00+04:00</collectingEndDate>
+        </procedureInfo>
+        <lot>
+            <lotNumber>1</lotNumber>
+            <maxPrice>9314.45</maxPrice>
+            <currency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </currency>
+            <OKPD>
+                <code>80.21.11.110</code>
+                <name>Услуги в области основного общего образования, предоставляемые школами, лицеями, гимназиями и т.п.</name>
+            </OKPD>
+            <requirements>
+                <requirement>
+                    <code>8361038</code>
+                    <name>Требование об отсутствии в предусмотренном Федеральным законом № 44-ФЗ реестре недобросовестных поставщиков (подрядчиков, исполнителей) информации об участнике запроса котировок, учредителях, о членах коллегиального исполнительного органа, лице, исполняющем функции единоличного исполнительного органа участника запроса котировок (для юридического лица) (в соответствии с Частью 1 Статьи 73 Федерального закона № 44-ФЗ)</name>
+                </requirement>
+            </requirements>
+        </lot>
+        <attachments>
+            <attachment>
+                <publishedContentId>F1B71953F058008CE043AC11072521AA</publishedContentId>
+                <fileName>1.jpeg</fileName>
+                <docDescription>1</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F1B71953F058008CE043AC11072521AA</url>
+            </attachment>
+            <attachment>
+                <publishedContentId>F1B9383F63B700D8E043AC110725951A</publishedContentId>
+                <fileName>2.jpeg</fileName>
+                <docDescription>2</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F1B9383F63B700D8E043AC110725951A</url>
+            </attachment>
+            <attachment>
+                <publishedContentId>F1B94DA5A8E1004EE043AC110725334D</publishedContentId>
+                <fileName>3.jpeg</fileName>
+                <docDescription>3</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F1B94DA5A8E1004EE043AC110725334D</url>
+            </attachment>
+        </attachments>
+    </fcsNotificationISO>
+</export>
+

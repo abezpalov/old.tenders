@@ -1,0 +1,20 @@
+<export>
+    <fcsNotificationCancel schemeVersion="1.0">
+        <id>193</id>
+        <purchaseNumber>0142300041114000001</purchaseNumber>
+        <docNumber>1</docNumber>
+        <docDate>2014-01-24T11:13:28+04:00</docDate>
+        <docPublishDate>2014-01-24T11:18:54+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/noticeCancel/view/common-info.html?noticeCancelId=193</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeCancelId=193</url>
+        </printForm>
+        <cancelReason>
+            <responsibleDecision>
+                <decisionDate>2014-01-24T00:00:00+04:00</decisionDate>
+            </responsibleDecision>
+        </cancelReason>
+        <addInfo />
+    </fcsNotificationCancel>
+</export>
+

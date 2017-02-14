@@ -83,8 +83,8 @@ class Runner(tenders.runner.Runner):
 		]
 
 		self.region_essences = [
-			{'category' : 'plangraphs',    'parser' : self.parse_plan},
 			{'category' : 'notifications', 'parser' : self.parse_notification},
+			{'category' : 'plangraphs',    'parser' : self.parse_plan},
 		]
 
 
@@ -98,7 +98,7 @@ class Runner(tenders.runner.Runner):
 		print('Обновляем справочники')
 		for essence in self.essences:
 
-			print('\n\n'.format(essence['category']))
+			print('\n\n{}'.format(essence['category']))
 
 			# Проверяем не вышло ли время
 			if self.is_time_up():
@@ -111,23 +111,22 @@ class Runner(tenders.runner.Runner):
 
 		for essence in self.region_essences:
 
-			print('\n\n'.format(essence['category']))
+			print('\n\n{}'.format(essence['category']))
 
-			for region in self.get_ftp_catalog(self.url, self.categories['regions']):
+			for region_key in self.get_ftp_catalog(self.url, self.categories['regions']):
 
-				if (not region in self.black_list) and (not '.'in region):
+				if (not region_key in self.black_list) and (not '.'in region_key):
 					try:
-						self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region))
-						region = Region.objects.take(
-							alias = region,
-							name = region,
-							full_name = region)
+						self.get_ftp_catalog(self.url, '{}/{}'.format(self.categories['regions'], region_key))
+						region = Region.objects.get_by_key(
+							updater = updater,
+							ext_key = region_key)
 						print(region)
 	
 					except Exception:
 						continue
 
-					if region.state:
+					if region and region.state:
 
 						for essence in self.region_essences:
 
@@ -135,8 +134,6 @@ class Runner(tenders.runner.Runner):
 								return True
 
 							self.update_region_essence(region, essence)
-
-
 
 		print("Завершил за {}.".format(timezone.now() - self.start_time))
 		return True
@@ -243,6 +240,7 @@ class Runner(tenders.runner.Runner):
 				code         = self.get_text(element, './countryCode'),
 				full_name    = self.get_text(element, './countryFullName'),
 				state        = self.get_bool(element, './actual'))
+
 			print("Страна: {}.".format(country))
 
 
@@ -255,6 +253,7 @@ class Runner(tenders.runner.Runner):
 				digital_code = self.get_text(element, './digitalCode'),
 				name         = self.get_text(element, './name'),
 				state        = self.get_bool(element, './actual'))
+
 			print("Валюта: {}.".format(currency))
 
 		for element in tree.xpath('.//currency'):
@@ -263,6 +262,7 @@ class Runner(tenders.runner.Runner):
 				code         = self.get_text(element, './code'),
 				digital_code = self.get_text(element, './digitalCode'),
 				name         = self.get_text(element, './name'))
+
 			print("Валюта: {}.".format(currency))
 
 
@@ -307,19 +307,23 @@ class Runner(tenders.runner.Runner):
 				parent = parent,
 				name   = self.get_text(element, './name'),
 				state  = self.get_bool(element, './actual'))
+
 			print("КОСГУ: {}.".format(kosgu))
 
 
 	def parse_okopf(self, tree):
 
 		for element in tree.xpath('.//nsiOKOPF'):
+
 			parent = OKOPF.objects.take(code = self.get_text(element, './parentCode'))
+
 			okopf = OKOPF.objects.write(
 				code          = self.get_text(element, './code'),
 				full_name     = self.get_text(element, './fullName'),
 				singular_name = self.get_text(element, './singularName'),
 				parent        = parent,
 				state         = self.get_bool(element, './actual'))
+
 			print("ОКОПФ: {}.".format(okopf))
 
 
@@ -327,13 +331,9 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiOKPD'):
 
-			ext_key = OKPDExtKey.objects.take(
+			parent = OKPD.objects.get_by_key(
 				updater = self.updater,
-				ext_key = self.get_text(element, './parentId'))
-			if ext_key:
-				parent = ext_key.okpd
-			else:
-				parent = None
+				key     = self.get_text(element, './parentId'))
 
 			okpd = OKPD.objects.write(
 				parent = parent,
@@ -341,10 +341,11 @@ class Runner(tenders.runner.Runner):
 				name   = self.get_text(element, './name'),
 				state  = self.get_bool(element, './actual'))
 
-			ext_key = OKPDExtKey.objects.write(
+			key = OKPDKey.objects.write(
 				updater = self.updater,
-				ext_key = self.get_text(element, './id'),
+				key     = self.get_text(element, './id'),
 				okpd    = okpd)
+
 			print("ОКПД: {}.".format(okpd))
 
 
@@ -352,13 +353,9 @@ class Runner(tenders.runner.Runner):
 
 		for element in tree.xpath('.//nsiOKPD2'):
 
-			ext_key = OKPD2ExtKey.objects.take(
+			parent = OKPD2.objects.get_by_key(
 				updater = self.updater,
-				ext_key = self.get_text(element, './parentId'))
-			if ext_key:
-				parent = ext_key.okpd2
-			else:
-				parent = None
+				key     = self.get_text(element, './parentId'))
 
 			okpd2 = OKPD2.objects.write(
 				parent = parent,
@@ -366,10 +363,11 @@ class Runner(tenders.runner.Runner):
 				name   = self.get_text(element, './name'),
 				state  = self.get_bool(element, './actual'))
 
-			ext_key = OKPD2ExtKey.objects.write(
+			key = OKPD2Key.objects.write(
 				updater = self.updater,
-				ext_key = self.get_text(element, './id'),
-				okpd2    = okpd2)
+				key     = self.get_text(element, './id'),
+				okpd2   = okpd2)
+
 			print("ОКПД2: {}.".format(okpd2))
 
 
@@ -383,6 +381,7 @@ class Runner(tenders.runner.Runner):
 				code   = self.get_text(element, './code'),
 				parent = parent,
 				name   = self.get_text(element, './fullName'))
+
 			print("ОКТМО: {}.".format(oktmo))
 
 
@@ -393,13 +392,9 @@ class Runner(tenders.runner.Runner):
 			section    = OKVEDSection.objects.take(name = self.get_text(element, './section'))
 			subsection = OKVEDSubSection.objects.take(name = self.get_text(element, './subsection'))
 
-			ext_key = OKVEDExtKey.objects.take(
+			parent = OKVED.objects.get_by_key(
 				updater = self.updater,
-				ext_key = self.get_text(element, './parentId'))
-			if ext_key:
-				parent = ext_key.okved
-			else:
-				parent = None
+				key     = self.get_text(element, './parentId'))
 
 			okved = OKVED.objects.write(
 				code       = self.get_text(element, './code'),
@@ -409,10 +404,11 @@ class Runner(tenders.runner.Runner):
 				name       = self.get_text(element, './name'),
 				state      = self.get_bool(element, './actual'))
 
-			ext_key = OKVEDExtKey.objects.write(
+			key = OKVEDKey.objects.write(
 				updater = self.updater,
-				ext_key = self.get_text(element, './id'),
+				key     = self.get_text(element, './id'),
 				okved   = okved)
+
 			print("ОКВЭД: {}.".format(okved))
 
 
@@ -431,10 +427,11 @@ class Runner(tenders.runner.Runner):
 				comment    = self.get_text(element, './comment'),
 				state      = self.get_bool(element, './actual'))
 
-			ext_key = OKVED2ExtKey.objects.write(
+			key = OKVED2Key.objects.write(
 				updater = self.updater,
-				ext_key = self.get_text(element, './id'),
-				okved2   = okved2)
+				key     = self.get_text(element, './id'),
+				okved2  = okved2)
+
 			print("ОКВЭД2: {}.".format(okved2))
 
 
@@ -446,6 +443,7 @@ class Runner(tenders.runner.Runner):
 				code       = self.get_text(element, './code'),
 				name       = self.get_text(element, './name'),
 				state      = self.get_bool(element, './actual'))
+
 			print("Бюджет: {}.".format(budget))
 
 
@@ -466,10 +464,12 @@ class Runner(tenders.runner.Runner):
 	def parse_organisation_type(self, tree):
 
 		for element in tree.xpath('.//nsiOrganizationType'):
+
 			organisation_type = OrganisationType.objects.write(
 				code        = self.get_text(element, './code'),
 				name        = self.get_text(element, './name'),
 				description = self.get_text(element, './description'))
+
 			print("Тип организации: {}".format(organisation_type))
 
 
@@ -492,21 +492,13 @@ class Runner(tenders.runner.Runner):
 				phone       = phone,
 				fax         = fax)
 
-			ext_key = OrganisationExtKey.objects.take(
+			head_agency = Organisation.objects.get_by_key(
 				updater = self.updater,
-				ext_key = self.get_text(element, './headAgency/regNum'))
-			if ext_key:
-				head_agency = ext_key.organisation
-			else:
-				head_agency = None
+				key     = self.get_text(element, './headAgency/regNum'))
 
-			ext_key = OrganisationExtKey.objects.take(
+			ordering_agency = Organisation.objects.get_by_key(
 				updater = self.updater,
-				ext_key = self.get_text(element, './orderingAgency/regNum'))
-			if ext_key:
-				ordering_agency = ext_key.organisation
-			else:
-				ordering_agency = None
+				key     = self.get_text(element, './orderingAgency/regNum'))
 
 			okopf = OKOPF.objects.take(
 				code      = self.get_text(element, './OKOPF/code'),
@@ -549,10 +541,11 @@ class Runner(tenders.runner.Runner):
 				state             = self.get_bool(element, './actual'),
 				register          = self.get_bool(element, './register'))
 
-			ext_key = OrganisationExtKey.objects.write(
-				updater = self.updater,
-				ext_key = self.get_text(element, './regNumber'),
+			key = OrganisationKey.objects.write(
+				updater      = self.updater,
+				key          = self.get_text(element, './regNumber'),
 				organisation = organisation)
+
 			print('Организация: {}'.format(organisation))
 
 
@@ -570,9 +563,9 @@ class Runner(tenders.runner.Runner):
 				subsystem_type = subsystem_type,
 				state          = self.get_bool(element, './actual'))
 
-			ext_key = PlacingWayExtKey.objects.write(
+			key = PlacingWayKey.objects.write(
 				updater    = self.updater,
-				ext_key    = self.get_text(element, './placingWayId'),
+				key        = self.get_text(element, './placingWayId'),
 				placingway = placingway)
 
 			print(placingway)
@@ -589,9 +582,9 @@ class Runner(tenders.runner.Runner):
 					description = self.get_text(element, './description'),
 					state       = self.get_bool(element, './actual'))
 
-			ext_key = PlanPositionChangeReasonExtKey.objects.write(
-				updater    = self.updater,
-				ext_key    = self.get_text(element, './id'),
+			key = PlanPositionChangeReasonKey.objects.write(
+				updater                  = self.updater,
+				key                      = self.get_text(element, './id'),
 				planpositionchangereason = changereason)
 
 			print(changereason)
@@ -833,11 +826,13 @@ class Runner(tenders.runner.Runner):
 		for element in tree.xpath('//fcsNotificationZP'):
 			ok = self.parse_notification_tender(element, region)
 
+		# Запрос котировок без размещения извещения
 		for element in tree.xpath('//fcsNotificationISO'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
+		# Конкурс с ограниченным участием
 		for element in tree.xpath('//fcsNotificationISM'):
-			self.parse_notification_tender(element, region)
+			ok = self.parse_notification_tender(element, region)
 
 		# Предварительный отбор
 		for element in tree.xpath('//fcsNotificationPO'):
@@ -877,180 +872,19 @@ class Runner(tenders.runner.Runner):
 		for element in tree.xpath('//fcsClarification'):
 			ok = self.parse_notification_document(element, region)
 
+		# Добавление протокола
+		for element in tree.xpath('//fcsProtocolZKBI'):
+			ok = self.parse_notification_protocol(element, region)
+
+
 		if not ok:
 			print(ET.tostring(tree.getroot(), encoding = 'unicode'))
 			exit()
 
 
-	def parse_notification_sign(self, element, region):
-
-		purchase = Purchase.objects.take(
-			number = self.get_text(element, './foundation/order/purchaseNumber'),
-			region = region)
-		print('{} - contract sign'.format(purchase))
-
-		customer = OrganisationExtKey.objects.get_organisation(
-			updater = self.updater,
-			ext_key = self.get_text(element, './customer/regNum'))
-
-		currency = Currency.objects.take(code = self.get_text(element, './currency/code'))
-
-		contract = Contract.objects.take(
-			purchase   = purchase,
-			customer   = customer,
-			currency   = currency,
-			number     = self.get_text(element, './number'),
-			price      = self.get_float(element, './price'),
-			price_rub  = self.get_float(element, './priceRUR'),
-			sign_date  = self.get_text(element, './signDate'))
-
-		contract.suppliers.clear()
-		for s in element.xpath('.//supplier'):
-
-			supplier = Organisation.objects.take(
-				inn = self.get_text(s, './inn'),
-				kpp = self.get_text(s, './kpp'),
-				full_name = self.get_text(s, './organizationName'))
-
-			contact = Person.objects.take(
-				first_name  = self.get_text(s, './contactInfo/firstName'),
-				middle_name = self.get_text(s, './contactInfo/middleName'),
-				last_name   = self.get_text(s, './contactInfo/lastName'))
-
-			link = ContractToSupplier.objects.take(
-				contract = contract,
-				supplier = supplier,
-				contact  = contact)
-
-		return True
-
-
-	def parse_notification_document(self, element, region):
-
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
-		print('{} - document added'.format(purchase))
-
-		doc_type = DocType.objects.take(
-			code = self.get_text(element, './docType/code'),
-			name = self.get_text(element, './docType/name'))
-
-		doc_type.code = self.get_text(element, './docType/code')
-
-		if doc_type.code == 'RD': # Разъяснения положений документации об электронном аукционе
-
-			for a in element.xpath('.//attachments/attachment'):
-
-				attachment = Attachment.objects.take(
-					url         = self.get_text(a, './url'),
-					name        = self.get_text(a, './fileName'),
-					size        = self.get_text(a, './fileSize'),
-					description = self.get_text(a, './docDescription'))
-
-				link = PurchaseToAttachment.objects.write(
-					purchase   = purchase,
-					attachment = attachment,
-					doc_type   = doc_type)
-
-		else:
-			return False
-
-		notification = Notification.objects.take(
-			updater  = self.updater,
-			code     = self.get_int(element, './id'),
-			url      = self.get_text(element, './printForm/url'),
-			purchase = purchase)
-
-		return True
-
-
-
-
-	def parse_notification_tender_prolongation(self, element, region):
-
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
-
-		doc_type = self.get_text(element, './docType/code')
-
-		if doc_type == 'IPP':
-			purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
-			purchase.save()
-		elif doc_type == 'UP':
-			purchase.scoring_time    = self.get_datetime(element, './scoringProlongationDate')
-			purchase.save()
-		else:
-			return False
-
-		print('{} - prolongated'.format(purchase))
-
-		notification = Notification.objects.take(
-			updater  = self.updater,
-			code     = self.get_int(element, './id'),
-			url      = self.get_text(element, './printForm/url'),
-			purchase = purchase)
-
-		return True
-
-
-
-	def parse_notification_tender_cancel(self, element, region):
-
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
-
-		notification = Notification.objects.take(
-			updater  = self.updater,
-			code     = self.get_int(element, './id'),
-			url      = self.get_text(element, './printForm/url'),
-			purchase = purchase)
-
-		purchase.cancel()
-
-		print('{} - canceled'.format(purchase))
-
-		return True
-
-
-
-	def parse_notification_lot_cancel(self, element, region):
-
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
-
-		notification = Notification.objects.take(
-			updater  = self.updater,
-			code     = self.get_int(element, './id'),
-			url      = self.get_text(element, './printForm/url'),
-			purchase = purchase)
-
-		lot = Lot.objects.take(
-				purchase = purchase,
-				number   = self.get_text(element, './lot/lotNumber')
-			)
-
-		lot.cancel()
-
-		print('{} - lot {} canceled'.format(purchase, lot.number))
-
-		return True
-
-
-	def parse_notification_tender_cancel(self, element, region):
-
-		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
-
-		notification = Notification.objects.take(
-			updater  = self.updater,
-			code     = self.get_int(element, './id'),
-			url      = self.get_text(element, './printForm/url'),
-			purchase = purchase)
-		purchase.cancel()
-		print('{} - canceled'.format(purchase))
-
-		return True
 
 
 	def parse_notification_tender(self, element, region):
-
-#		print(self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
-#		print(self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
 
 		responsible = OrganisationExtKey.objects.get_organisation(
 			updater = self.updater,
@@ -1065,7 +899,7 @@ class Runner(tenders.runner.Runner):
 		if not responsible:
 			print(ET.tostring(element, encoding = 'unicode'))
 			print('Ответственного нет!!!')
-			exit()
+			return False
 
 		email = Email.objects.take(email = self.get_text(element, './purchaseResponsible/responsibleInfo/contactEMail'))
 		phone = Phone.objects.take(phone = self.get_text(element, './purchaseResponsible/responsibleInfo/contactPhone'))
@@ -1225,10 +1059,53 @@ class Runner(tenders.runner.Runner):
 		return True
 
 
-	def parse_notification_lot_change(self, element, region):
 
-#		print(self.get_text(element, './purchaseResponsible/responsibleOrg/regNum'))
-#		print(self.get_text(element, './purchaseResponsible/specializedOrg/regNum'))
+	def parse_notification_tender_prolongation(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+
+		doc_type = self.get_text(element, './docType/code')
+
+		if doc_type == 'IPP':
+			purchase.collecting_end_time    = self.get_datetime(element, './collectingProlongationDate')
+			purchase.save()
+		elif doc_type == 'UP':
+			purchase.scoring_time    = self.get_datetime(element, './scoringProlongationDate')
+			purchase.save()
+		else:
+			return False
+
+		print('{} - prolongated'.format(purchase))
+
+		notification = Notification.objects.take(
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
+			url      = self.get_text(element, './printForm/url'),
+			purchase = purchase)
+
+		return True
+
+
+
+	def parse_notification_tender_cancel(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+
+		notification = Notification.objects.take(
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
+			url      = self.get_text(element, './printForm/url'),
+			purchase = purchase)
+
+		purchase.cancel()
+
+		print('{} - canceled'.format(purchase))
+
+		return True
+
+
+
+	def parse_notification_lot_change(self, element, region):
 
 		responsible = OrganisationExtKey.objects.get_organisation(
 			updater = self.updater,
@@ -1418,6 +1295,132 @@ class Runner(tenders.runner.Runner):
 					link.save()
 
 		return True
+
+
+
+	def parse_notification_lot_cancel(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+
+		notification = Notification.objects.take(
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
+			url      = self.get_text(element, './printForm/url'),
+			purchase = purchase)
+
+		lot = Lot.objects.take(
+				purchase = purchase,
+				number   = self.get_text(element, './lot/lotNumber')
+			)
+
+		lot.cancel()
+
+		print('{} - lot {} canceled'.format(purchase, lot.number))
+
+		return True
+
+
+
+	def parse_notification_sign(self, element, region):
+
+		purchase = Purchase.objects.take(
+			number = self.get_text(element, './foundation/order/purchaseNumber'),
+			region = region)
+		print('{} - contract sign'.format(purchase))
+
+		customer = OrganisationExtKey.objects.get_organisation(
+			updater = self.updater,
+			ext_key = self.get_text(element, './customer/regNum'))
+
+		currency = Currency.objects.take(code = self.get_text(element, './currency/code'))
+
+		contract = Contract.objects.take(
+			purchase   = purchase,
+			customer   = customer,
+			currency   = currency,
+			number     = self.get_text(element, './number'),
+			price      = self.get_float(element, './price'),
+			price_rub  = self.get_float(element, './priceRUR'),
+			sign_date  = self.get_text(element, './signDate'))
+
+		contract.suppliers.clear()
+		for s in element.xpath('.//supplier'):
+
+			supplier = Organisation.objects.take(
+				inn = self.get_text(s, './inn'),
+				kpp = self.get_text(s, './kpp'),
+				full_name = self.get_text(s, './organizationName'))
+
+			contact = Person.objects.take(
+				first_name  = self.get_text(s, './contactInfo/firstName'),
+				middle_name = self.get_text(s, './contactInfo/middleName'),
+				last_name   = self.get_text(s, './contactInfo/lastName'))
+
+			link = ContractToSupplier.objects.take(
+				contract = contract,
+				supplier = supplier,
+				contact  = contact)
+
+		return True
+
+
+	def parse_notification_document(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+		print('{} - document added'.format(purchase))
+
+		doc_type = DocType.objects.take(
+			code = self.get_text(element, './docType/code'),
+			name = self.get_text(element, './docType/name'))
+
+		doc_type.code = self.get_text(element, './docType/code')
+
+		if doc_type.code == 'RD': # Разъяснения положений документации об электронном аукционе
+
+			for a in element.xpath('.//attachments/attachment'):
+
+				attachment = Attachment.objects.take(
+					url         = self.get_text(a, './url'),
+					name        = self.get_text(a, './fileName'),
+					size        = self.get_text(a, './fileSize'),
+					description = self.get_text(a, './docDescription'))
+
+				link = PurchaseToAttachment.objects.write(
+					purchase   = purchase,
+					attachment = attachment,
+					doc_type   = doc_type)
+
+		else:
+			return False
+
+		notification = Notification.objects.take(
+			updater  = self.updater,
+			code     = self.get_int(element, './id'),
+			url      = self.get_text(element, './printForm/url'),
+			purchase = purchase)
+
+		return True
+
+
+
+	def parse_notification_protocol(self, element, region):
+
+		purchase = Purchase.objects.take(number = self.get_text(element, './purchaseNumber'), region = region)
+		print('{} - protocol added'.format(purchase))
+
+
+
+
+
+
+
+
+
+
+
+		return False
+
+
 
 
 	def get_text(self, element, query):

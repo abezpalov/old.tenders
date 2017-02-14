@@ -1,0 +1,189 @@
+<export>
+    <fcsNotificationOKD schemeVersion="1.0">
+        <id>245942</id>
+        <purchaseNumber>0342300000114000027</purchaseNumber>
+        <docPublishDate>2014-03-06T17:12:04+04:00</docPublishDate>
+        <href>http://zakupki.gov.ru/epz/order/notice/okd44/view/common-info.html?regNumber=0342300000114000027</href>
+        <printForm>
+            <url>http://zakupki.gov.ru/epz/order/notice/printForm/view.html?noticeId=245942</url>
+            <signature type="CAdES-BES">TUlJTlBBWUpLb1pJaHZjTkFRY0NvSUlOTFRDQ0RTa0NBUUV4RERBS0JnWXFoUU1DQWdrRkFEQUxCZ2txaGtpRzl3MEJCd0dnZ2dkQU1JSUhQRENDQnV1Z0F3SUJBZ0lESk9GdU1BZ0dCaXFGQXdJQ0F6Q0NBa014SVRBZkJna3Foa2lHOXcwQkNRRVdFblYxWTE5bWEwQnliM05yWVhwdVlTNXlkVEVpTUNBR0ExVUVDUXdaMFlQUXV5NGcwSmpRdTlHTTBMalF2ZEM2MExBZzBMUXVOekVaTUJjR0ExVUVCd3dRMExNdUlOQ2MwTDdSZ2RDNjBMTFFzREdCb2pDQm53WUpLb1pJaHZjTkFRa0NESUdSMEpUUXNOQzkwTDNSaTlDNUlOR0IwTFhSZ05HQzBMalJoTkM0MExyUXNOR0NJTkMrMFlMUXV0R0EwWXZSZ3RDKzBMUFF2aURRdXRDNzBZN1JoOUN3SU5DNDBZSFF2OUMrMEx2UmpOQzMwWVBRdGRHQzBZSFJqeURSZ2RDK0lOR0IwWURRdGRDMDBZSFJndEN5MEw3UXZDRFFvZENhMEpmUW1DRFFtdEdBMExqUXY5R0MwTDRnMEovUmdOQytJRU5UVURFTE1Ba0dBMVVFQmhNQ1VsVXhjakJ3QmdOVkJBc01hZENqMEwvUmdOQ3cwTExRdTlDMTBMM1F1TkMxSU5HQTBMWFF0dEM0MEx6UXNDRFJnZEMxMExyUmdOQzEwWUxRdmRDKzBZSFJndEM0SU5DNElOQ3gwTFhRdDlDKzBML1FzTkdCMEwzUXZ0R0IwWUxRdUNEUXVOQzkwWVRRdnRHQTBMelFzTkdHMExqUXVERTRNRFlHQTFVRUNnd3YwS1RRdGRDMDBMWFJnTkN3MEx2UmpOQzkwTDdRdFNEUXV0Q3cwTGZRdmRDdzBZZlF0ZEM1MFlIUmd0Q3kwTDR4ZnpCOUJnTlZCQU1NZHRDajBML1F2dEM3MEwzUXZ0QzgwTDdSaDlDMTBMM1F2ZEdMMExrZzBZUFF0TkMrMFlIUmd0QyswTExRdGRHQTBZL1JqdEdKMExqUXVTRFJodEMxMEwzUmd0R0FJTkNrMExYUXROQzEwWURRc05DNzBZelF2ZEMrMExQUXZpRFF1dEN3MExmUXZkQ3cwWWZRdGRDNTBZSFJndEN5MExBd0hoY05NVFF3TWpJM01USTBPVEl3V2hjTk1UVXdNakkzTVRJME9USXdXakNDQWlVeEZEQVNCZ05WQkFVVEN6QXdPRFV5T1RFNE9UVTVNUjR3SEFZSktvWklodmNOQVFrQkZnOXBZWFZBWkdaellXMWhjbUV1Y25VeEN6QUpCZ05WQkFZVEFsSlZNU293S0FZRFZRUUlEQ0hRb2RDdzBMelFzTkdBMFlIUXV0Q3cwWThnMEw3UXNkQzcwTERSZ2RHQzBZd3hGVEFUQmdOVkJBY01ETkNoMExEUXZOQ3cwWURRc0RGNk1IZ0dBMVVFQ2d4eDBKVFF0ZEMvMExEUmdOR0MwTERRdk5DMTBMM1JnaURSaE5DNDBMM1FzTkM5MFlIUXZ0Q3lJTkNRMExUUXZOQzQwTDNRdU5HQjBZTFJnTkN3MFliUXVOQzRJTkN6MEw3UmdOQyswTFRSZ2RDNjBMN1FzOUMrSU5DKzBMclJnTkdEMExQUXNDRFFvZEN3MEx6UXNOR0EwTEF4UVRBL0JnTlZCQXNNT05DajBML1JnTkN3MExMUXU5QzEwTDNRdU5DMUlOQyswWURRczlDdzBMM1F1TkMzMExEUmh0QzQwTGdnMFlMUXZ0R0EwTFBRdnRDeU1TZ3dKZ1lEVlFRcURCL1FydEM3MExqUmp5RFFrOUMxMEwzUXZkQ3cwTFRRdU5DMTBMTFF2ZEN3TVJzd0dRWURWUVFFREJMUW9kQzQwTHpRdnRDOTBMWFF2ZEM2MEw0eFdqQllCZ05WQkF3TVVkQ2QwTERSaDlDdzBMdlJqTkM5MExqUXVpRFF2dEdDMExUUXRkQzcwTEFnMFlMUXZ0R0EwTFBRdnRDeUlOQy8wTDRnMExmUXNOQzYwWVBRdjlDNjBMRFF2Q0RSZ3RDKzBMTFFzTkdBMEw3UXNqRTdNRGtHQTFVRUF3d3kwS0hRdU5DODBMN1F2ZEMxMEwzUXV0QytJTkN1MEx2UXVOR1BJTkNUMExYUXZkQzkwTERRdE5DNDBMWFFzdEM5MExBd1l6QWNCZ1lxaFFNQ0FoTXdFZ1lIS29VREFnSWtBQVlIS29VREFnSWVBUU5EQUFSQUtsT0VtendJQnpTcUI3a2FlMzFBbE0vK1dHSjlSMDVMU200cGpNU1NveVplOUFncU9vOS9hMW9qRytyQzBIRUZ4ZXgyaGxJZSt0bERCTVJQQXZVbEpLT0NBZDR3Z2dIYU1Bd0dBMVVkRXdFQi93UUNNQUF3R0FZRFZSMGdCQkV3RHpBTkJnc3FoUU1EUFo3WE5nRUNBakNCd0FZRFZSMFJCSUc0TUlHMW9CSUdBMVVFREtBTEV3a3lNalV4TURJeE1UYWdHQVlJS29VREE0RURBUUdnREJNS05qTXhOekF3TURNM09LQVpCZ29xaFFNRFBaN1hOZ0VIb0FzVENUWXpNVFV3TVRBd01hQWJCZ29xaFFNRFBaN1hOZ0VGb0EwVEN6QXpOREl6TURBd01EQXhvQTBHQnlxRkF3SGdPUUdnQWhNQW9BOEdDU3FHU0liM0RRRUpGS0FDRXdDZ0VBWUtLb1VEQXoyZTF6WUJDS0FDRXdDZ0dBWUZLb1VEWkFHZ0R4TU5NVEF6TmpNd01EWTJNREUxTTRZQk1EQU9CZ05WSFE4QkFmOEVCQU1DQStnd1l3WURWUjBsQkZ3d1dnWUlLd1lCQlFVSEF3SUdEaXFGQXdNOW50YzJBUVlEQkFJQkJnNHFoUU1EUFo3WE5nRUdBd1FDQWdZT0tvVURBejJlMXpZQkJnTUVBZ01HRGlxRkF3TTludGMyQVFZREJBSUVCZzRxaFFNRFBaN1hOZ0VHQXdRQ0JUQWZCZ05WSFNNRUdEQVdnQlJubmZ0djcxazY4d3NoS1R1RFdNTVdEUkREb2pBNEJnTlZIUjhFTVRBdk1DMmdLNkFwaGlkb2RIUndPaTh2WTNKc0xuSnZjMnRoZW01aExuSjFMMk55YkM5TVFWTlVYMjVsZHk1amNtd3dIUVlEVlIwT0JCWUVGUGUveThtWXU2QUd6bmh4ZlBOanl0NnpOcXhSTUFnR0JpcUZBd0lDQXdOQkFFWk5YRURwK2hvUnpLRUx5clVQVDlXTHlKd3lnKzFBWFhJTHJJcjlTOCtYcFpYSWVPRFJYRXE0RVNoQytzd3FnQlZjTGE1ME11bTdJOGcvY3I0WVRVd3hnZ1hETUlJRnZ3SUJBVENDQWt3d2dnSkRNU0V3SHdZSktvWklodmNOQVFrQkZoSjFkV05mWm10QWNtOXphMkY2Ym1FdWNuVXhJakFnQmdOVkJBa01HZEdEMExzdUlOQ1kwTHZSak5DNDBMM1F1dEN3SU5DMExqY3hHVEFYQmdOVkJBY01FTkN6TGlEUW5OQyswWUhRdXRDeTBMQXhnYUl3Z1o4R0NTcUdTSWIzRFFFSkFneUJrZENVMExEUXZkQzkwWXZRdVNEUmdkQzEwWURSZ3RDNDBZVFF1TkM2MExEUmdpRFF2dEdDMExyUmdOR0wwWUxRdnRDejBMNGcwTHJRdTlHTzBZZlFzQ0RRdU5HQjBML1F2dEM3MFl6UXQ5R0QwTFhSZ3RHQjBZOGcwWUhRdmlEUmdkR0EwTFhRdE5HQjBZTFFzdEMrMEx3ZzBLSFFtdENYMEpnZzBKclJnTkM0MEwvUmd0QytJTkNmMFlEUXZpQkRVMUF4Q3pBSkJnTlZCQVlUQWxKVk1YSXdjQVlEVlFRTERHblFvOUMvMFlEUXNOQ3kwTHZRdGRDOTBMalF0U0RSZ05DMTBMYlF1TkM4MExBZzBZSFF0ZEM2MFlEUXRkR0MwTDNRdnRHQjBZTFF1Q0RRdUNEUXNkQzEwTGZRdnRDLzBMRFJnZEM5MEw3UmdkR0MwTGdnMExqUXZkR0UwTDdSZ05DODBMRFJodEM0MExneE9EQTJCZ05WQkFvTUw5Q2swTFhRdE5DMTBZRFFzTkM3MFl6UXZkQyswTFVnMExyUXNOQzMwTDNRc05HSDBMWFF1ZEdCMFlMUXN0QytNWDh3ZlFZRFZRUURESGJRbzlDLzBMN1F1OUM5MEw3UXZOQyswWWZRdGRDOTBMM1JpOUM1SU5HRDBMVFF2dEdCMFlMUXZ0Q3kwTFhSZ05HUDBZN1JpZEM0MExrZzBZYlF0ZEM5MFlMUmdDRFFwTkMxMExUUXRkR0EwTERRdTlHTTBMM1F2dEN6MEw0ZzBMclFzTkMzMEwzUXNOR0gwTFhRdWRHQjBZTFFzdEN3QWdNazRXNHdDZ1lHS29VREFnSUpCUUNnZ2dNT01CZ0dDU3FHU0liM0RRRUpBekVMQmdrcWhraUc5dzBCQndFd0hBWUpLb1pJaHZjTkFRa0ZNUThYRFRFME1ETXdOakV6TVRJd00xb3dMd1lKS29aSWh2Y05BUWtFTVNJRUlGTUNKTCtJUitEcG9qeSt6empqa1k1dnVLOHhJaW80WUpKMERWbitla0RaTUlJQ29RWUxLb1pJaHZjTkFRa1FBaTh4Z2dLUU1JSUNqRENDQW9nd2dnS0VNQWdHQmlxRkF3SUNDUVFndW1uQlNVU09Kd0ovTU5oRWczZlZGRGNCbnBDMGVDSjhwWXhESnpVWVRzUXdnZ0pVTUlJQ1M2U0NBa2N3Z2dKRE1TRXdId1lKS29aSWh2Y05BUWtCRmhKMWRXTmZabXRBY205emEyRjZibUV1Y25VeElqQWdCZ05WQkFrTUdkR0QwTHN1SU5DWTBMdlJqTkM0MEwzUXV0Q3dJTkMwTGpjeEdUQVhCZ05WQkFjTUVOQ3pMaURRbk5DKzBZSFF1dEN5MExBeGdhSXdnWjhHQ1NxR1NJYjNEUUVKQWd5QmtkQ1UwTERRdmRDOTBZdlF1U0RSZ2RDMTBZRFJndEM0MFlUUXVOQzYwTERSZ2lEUXZ0R0MwTHJSZ05HTDBZTFF2dEN6MEw0ZzBMclF1OUdPMFlmUXNDRFF1TkdCMEwvUXZ0QzcwWXpRdDlHRDBMWFJndEdCMFk4ZzBZSFF2aURSZ2RHQTBMWFF0TkdCMFlMUXN0QyswTHdnMEtIUW10Q1gwSmdnMEpyUmdOQzQwTC9SZ3RDK0lOQ2YwWURRdmlCRFUxQXhDekFKQmdOVkJBWVRBbEpWTVhJd2NBWURWUVFMREduUW85Qy8wWURRc05DeTBMdlF0ZEM5MExqUXRTRFJnTkMxMExiUXVOQzgwTEFnMFlIUXRkQzYwWURRdGRHQzBMM1F2dEdCMFlMUXVDRFF1Q0RRc2RDMTBMZlF2dEMvMExEUmdkQzkwTDdSZ2RHQzBMZ2cwTGpRdmRHRTBMN1JnTkM4MExEUmh0QzQwTGd4T0RBMkJnTlZCQW9NTDlDazBMWFF0TkMxMFlEUXNOQzcwWXpRdmRDKzBMVWcwTHJRc05DMzBMM1FzTkdIMExYUXVkR0IwWUxRc3RDK01YOHdmUVlEVlFRRERIYlFvOUMvMEw3UXU5QzkwTDdRdk5DKzBZZlF0ZEM5MEwzUmk5QzVJTkdEMExUUXZ0R0IwWUxRdnRDeTBMWFJnTkdQMFk3UmlkQzQwTGtnMFliUXRkQzkwWUxSZ0NEUXBOQzEwTFRRdGRHQTBMRFF1OUdNMEwzUXZ0Q3owTDRnMExyUXNOQzMwTDNRc05HSDBMWFF1ZEdCMFlMUXN0Q3dBZ01rNFc0d0NnWUdLb1VEQWdJVEJRQUVRRE5yZDJyZkdSc2FmVFllUzF0bEhBMzdkMVdIa3VtMjNiTVBrd3ZvYi9IRUZzNktUWG8zNldVUjVOUisxWFdxS1czRjJJQXVXMFh4MHJxTFZ0ZEZ5elE9</signature>
+        </printForm>
+        <purchaseObjectInfo>Оказание услуг по созданию произведения искусства: «Мемориальное сооружение (архитектурное сооружение) в честь 70-летия Победы в Великой Отечественной войне».</purchaseObjectInfo>
+        <purchaseResponsible>
+            <responsibleOrg>
+                <regNum>03423000001</regNum>
+                <fullName>Департамент финансов Администрации городского округа Самара</fullName>
+                <postAddress>Российская Федерация, 443041, Самарская обл, Братьев Коростелевых, 144, -</postAddress>
+                <factAddress>Российская Федерация, 443041, Самарская обл, Самара г, Братьев Коростелевых, 144, -</factAddress>
+                <INN>6317000378</INN>
+                <KPP>631501001</KPP>
+            </responsibleOrg>
+            <responsibleRole>RA</responsibleRole>
+            <responsibleInfo>
+                <orgPostAddress>Российская Федерация, 443041, Самарская обл, Братьев Коростелевых, 144, -</orgPostAddress>
+                <orgFactAddress>Российская Федерация, 443041, Самарская обл, Самара г, Братьев Коростелевых, 144, -</orgFactAddress>
+                <contactPerson>
+                    <lastName>Труханович</lastName>
+                    <firstName>Александр</firstName>
+                    <middleName>Николаевич</middleName>
+                </contactPerson>
+                <contactEMail>torg@dfsamara.ru</contactEMail>
+                <contactPhone>7-846-2476732</contactPhone>
+            </responsibleInfo>
+        </purchaseResponsible>
+        <placingWay>
+            <code>OKD44</code>
+            <name>Двухэтапный конкурс</name>
+        </placingWay>
+        <purchaseDocumentation>
+            <grantStartDate>2014-03-06T17:30:00+04:00</grantStartDate>
+            <grantPlace>Российская Федерация, 443041, Самарская обл, Самара г, Братьев Коростелевых, 144, -</grantPlace>
+            <grantOrder>заинтересованные лица могут получить конкурсную документацию 
+в единой информационной системе или на основании поданного в письменной форме заявления в управлении организации торгов Департамента финансов Администрации городского округа Самара по адресу: г.Самара, ул.Бр.Коростелевых, 144, кабинет 012, после даты размещения в единой информационной системе с 09:00 до 12:00 и с 15:00 до 17:00 по рабочим дням (по пятницам и в предпраздничные дни – до 16:00).
+</grantOrder>
+            <languages>Конкурсная документация предоставляется на русском языке.</languages>
+            <grantMeans>заинтересованные лица могут получить конкурсную документацию 
+в единой информационной системе или на основании поданного в письменной форме заявления в управлении организации торгов Департамента финансов Администрации городского округа Самара по адресу: г.Самара, ул.Бр.Коростелевых, 144, кабинет 012, после даты размещения в единой информационной системе с 09:00 до 12:00 и с 15:00 до 17:00 по рабочим дням (по пятницам и в предпраздничные дни – до 16:00).
+
+</grantMeans>
+            <grantEndDate>2014-04-04T11:00:00+04:00</grantEndDate>
+            <payCurrency>
+                <code>RUB</code>
+                <name>Российский рубль</name>
+            </payCurrency>
+        </purchaseDocumentation>
+        <procedureInfo>
+            <stageOne>
+                <collecting>
+                    <startDate>2014-03-07T09:00:00+04:00</startDate>
+                    <place>г.Самара, ул.Бр.Коростелевых, 144, кабинет 012.</place>
+                    <order>порядок подачи заявок: прием заявок на участие в конкурсе осуществляется по рабочим дням с 09:00 до 12:00 и с 15:00 до 17:00 по местному времени (по пятницам и в предпраздничные дни – до 16:00) по адресу: г.Самара, ул.Бр.Коростелевых, 144, кабинет 012, управление организации торгов Департамента финансов Администрации городского округа Самара, тел. 247-67-32. 04.04.2014 заявки принимаются с 10:30 до 11:00 по адресу: г.Самара, ул.Куйбышева, 135, конференц-зал.</order>
+                    <endDate>2014-04-04T11:00:00+04:00</endDate>
+                </collecting>
+                <opening>
+                    <date>2014-05-20T11:00:00+04:00</date>
+                    <place>г.Самара, ул.Куйбышева, 135, конференц-зал Администрации городского округа Самара.</place>
+                </opening>
+                <scoring>
+                    <date>2014-04-04T11:00:00+04:00</date>
+                    <place>г.Самара, ул.Куйбышева, 135, конференц-зал Администрации городского округа Самара.</place>
+                </scoring>
+            </stageOne>
+            <stageTwo>
+                <collecting>
+                    <startDate>2014-04-29T09:00:00+04:00</startDate>
+                    <place>г.Самара, ул.Бр.Коростелевых, 144, кабинет 012.</place>
+                    <order>прием заявок на участие в конкурсе осуществляется по рабочим дням с 09:00 до 12:00 и с 15:00 до 17:00 по местному времени (по пятницам и в предпраздничные дни – до 16:00) по адресу: г.Самара, ул.Бр.Коростелевых, 144, кабинет 012, управление организации торгов Департамента финансов Администрации городского округа Самара, тел. 247-67-32.
+23.05.2014 заявки принимаются с 10:30 до 11:00 по адресу: г.Самара, ул.Куйбышева, 135, конференц-зал.</order>
+                    <endDate>2014-05-20T11:00:00+04:00</endDate>
+                </collecting>
+                <opening>
+                    <date>2014-05-20T11:00:00+04:00</date>
+                    <place>г.Самара, ул.Куйбышева, 135, конференц-зал Администрации городского округа Самара.</place>
+                </opening>
+                <scoring>
+                    <date>2014-06-09T09:00:00+04:00</date>
+                    <place>г.Самара, ул.Куйбышева, 135, конференц-зал Администрации городского округа Самара.</place>
+                </scoring>
+            </stageTwo>
+        </procedureInfo>
+        <lots>
+            <lot>
+                <lotNumber>1</lotNumber>
+                <lotObjectInfo>Оказание услуг по созданию произведения искусства: «Мемориальное сооружение (архитектурное сооружение) в честь 70-летия Победы в Великой Отечественной войне».</lotObjectInfo>
+                <maxPrice>28442820</maxPrice>
+                <currency>
+                    <code>RUB</code>
+                    <name>Российский рубль</name>
+                </currency>
+                <financeSource>бюджет городского округа Самара.</financeSource>
+                <quantityUndefined>false</quantityUndefined>
+                <customerRequirements>
+                    <customerRequirement>
+                        <customer>
+                            <regNum>01423000245</regNum>
+                            <fullName>Департамент строительства и архитектуры городского округа Самара</fullName>
+                        </customer>
+                        <maxPrice>28442820</maxPrice>
+                        <deliveryPlace>городской округ Самара. </deliveryPlace>
+                        <deliveryTerm>8,5 месяцев с момента подписания Контракта.</deliveryTerm>
+                        <applicationGuarantee>
+                            <amount>1422141</amount>
+                            <part>5.0</part>
+                            <procedureInfo>Обеспечение заявки на участие в конкурсе может предоставляться участником конкурса путем внесения денежных средств или банковской гарантией. Выбор способа обеспечения заявки на участие в конкурсе осуществляется участником закупок.
+Банковская гарантия, выданная участнику конкурса банком для целей обеспечения заявки на участие в конкурсе, должна соответствовать требованиям статьи 45 Федерального закона. Срок действия банковской гарантии, предоставленной в качестве обеспечения заявки, должен составлять не менее чем два месяца с даты окончания срока подачи заявок.
+Требование об обеспечении заявки на участие в определении поставщика (подрядчика, исполнителя) в равной мере относится ко всем участникам закупки.
+В случае, если участником конкурса в составе заявки представлены документы, подтверждающие внесение денежных средств в качестве обеспечения заявки на участие в определении поставщика (подрядчика, исполнителя), и до даты рассмотрения и оценки заявок денежные средства не поступили на счет, который указан заказчиком в документации о закупке и на котором в соответствии с законодательством Российской Федерации учитываются операции со средствами, поступающими заказчику, такой участник признается не предоставившим обеспечение заявки. 
+</procedureInfo>
+                            <settlementAccount>40204810200000000002</settlementAccount>
+                            <personalAccount>109010010</personalAccount>
+                            <bik>043601001</bik>
+                        </applicationGuarantee>
+                        <contractGuarantee>
+                            <amount>8532846</amount>
+                            <part>30.0</part>
+                            <procedureInfo>Контракт заключается после предоставления участником конкурса, с которым заключается контракт, обеспечения исполнения контракта. Требования к обеспечению исполнения контракта – исполнение контракта может обеспечиваться предоставлением банковской гарантии, выданной банком и соответствующей требованиям статьи 45 Федерального закона, или внесением денежных средств на указанный заказчиком счет, на котором в соответствии с законодательством Российской Федерации учитываются операции со средствами, поступающими заказчику. Способ обеспечения исполнения контракта определяется участником конкурса, с которым заключается контракт, самостоятельно. Срок действия банковской гарантии должен превышать срок действия контракта не менее чем на один месяц.
+
+</procedureInfo>
+                            <settlementAccount>40204810200000000002</settlementAccount>
+                            <personalAccount>109010010</personalAccount>
+                            <bik>043601001</bik>
+                        </contractGuarantee>
+                    </customerRequirement>
+                </customerRequirements>
+                <purchaseObjects>
+                    <purchaseObject>
+                        <OKPD>
+                            <code>92.31.10.190</code>
+                            <name>Произведения искусства прочие</name>
+                        </OKPD>
+                        <name>оказание услуг по созданию произведения искусства: «Мемориальное сооружение (архитектурное сооружение) в честь 70-летия Победы в Великой Отечественной войне».</name>
+                        <OKEI>
+                            <code>876</code>
+                            <nationalCode>УСЛ ЕД</nationalCode>
+                        </OKEI>
+                        <customerQuantities>
+                            <customerQuantity>
+                                <customer>
+                                    <regNum>01423000245</regNum>
+                                    <fullName>Департамент строительства и архитектуры городского округа Самара</fullName>
+                                </customer>
+                                <quantity>1.0</quantity>
+                            </customerQuantity>
+                        </customerQuantities>
+                        <price>28442820</price>
+                        <quantity>
+                            <value>1.0</value>
+                        </quantity>
+                        <sum>28442820</sum>
+                    </purchaseObject>
+                    <totalSum>28442820</totalSum>
+                </purchaseObjects>
+                <requirements>
+                    <requirement>
+                        <code>8361040</code>
+                        <name>Единые требования к участникам (в соответствии  с частью 1 Статьи 31 Федерального закона № 44-ФЗ)</name>
+                        <content>единые требования к участникам в соответствии с частью 1 статьи 31 Федерального закона от 05.04.2013 N 44-ФЗ "О контрактной системе в сфере закупок товаров, работ, услуг для обеспечения государственных и муниципальных нужд" (далее – Федеральный закон).
+Документы, подтверждающие соответствие участника двухэтапного конкурса требованиям к участникам конкурса, установленным заказчиком в конкурсной документации в соответствии с пунктами 1 и 2 части 1 статьи 31 Федерального закона:
+- документы, подтверждающие правомочность участника закупки заключать контракт:
+документ, подтверждающий полномочия лица на заключение контракта от имени участника закупки  (копия решения о назначении или об избрании либо приказа о назначении физического лица на должность, в соответствии с которым такое физическое лицо обладает правом заключить контракт от имени участника закупки без доверенности. В случае, если от имени участника закупки действует иное лицо, заявка на участие в электронном аукционе должна содержать также копию доверенности на право заключить контракт от имени участника закупки, заверенную печатью участника закупки и подписанную руководителем участника закупки  (для юридических лиц) или уполномоченным этим руководителем лицом. В случае, если указанная доверенность подписана лицом, уполномоченным руководителем участника закупки, заявка на участие в электронном аукционе должна содержать также документ, подтверждающий полномочия такого лица).
+</content>
+                    </requirement>
+                </requirements>
+                <restrictInfo>Не установлено.</restrictInfo>
+            </lot>
+        </lots>
+        <attachments>
+            <attachment>
+                <publishedContentId>F3EC016EA4060018E043AC110725E6E2</publishedContentId>
+                <fileName>Конкурсная документация.zip</fileName>
+                <docDescription>Конкурсная документация</docDescription>
+                <url>http://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=F3EC016EA4060018E043AC110725E6E2</url>
+                <cryptoSigns>
+                    <signature type="CAdES-BES">TUlJTlBBWUpLb1pJaHZjTkFRY0NvSUlOTFRDQ0RTa0NBUUV4RERBS0JnWXFoUU1DQWdrRkFEQUxCZ2txaGtpRzl3MEJCd0dnZ2dkQU1JSUhQRENDQnV1Z0F3SUJBZ0lESk9GdU1BZ0dCaXFGQXdJQ0F6Q0NBa014SVRBZkJna3Foa2lHOXcwQkNRRVdFblYxWTE5bWEwQnliM05yWVhwdVlTNXlkVEVpTUNBR0ExVUVDUXdaMFlQUXV5NGcwSmpRdTlHTTBMalF2ZEM2MExBZzBMUXVOekVaTUJjR0ExVUVCd3dRMExNdUlOQ2MwTDdSZ2RDNjBMTFFzREdCb2pDQm53WUpLb1pJaHZjTkFRa0NESUdSMEpUUXNOQzkwTDNSaTlDNUlOR0IwTFhSZ05HQzBMalJoTkM0MExyUXNOR0NJTkMrMFlMUXV0R0EwWXZSZ3RDKzBMUFF2aURRdXRDNzBZN1JoOUN3SU5DNDBZSFF2OUMrMEx2UmpOQzMwWVBRdGRHQzBZSFJqeURSZ2RDK0lOR0IwWURRdGRDMDBZSFJndEN5MEw3UXZDRFFvZENhMEpmUW1DRFFtdEdBMExqUXY5R0MwTDRnMEovUmdOQytJRU5UVURFTE1Ba0dBMVVFQmhNQ1VsVXhjakJ3QmdOVkJBc01hZENqMEwvUmdOQ3cwTExRdTlDMTBMM1F1TkMxSU5HQTBMWFF0dEM0MEx6UXNDRFJnZEMxMExyUmdOQzEwWUxRdmRDKzBZSFJndEM0SU5DNElOQ3gwTFhRdDlDKzBML1FzTkdCMEwzUXZ0R0IwWUxRdUNEUXVOQzkwWVRRdnRHQTBMelFzTkdHMExqUXVERTRNRFlHQTFVRUNnd3YwS1RRdGRDMDBMWFJnTkN3MEx2UmpOQzkwTDdRdFNEUXV0Q3cwTGZRdmRDdzBZZlF0ZEM1MFlIUmd0Q3kwTDR4ZnpCOUJnTlZCQU1NZHRDajBML1F2dEM3MEwzUXZ0QzgwTDdSaDlDMTBMM1F2ZEdMMExrZzBZUFF0TkMrMFlIUmd0QyswTExRdGRHQTBZL1JqdEdKMExqUXVTRFJodEMxMEwzUmd0R0FJTkNrMExYUXROQzEwWURRc05DNzBZelF2ZEMrMExQUXZpRFF1dEN3MExmUXZkQ3cwWWZRdGRDNTBZSFJndEN5MExBd0hoY05NVFF3TWpJM01USTBPVEl3V2hjTk1UVXdNakkzTVRJME9USXdXakNDQWlVeEZEQVNCZ05WQkFVVEN6QXdPRFV5T1RFNE9UVTVNUjR3SEFZSktvWklodmNOQVFrQkZnOXBZWFZBWkdaellXMWhjbUV1Y25VeEN6QUpCZ05WQkFZVEFsSlZNU293S0FZRFZRUUlEQ0hRb2RDdzBMelFzTkdBMFlIUXV0Q3cwWThnMEw3UXNkQzcwTERSZ2RHQzBZd3hGVEFUQmdOVkJBY01ETkNoMExEUXZOQ3cwWURRc0RGNk1IZ0dBMVVFQ2d4eDBKVFF0ZEMvMExEUmdOR0MwTERRdk5DMTBMM1JnaURSaE5DNDBMM1FzTkM5MFlIUXZ0Q3lJTkNRMExUUXZOQzQwTDNRdU5HQjBZTFJnTkN3MFliUXVOQzRJTkN6MEw3UmdOQyswTFRSZ2RDNjBMN1FzOUMrSU5DKzBMclJnTkdEMExQUXNDRFFvZEN3MEx6UXNOR0EwTEF4UVRBL0JnTlZCQXNNT05DajBML1JnTkN3MExMUXU5QzEwTDNRdU5DMUlOQyswWURRczlDdzBMM1F1TkMzMExEUmh0QzQwTGdnMFlMUXZ0R0EwTFBRdnRDeU1TZ3dKZ1lEVlFRcURCL1FydEM3MExqUmp5RFFrOUMxMEwzUXZkQ3cwTFRRdU5DMTBMTFF2ZEN3TVJzd0dRWURWUVFFREJMUW9kQzQwTHpRdnRDOTBMWFF2ZEM2MEw0eFdqQllCZ05WQkF3TVVkQ2QwTERSaDlDdzBMdlJqTkM5MExqUXVpRFF2dEdDMExUUXRkQzcwTEFnMFlMUXZ0R0EwTFBRdnRDeUlOQy8wTDRnMExmUXNOQzYwWVBRdjlDNjBMRFF2Q0RSZ3RDKzBMTFFzTkdBMEw3UXNqRTdNRGtHQTFVRUF3d3kwS0hRdU5DODBMN1F2ZEMxMEwzUXV0QytJTkN1MEx2UXVOR1BJTkNUMExYUXZkQzkwTERRdE5DNDBMWFFzdEM5MExBd1l6QWNCZ1lxaFFNQ0FoTXdFZ1lIS29VREFnSWtBQVlIS29VREFnSWVBUU5EQUFSQUtsT0VtendJQnpTcUI3a2FlMzFBbE0vK1dHSjlSMDVMU200cGpNU1NveVplOUFncU9vOS9hMW9qRytyQzBIRUZ4ZXgyaGxJZSt0bERCTVJQQXZVbEpLT0NBZDR3Z2dIYU1Bd0dBMVVkRXdFQi93UUNNQUF3R0FZRFZSMGdCQkV3RHpBTkJnc3FoUU1EUFo3WE5nRUNBakNCd0FZRFZSMFJCSUc0TUlHMW9CSUdBMVVFREtBTEV3a3lNalV4TURJeE1UYWdHQVlJS29VREE0RURBUUdnREJNS05qTXhOekF3TURNM09LQVpCZ29xaFFNRFBaN1hOZ0VIb0FzVENUWXpNVFV3TVRBd01hQWJCZ29xaFFNRFBaN1hOZ0VGb0EwVEN6QXpOREl6TURBd01EQXhvQTBHQnlxRkF3SGdPUUdnQWhNQW9BOEdDU3FHU0liM0RRRUpGS0FDRXdDZ0VBWUtLb1VEQXoyZTF6WUJDS0FDRXdDZ0dBWUZLb1VEWkFHZ0R4TU5NVEF6TmpNd01EWTJNREUxTTRZQk1EQU9CZ05WSFE4QkFmOEVCQU1DQStnd1l3WURWUjBsQkZ3d1dnWUlLd1lCQlFVSEF3SUdEaXFGQXdNOW50YzJBUVlEQkFJQkJnNHFoUU1EUFo3WE5nRUdBd1FDQWdZT0tvVURBejJlMXpZQkJnTUVBZ01HRGlxRkF3TTludGMyQVFZREJBSUVCZzRxaFFNRFBaN1hOZ0VHQXdRQ0JUQWZCZ05WSFNNRUdEQVdnQlJubmZ0djcxazY4d3NoS1R1RFdNTVdEUkREb2pBNEJnTlZIUjhFTVRBdk1DMmdLNkFwaGlkb2RIUndPaTh2WTNKc0xuSnZjMnRoZW01aExuSjFMMk55YkM5TVFWTlVYMjVsZHk1amNtd3dIUVlEVlIwT0JCWUVGUGUveThtWXU2QUd6bmh4ZlBOanl0NnpOcXhSTUFnR0JpcUZBd0lDQXdOQkFFWk5YRURwK2hvUnpLRUx5clVQVDlXTHlKd3lnKzFBWFhJTHJJcjlTOCtYcFpYSWVPRFJYRXE0RVNoQytzd3FnQlZjTGE1ME11bTdJOGcvY3I0WVRVd3hnZ1hETUlJRnZ3SUJBVENDQWt3d2dnSkRNU0V3SHdZSktvWklodmNOQVFrQkZoSjFkV05mWm10QWNtOXphMkY2Ym1FdWNuVXhJakFnQmdOVkJBa01HZEdEMExzdUlOQ1kwTHZSak5DNDBMM1F1dEN3SU5DMExqY3hHVEFYQmdOVkJBY01FTkN6TGlEUW5OQyswWUhRdXRDeTBMQXhnYUl3Z1o4R0NTcUdTSWIzRFFFSkFneUJrZENVMExEUXZkQzkwWXZRdVNEUmdkQzEwWURSZ3RDNDBZVFF1TkM2MExEUmdpRFF2dEdDMExyUmdOR0wwWUxRdnRDejBMNGcwTHJRdTlHTzBZZlFzQ0RRdU5HQjBML1F2dEM3MFl6UXQ5R0QwTFhSZ3RHQjBZOGcwWUhRdmlEUmdkR0EwTFhRdE5HQjBZTFFzdEMrMEx3ZzBLSFFtdENYMEpnZzBKclJnTkM0MEwvUmd0QytJTkNmMFlEUXZpQkRVMUF4Q3pBSkJnTlZCQVlUQWxKVk1YSXdjQVlEVlFRTERHblFvOUMvMFlEUXNOQ3kwTHZRdGRDOTBMalF0U0RSZ05DMTBMYlF1TkM4MExBZzBZSFF0ZEM2MFlEUXRkR0MwTDNRdnRHQjBZTFF1Q0RRdUNEUXNkQzEwTGZRdnRDLzBMRFJnZEM5MEw3UmdkR0MwTGdnMExqUXZkR0UwTDdSZ05DODBMRFJodEM0MExneE9EQTJCZ05WQkFvTUw5Q2swTFhRdE5DMTBZRFFzTkM3MFl6UXZkQyswTFVnMExyUXNOQzMwTDNRc05HSDBMWFF1ZEdCMFlMUXN0QytNWDh3ZlFZRFZRUURESGJRbzlDLzBMN1F1OUM5MEw3UXZOQyswWWZRdGRDOTBMM1JpOUM1SU5HRDBMVFF2dEdCMFlMUXZ0Q3kwTFhSZ05HUDBZN1JpZEM0MExrZzBZYlF0ZEM5MFlMUmdDRFFwTkMxMExUUXRkR0EwTERRdTlHTTBMM1F2dEN6MEw0ZzBMclFzTkMzMEwzUXNOR0gwTFhRdWRHQjBZTFFzdEN3QWdNazRXNHdDZ1lHS29VREFnSUpCUUNnZ2dNT01CZ0dDU3FHU0liM0RRRUpBekVMQmdrcWhraUc5dzBCQndFd0hBWUpLb1pJaHZjTkFRa0ZNUThYRFRFME1ETXdOakV6TVRJd00xb3dMd1lKS29aSWh2Y05BUWtFTVNJRUlCN2xOUDRtTUUwZGJkcm9SajcrNmFYUGkrV08wYkxoc2NFUzFtOXhVUVFLTUlJQ29RWUxLb1pJaHZjTkFRa1FBaTh4Z2dLUU1JSUNqRENDQW9nd2dnS0VNQWdHQmlxRkF3SUNDUVFndW1uQlNVU09Kd0ovTU5oRWczZlZGRGNCbnBDMGVDSjhwWXhESnpVWVRzUXdnZ0pVTUlJQ1M2U0NBa2N3Z2dKRE1TRXdId1lKS29aSWh2Y05BUWtCRmhKMWRXTmZabXRBY205emEyRjZibUV1Y25VeElqQWdCZ05WQkFrTUdkR0QwTHN1SU5DWTBMdlJqTkM0MEwzUXV0Q3dJTkMwTGpjeEdUQVhCZ05WQkFjTUVOQ3pMaURRbk5DKzBZSFF1dEN5MExBeGdhSXdnWjhHQ1NxR1NJYjNEUUVKQWd5QmtkQ1UwTERRdmRDOTBZdlF1U0RSZ2RDMTBZRFJndEM0MFlUUXVOQzYwTERSZ2lEUXZ0R0MwTHJSZ05HTDBZTFF2dEN6MEw0ZzBMclF1OUdPMFlmUXNDRFF1TkdCMEwvUXZ0QzcwWXpRdDlHRDBMWFJndEdCMFk4ZzBZSFF2aURSZ2RHQTBMWFF0TkdCMFlMUXN0QyswTHdnMEtIUW10Q1gwSmdnMEpyUmdOQzQwTC9SZ3RDK0lOQ2YwWURRdmlCRFUxQXhDekFKQmdOVkJBWVRBbEpWTVhJd2NBWURWUVFMREduUW85Qy8wWURRc05DeTBMdlF0ZEM5MExqUXRTRFJnTkMxMExiUXVOQzgwTEFnMFlIUXRkQzYwWURRdGRHQzBMM1F2dEdCMFlMUXVDRFF1Q0RRc2RDMTBMZlF2dEMvMExEUmdkQzkwTDdSZ2RHQzBMZ2cwTGpRdmRHRTBMN1JnTkM4MExEUmh0QzQwTGd4T0RBMkJnTlZCQW9NTDlDazBMWFF0TkMxMFlEUXNOQzcwWXpRdmRDKzBMVWcwTHJRc05DMzBMM1FzTkdIMExYUXVkR0IwWUxRc3RDK01YOHdmUVlEVlFRRERIYlFvOUMvMEw3UXU5QzkwTDdRdk5DKzBZZlF0ZEM5MEwzUmk5QzVJTkdEMExUUXZ0R0IwWUxRdnRDeTBMWFJnTkdQMFk3UmlkQzQwTGtnMFliUXRkQzkwWUxSZ0NEUXBOQzEwTFRRdGRHQTBMRFF1OUdNMEwzUXZ0Q3owTDRnMExyUXNOQzMwTDNRc05HSDBMWFF1ZEdCMFlMUXN0Q3dBZ01rNFc0d0NnWUdLb1VEQWdJVEJRQUVRRng2Tkk4M04wckFVTUI0UURObVNkeWo4QUZPYUpZNVNOOHdYS2ZYY2tNWjVZYnY5cmZsZUVBNjZsR0xtTVh6cU5sY2Q5Kzk3aG1FVnFaR3ZxeUVZcUE9</signature>
+                </cryptoSigns>
+            </attachment>
+        </attachments>
+    </fcsNotificationOKD>
+</export>
+
